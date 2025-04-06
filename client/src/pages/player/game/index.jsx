@@ -308,6 +308,7 @@ export default function PlayerGame() {
                   revealedPieces={revealedPieces}
                   currentRound={currentRound}
                 />
+                <div>The key phrase has <b>{currentRoundData.keyPhrase.length}</b> characters.</div>
               </CardContent>
             </Card>
           </div>

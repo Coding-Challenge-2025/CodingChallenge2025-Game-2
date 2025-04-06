@@ -222,6 +222,7 @@ export default function AudienceGame() {
                   currentRound={currentRound}
                   audienceView={true}
                 />
+                <div>The key phrase has <b>{currentRoundData.keyPhrase.length}</b> characters.</div>
                 {(gamePhase === "roundSummary" || gamePhase === "final") && (
                   <div className="mt-2 p-2 bg-white rounded-lg border text-center">
                     <p className="text-lg font-bold text-blue-600">{currentRoundData.keyPhrase}</p>
