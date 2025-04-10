@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timer with Textbox</title>
+</head>
+<body>
+  <h1>Timer and Textbox</h1>
+  <button id="startButton">Start Timer</button>
+  <p id="timerDisplay">Timer will start when you click the button.</p>
+  <textarea id="dataTextbox" rows="4" cols="50" placeholder="Enter text here..."></textarea>
+  <p id="message"></p>
+
+  <script>
+    const startButton = document.getElementById('startButton');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const dataTextbox = document.getElementById('dataTextbox');
+    const messageDisplay = document.getElementById('message');
+    let timerInterval;
+    let timeLeft = 30;
+
+    startButton.addEventListener('click', () => {
+      startButton.disabled = true;
+      dataTextbox.disabled = false;
+      dataTextbox.focus();
+      timeLeft = 30;
+      timerDisplay.textContent = `Time remaining: ${timeLeft} seconds`;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time remaining: ${timeLeft} seconds`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.textContent = 'Time is up!';
+          sendDataToServer();
+        }
+      }, 1000);
+    });
+
+    function sendDataToServer() {
+      const textContent = dataTextbox.value;
+      fetch('/log-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `textboxContent=${encodeURIComponent(textContent)}`,
+      })
+      .then(response => response.text())
+      .then(data => {
+        messageDisplay.textContent = data;
+        dataTextbox.disabled = true;
+      })
+      .catch(error => {
+        console.error('Error sending data:', error);
+        messageDisplay.textContent = 'Error sending data to the server.';
+      });
+    }
+  </script>
+</body>
+</html>

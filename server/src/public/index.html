@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Random Data Display (WebSocket)</title>
+  <style>
+    #data-container {
+      font-family: sans-serif;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Random Data Stream (WebSocket)</h1>
+  <div id="data-container">
+    </div>
+
+  <script>
+    const dataContainer = document.getElementById('data-container');
+    let websocket;
+
+    function connectWebSocket() {
+      websocket = new WebSocket('ws://localhost:3000'); // Use 'ws://' for WebSocket
+
+      websocket.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      websocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const newDataElement = document.createElement('p');
+          newDataElement.textContent = `Value: ${data.value.toFixed(3)}, Time: ${data.time}`;
+          dataContainer.appendChild(newDataElement);
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+          console.error('Received data:', event.data);
+        }
+      };
+
+      websocket.onclose = () => {
+        console.log('WebSocket connection closed');
+        // Optionally attempt to reconnect after a delay
+        setTimeout(connectWebSocket, 2000);
+      };
+
+      websocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    }
+
+    // Connect to the WebSocket server when the page loads
+    connectWebSocket();
+  </script>
+</body>
+</html>
