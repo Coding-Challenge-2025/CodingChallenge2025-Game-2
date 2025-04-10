@@ -1,0 +1,115 @@
+{
+    "keywords":
+    [
+      {
+        "imageDir": "greentech.png",
+        "keyword": "GREENTECH",
+        "clues": ["biofuel", "environment", "carbon footprints", "energy", "sustainable development", "climate change", "waste", "solar panel", "renewable", "low-cost", "oxygen", "india"]
+      },
+      {
+        "imageDir": "telehealth.jpg",
+        "keyword": "TELEHEALTH",
+        "clues": ["digital information", "healthcare", "food logs", "patient portal", "rural communities", "virtual appointments", "nursing", "medication", "remote monitor", "doctor", "personal", "record"]
+      },
+      {
+        "imageDir": "datacentric-ai.png",
+        "keyword": "DATACENTRICAI",
+        "clues": ["discipline", "crowdsourcing", "data augmentation", "focus on data", "x10 faster", "steel defects", "improve accuracy", "LandingLens", "machine vision", "AndrewNg", "automotive", "less model"]
+      },
+      {
+        "imageDir": "ai-at-the-edge.png",
+        "keyword": "AIATTHEEDGE",
+        "clues": ["physical world", "near user", "edge computing", "latency", "realtime", "information security", "reduced costs", "no connection", "federated learning", "5G", "airbus", "video analytics"]
+      },
+      {
+        "imageDir": "digital-twin.jpg",
+        "keyword": "DIGITALTWIN",
+        "clues": ["virtual", "realtime", "simulation", "reasoning", "decision-making", "counterpart", "NASA", "double", "modularity", "IoT", "reprogrammable", "digital traces"]
+      },
+      {
+        "imageDir": "confidential-computing.jpg",
+        "keyword": "CONFIDENTIALCOMPUTING",
+        "clues": ["private data", "prevent fraud", "hardware-based", "TEE", "secure IP", "Fortanix", "healthcare", "data at rest", "data in motion", "data in use", "integrity", "encryption"]
+      },
+      {
+        "imageDir": "nano-robotics.jpg",
+        "keyword": "NANOROBOTICS",
+        "clues": ["very small", "molecular", "nanite", "open design", "biochip", "virus-based", "3d printing", "microswimmer", "nubots", "grey goo", "locomotion", "toxic chemical"]
+      },
+      {
+        "imageDir": "distributed-cloud.jpg",
+        "keyword": "DISTRIBUTEDCLOUD",
+        "clues": ["gartner", "public", "cloud provider", "center hardware", "reduced latency", "network congestion", "increase uptime", "performance", "CDN", "bandwidth", "IoT", "edge computing"]
+      },
+      {
+        "imageDir": "cybersecurity-mesh.jpg",
+        "keyword": "CYBERSECURITYMESH",
+        "clues": ["defense", "strategy", "perimeter", "firewall", "protection tools", "endpoint", "authentication", "gartner", "fortinet", "vulnerability", "agility", "distributed assets"]
+      },
+      {
+        "imageDir": "voice-as-user-interface.png",
+        "keyword": "VOICEASUSERINTERFACE",
+        "clues": ["CLI", "GUI", "menu-driven", "modality", "efficient input", "speaker", "IoT", "speech recognition", "phone dialing", "dictate", "alexa", "non-verbal"]
+      },
+      {
+        "imageDir": "net-neutrality.png",
+        "keyword": "NETNEUTRALITY",
+        "clues": ["ISP", "theory", "no difference", "communication", "free and open", "no blocking", "no extra charge", "you control", "controversial", "throttling", "equality", "fake news"]
+      },
+      {
+        "imageDir": "extended-reality.jpg",
+        "keyword": "EXTENDEDREALITY",
+        "clues": ["immersion", "VR", "simulated", "real-and-virtual", "encapsulating", "adding to real world", "vehicle design", "try-ons", "surgical", "real estate", "metaverse", "practical"]
+      },
+      {
+        "imageDir": "5g-connectivity.png",
+        "keyword": "5GCONNECTIVITY",
+        "clues": ["1234", "global growth", "OEMs", "22.8 million jobs", "mobile broadband", "massive iot", "peak data rates", "gigabit LTE", "snapdragon", "tech summit", "Qualcomm", "5th generation"]
+      },
+      {
+        "imageDir": "multiexperience.png",
+        "keyword": "MULTIEXPERIENCE",
+        "clues": ["touchpoint", "modality", "omnichannel", "digital", "transformation", "sync me", "see me", "know me", "be me", "domino", "understand people", "seamless"]
+      },
+      {
+        "imageDir": "internet-of-senses.png",
+        "keyword": "INTERNETOFSENSES",
+        "clues": ["visual", "audio", "haptic", "digital sensory", "augment sense", "remote operation", "immersion", "5 senses", "merged reality", "online shopping", "vacations", "VR"]
+      },
+      {
+        "imageDir": "actionable-analytics.jpg",
+        "keyword": "ACTIONABLEANALYTICS",
+        "clues": ["relevant data", "correct context", "immediately", "outcome", "accessible", "business intelligence", "smart analysis", "control cost", "enterprise", "decision making", "finding", "learning"]
+      },
+      {
+        "imageDir": "quantum-computing.jpg",
+        "keyword": "QUANTUMCOMPUTING",
+        "clues": ["Majorana 1", "qubit", "Willow", "RIKEN", "IBM", "Superposition", "Superconducting", "Cryptography", "Coherence", "Error-correction", "Entropy", "Wavefunction"]
+      },
+      {
+        "imageDir": "side-channel-attack.png",
+        "keyword": "SIDECHANNELATTACK",
+        "clues": ["Covert channel", "Fault injection", "Spectre", "Rowhammer", "Memory forensics", "Timing variations", "Power analysis", "Cold boot attack", "Key extraction", "Acoustic cryptanalysis", "Electromagnetic emanation", "program counter security model"]
+      },
+      {
+        "imageDir": "information-surveillance.png",
+        "keyword": "INFORMATIONSURVEILLANCE",
+        "clues": ["firewall", "censorship", "Tor", "Five Eyes", "NSA", "Wiretapping", "Geolocation tracking", "CCTV", "Edward Snowden", "Deep packet inspection", "Policeware", "VPN"]
+      },
+      {
+        "imageDir": "gnu.png",
+        "keyword": "GNU",
+        "clues": ["is not unix", "Linux", "FOSS", "collections", "GPL", "Richard Stallman", "glibc", "wildebeest", "copyleft", "Free Software Foundation", "popular compiler", "coreutils"]
+      },
+      {
+        "imageDir": "computational-cognition.png",
+        "keyword": "COMPUTATIONALCOGNITION",
+        "clues": ["ACT-R", "Bayesian cognitive science", "Cognitive modeling", "Connectionism", "Mental simulation", "Symbolic artificial intelligence", "Neuroscience", "aesthetic psychology", "Natural language processing", "Embodied cognition", "Memory retrieval", "Pattern analysis"]
+      },
+      {
+        "imageDir": "computer-graphics.png",
+        "keyword": "COMPUTERGRAPHICS",
+        "clues": ["Ray-tracing", "Rasterization", "Utah teapot", "CGI", "Z-buffer", "Anti-aliasing", "Polygon", "NURBS", "Subsurface scattering", "Ambient lighting", "Voodoo", "Fractal"]
+      }
+    ]
+}
