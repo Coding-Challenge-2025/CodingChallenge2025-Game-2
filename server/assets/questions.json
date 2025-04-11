@@ -2,988 +2,194 @@
   "questions":
     [
       {
-        "question": "Máy tính đầu tiên được sản xuất vào năm mấy?",
-        "answer": "1943"
+        "question": "Máy tính điện tử đầu tiên được sản xuất vào năm mấy?",
+        "choice": ["1943", "1945", "1642", "1837"],
+        "answer_index": 1
       },
       {
-        "question": "Tên viết tắt của máy tính đầu tiên được sản xuất?",
-        "answer": "ENIAC"
+        "question": "Tên viết tắt của máy tính điện tử đầu tiên được sản xuất?",
+        "choice": ["ENIAC", "ZOTAC", "THERAC", "Z3"],
+        "answer_index": 0
       },
       {
-        "question": "Hệ máy tính đầu tiên dùng giao diện có màu?",
-        "answer": "APPLE1"
-      },
-      {
-        "question": "Tên đầy đủ của nữ lập trình viên đầu tiên và cũng là tên của một ngôn ngữ lập trình song song phổ biến?",
-        "answer": "ADALOVELACE"
-      },
-      {
-        "question": "Loại phần mềm nào chỉ được cấp phép sử dụng trên máy người dùng trong một khoảng thời gian ngắn hạn?",
-        "answer": "SHAREWARE"
-      },
-      {
-        "question": "Công nghệ thành phố thông minh (Sensing City Technology) do đại học MIT thiết lập tại Toronto còn có tên gọi khác là?",
-        "answer": "QUAYSIDE"
-      },
-      {
-        "question": "Một mảng công nghệ học về phân tử với kích thước 1 - 100 nm?",
-        "answer": "NANOTECHNOLOGY"
-      },
-      {
-        "question": "Tên một loại virus được thiết kế để lợi dụng tấn công một lỗ hỏng bảo mật trước khi nó được phát hiện?",
-        "answer": "ZERODAY"
-      },
-      {
-        "question": "Một trình duyệt web được phát triển để nâng cao độ bảo mật khi tìm kiếm của người dùng?",
-        "answer": "DUCKDUCKGO"
-      },
-      {
-        "question": "Tên đầy đủ của loại định dạng file, viết tắt là RTF?",
-        "answer": "RICHTEXTFORMAT"
-      },
-      {
-        "question": "Thuật ngữ đề ra bởi nhà khoa học Gartner năm 2016, mang ý nghĩa áp dụng máy học vào việc điều hành và phân tích quy trình phát triển phần mềm?",
-        "answer": "AIOPS"
-      },
-      {
-        "question": "Tên viết tắt của một hệ thống ứng dụng tự động hóa, nói về việc nâng cao năng suất lao động bằng phần mềm robot hoặc AI?",
-        "answer": "RPA"
+        "question": "Một công cụ tìm kiếm được phát triển để nâng cao độ bảo mật của người dùng?",
+        "choice": ["Duck Duck Go", "Brave", "Zen", "Coccoc"],
+        "answer_index": 0
       },
       {
         "question": "Phương pháp thiết kế phần mềm phát triển bởi Harlan Mills, đề cao việc xây dựng phần mềm mang tính bền bỉ, ít lỗi nhất có thể?",
-        "answer": "CLEANROOM"
-      },
-      {
-        "question": "Tên viết tắt của một nguyên tắc trong lập trình, rằng khi đưa input lỗi thì tất nhiên output cũng lỗi?",
-        "answer": "GIGO"
-      },
-      {
-        "question": "Một mảng lớn trong việc kiểm thử phần mềm, sau unit testing và trước validation testing?",
-        "answer": "INTEGRATIONTESTING"
-      },
-      {
-        "question": "Phần biên giữa 2 thành phần của một hệ thống, dùng để trao đổi thông tin giữa 2 bên, ví dụ điển hình như touchscreen?",
-        "answer": "INTERFACE"
-      },
-      {
-        "question": "Thành phần đầu tiên không thể thiếu khi bắt đầu chạy và tích hợp hệ điều hành vào máy chủ?",
-        "answer": "INTEGRATIONTESTING"
-      },
-      {
-        "question": "Tên gọi chung cho các thiết bị hỗ trợ (phụ) được tích hợp vào hệ thống máy tính, dùng để trao đổi thông tin?",
-        "answer": "PERIPHERAL"
-      },
-      {
-        "question": "Một thông số cho biết chất lượng xê dịch mã nguồn (obfuscation) sao cho các đoạn mã không bị đánh cắp?",
-        "answer": "RESILIENCE"
-      },
-      {
-        "question": "Một loại điều kiện (phải luôn đúng) dùng để kiểm tra sau khi chạy một chức năng đề ra trong yêu cầu phần mềm?",
-        "answer": "POSTCONDITION"
-      },
-      {
-        "question": "Một loại giá trị cho phép truy cập gián tiếp vào vùng nhớ của một cấu trúc dữ liệu?",
-        "answer": "REFERENCE"
-      },
-      {
-        "question": "Tên của mảng nghiên cứu trong nguyên lý ngôn ngữ lập trình, tập trung về các điều kiện toán học để định nghĩa cấu trúc và cú pháp của một ngôn ngữ lập trình?",
-        "answer": "SEMANTICS"
-      },
-      {
-        "question": "Khi lập trình, chúng ta thường viết một cụm lệnh để làm một task nào đó, và có thể dùng lại cụm lệnh đó cho nhiều chỗ khác nhau trong chương trình. Cụm lệnh đó còn được gọi là?",
-        "answer": "SUBROUTINE"
+        "choice": ["Agile", "CLEANROOM", "Spiral", "Waterfall"],
+        "answer_index": 1
       },
       {
         "question": "Tín hiệu gửi đến bộ vi xử lý để yêu cầu xử lý tức thì?",
-        "answer": "INTERRUPT"
-      },
-      {
-        "question": "Trong C/C++, từ này mô tả hành động khai báo biến/lớp mà chưa nêu định nghĩa đầy đủ của nó ngay lập tức.",
-        "answer": "OBJECTINSTATIATION"
-      },
-      {
-        "question": "Một loại hình thức lý luận với chân giá trị là số thực trong khoảng 0 đến 1.",
-        "answer": "FUZZYLOGIC"
-      },
-      {
-        "question": "Đây là thuật toán nén không mất mát thông tin, dựa trên việc mã hóa ký tự thành chuỗi bit.",
-        "answer": "HUFFMAN"
+        "choice": ["Interrupt", "Halt", "SEND", "syscall"],
+        "answer_index": 0
       },
       {
         "question": "Cho 2 điểm A(x1, y1) và B(x2, y2). Khoảng cách d(A, B) = |x1 - x2| + |y1 - y2|. Đây là độ đo khoảng cách gì?",
-        "answer": "MANHATTAN"
+        "choice": ["Euclidean", "Manhattan", "Euclidean", "Minkowski"],
+        "answer_index": 1
       },
       {
-        "question": "Một ngôn ngữ lập trình mã nguồn mở, được thiết kế tại Google bởi Robert Griesemer, Rob Pike và Ken Thompson.",
-        "answer": "GOLANG"
+        "question": "Ngôn ngữ lập trình nào được thiết kế tại Google bởi Lars Bak và Kasper Lund?",
+        "choice": ["Carbon", "Go", "Kotlin", "Dart"],
+        "answer_index": 3
       },
       {
         "question": "Một giao thức chuẩn TCP/IP được dùng để truyền tải thư điện tử (e-mail) trên mạng Internet?",
-        "answer": "SMTP"
+        "choice": ["SMP", "SMTP", "NNTP", "IRC"],
+        "answer_index": 1
       },
       {
         "question": "Một loại định dạng ký tự Unicode được dùng phổ biến trên phần lớn các trang web hiện nay?",
-        "answer": "UTF8"
+        "choice": ["UCS-2", "UTF-16", "UTF-8", "ASCII"],
+        "answer_index": 2
       },
       {
         "question": "Hệ điều hành MS-DOS thường gán các ổ cứng ký tự từ C trở đi, vậy các chữ cái A và B được dành cho thiết bị nào?",
-        "answer": "FLOPPYDISK"
+        "choice": ["Đĩa mềm", "Đĩa ảo", "Máy fax", "Switch"],
+        "answer_index": 0
       },
       {
         "question": "Một loại design pattern diễn tả một nhóm đối tượng có thể được dùng như một đối tượng chung lớp với nhau.",
-        "answer": "COMPOSITE"
-      },
-      {
-        "question": "Cho số thành phố (TP) và chi phí di chuyển giữa các TP. Tìm đường đi có chi phí thấp nhất sao cho qua mọi TP và trở về TP ban đầu, và mỗi TP chỉ đi qua 1 lần. Tên viết tắt của bài toán này là?",
-        "answer": "TSP"
-      },
-      {
-        "question": "Một công nghệ phân tích dữ liệu nghiệp vụ đa chiều cũng như cung cấp các tính năng tính toán phức tạp, phân tích xu hướng mô hình hóa dữ liệu.",
-        "answer": "OLAP"
-      },
-      {
-        "question": "Phân phối của biến ngẫu nhiên số lần tung đồng xu để ra mặt ngửa lần đầu?",
-        "answer": "GEOMETRIC"
+        "choice": ["Composite", "Decorator", "Observer", "Flyweight"],
+        "answer_index": 0
       },
       {
         "question": "This is an open-source, cross-platform, back-end Javascript runtime environment that runs on V8 engine and executes Javascript code outside a web browser.",
-        "answer": "NODEJS"
+        "choice": ["NodeJS", "WebAssembly", "Ruby on Rails", "Java"],
+        "answer_index": 0
       },
       {
         "question": "Tên của mô hình điện toán phân tán, đưa tính toán và lưu trữ dữ liệu đến gần vị trí cần thiết hơn, để cải thiện thời gian phản hồi và tiết kiệm băng thông?",
-        "answer": "EDGECOMPUTING"
-      },
-      {
-        "question": "Tên của một thuật toán sắp xếp không so sánh, hoạt động bằng cách sắp xếp các số theo từng chữ số một.",
-        "answer": "RADIXSORT"
+        "choice": ["Cloud computing", "Mainframe computing", "Node computing", "Edge computing"],
+        "answer_index": 3
       },
       {
         "question": "Hệ thống quản lý tập tin thường được sử dụng trên các hệ điều hành Windows hiện nay (bắt đầu từ Windows NT 3.1)",
-        "answer": "NTFS"
-      },
-      {
-        "question": "Một lĩnh vực trong điều tra tội phạm máy tính, nhầm thu thập chứng cứ",
-        "answer": "FORENSICS"
-      },
-      {
-        "question": "Tên gọi viết tắt của 4 công nghệ mới, có ý nghĩa quan trọng, xem như chất xúc tác cho những thay đổi lớn trong công nghệ.",
-        "answer": "DARQ"
+        "choice": ["ReFS", "ReiserFS", "NTFS", "exFAT"],
+        "answer_index": 2
       },
       {
         "question": "5V - hãy cho biết tính chất còn thiếu trong 5 tính chất quan trọng của Big Data: Volume, Variety, Velocity, Value và ...",
-        "answer": "VERACITY"
+        "choice": ["VERACITY", "VISCOSITY", "Verifiable", "Void"],
+        "answer_index": 0
       },
       {
-        "question": "Đây là một bộ giao thức dùng để bảo mất các giao tiếp IP bằng cách xác minh và mã hóa từng IP Packet trong một datastream.",
-        "answer": "IPSEC"
+        "question": "Chương trình chơi cờ vây thông minh phát triển bởi David Wu",
+        "choice": ["AlphaGo", "Fuego", "MoGo", "KataGo"],
+        "answer_index": 3
       },
       {
-        "question": "Một mô hình xử lý dữ liệu lớn (Big Data) một cách song song (Parallel) và thuật toán được phân tán (Distributed) trên một cluster.",
-        "answer": "MAPREDUCE"
+        "question": "Nguyên tắc triết học nào khuyến khích việc lựa chọn giả thuyết đơn giản nhất nhưng vẫn giải thích đầy đủ các bằng chứng?",
+        "choice": ["Relativity Theory", "Butterfly Effect", "Zeno's Paradox", "Ockham's Razor"],
+        "answer_index": 3
       },
       {
-        "question": "Thuật ngữ dùng để chỉ bản sao kỹ thuật số của các thực thể trong thế giới thực, được tạo ra, cập nhật và duy trì tương ứng với các thay đổi của đối tượng thật.",
-        "answer": "DIGITALTWIN"
-      },
-      {
-        "question": "Một mạng CNN được thiết kế để làm việc với hàng trăm hoặc hàng nghìn lớp chập.",
-        "answer": "RESNET"
-      },
-      {
-        "question": "Đơn vị dùng để trao đổi các món hàng trong các game sử dụng nền tảng blockchain",
-        "answer": "NFT"
-      },
-      {
-        "question": "Chương trình chơi cờ vây thông minh phát triển bởi Google",
-        "answer": "ALPHAGO"
-      },
-      {
-        "question": "A method used in artificial neural networks to calculate a gradient that is needed in the calculation of the weights to be used in the network.",
-        "answer": "BACKPROPAGATION"
-      },
-      {
-        "question": "A simplifying representation used in natural language processing and information retrieval (IR).",
-        "answer": "BAGOFWORDS"
-      },
-      {
-        "question": "A technique for improving the performance and stability of artificial neural networks. It is a technique to provide any layer in a neural network with inputs that are zero mean/unit variance.",
-        "answer": "BATCHNORMALIZATION"
-      },
-      {
-        "question": "A type of stochastic recurrent neural network and Markov random field.",
-        "answer": "BOLTZMANMACHINE"
-      },
-      {
-        "question": "A computer program or an artificial intelligence which conducts a conversation via auditory or textual methods.",
-        "answer": "CHATBOT"
-      },
-      {
-        "question": "An incremental system for hierarchical conceptual clustering. Each node in a classification tree represents a class (concept) and is labeled by a probabilistic concept that summarizes the attribute-value distributions of objects classified under the node",
-        "answer": "COBWEB"
-      },
-      {
-        "question": "A computer go program developed by Facebook, based on deep learning techniques using a convolutional neural network.",
-        "answer": "DARKFOREST"
-      },
-      {
-        "question": "A declarative logic programming language that syntactically is a subset of Prolog. It is often used as a query language for deductive databases.",
-        "answer": "DATALOG"
-      },
-      {
-        "question": "A test which gauges whether a computer-based synthesized voice can tell a joke with sufficient skill to cause people to laugh.",
-        "answer": "EBERTTEST"
-      },
-      {
-        "question": "A learning method in which the system tries to construct a general, input-independent target function during training of the system, as opposed to lazy learning.",
-        "answer": "EAGERLEARNING"
-      },
-      {
-        "question": "A computer system that emulates the decision-making ability of a human expert.",
-        "answer": "EXPERTSYSTEM"
-      },
-      {
-        "question": "A kind of logic that distinguishes itself from propositional logic, which does not use quantifiers or relations.[",
-        "answer": "FIRSTORDERLOGIC"
-      },
-      {
-        "question": "A heuristic search method that seeks to automate the process of selecting, combining, generating, or adapting several simpler heuristics (or components of such heuristics) to efficiently solve computational search problems.",
-        "answer": "HYPERHEURISTIC"
-      },
-      {
-        "question": "A graphical breakdown of a question that dissects it into its different components vertically and that progresses into details as it reads to the right.",
-        "answer": "ISSUETREE"
-      },
-      {
-        "question": "A well-known knowledge representation system in the tradition of semantic networks and frames; that is, it is a frame language.",
-        "answer": "KLONE"
-      },
-      {
-        "question": "A family of programming languages with a long history and a distinctive, fully parenthesized prefix notation.",
-        "answer": "LISP"
-      },
-      {
-        "question": "A multidisciplinary branch of engineering that focuses on the engineering of both electrical and mechanical systems.",
-        "answer": "MECHATRONICS"
-      },
-      {
-        "question": "Rule of inference. It can be summarized as <P implies Q and P is asserted to be true, therefore Q must be true>",
-        "answer": "MODUSPONENS"
-      },
-      {
-        "question": "An early backward chaining expert system that used artificial intelligence to identify bacteria causing severe infections, such as bacteremia and meningitis, and to recommend antibiotics.",
-        "answer": "MYCIN"
-      },
-      {
-        "question": "The problem-solving principle that states that when presented with competing hypotheses that make the same predictions, one should select the solution with the fewest assumptions.",
-        "answer": "OCKHAMRAZOR"
-      },
-      {
-        "question": "The automatic or semi-automatic creation of ontologies, including extracting the corresponding domain's terms and the relationships between the concepts that these terms represent from a corpus of natural language text.",
-        "answer": "ONTOLOGYLEARNING"
-      },
-      {
-        "question": "An ensemble learning method for classification, regression and other tasks that operates by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes.",
-        "answer": "RANDOMFOREST"
-      },
-      {
-        "question": "A pattern matching algorithm for implementing rule-based systems. The algorithm was developed to efficiently apply many rules or patterns to many objects, or facts, in a knowledge base.",
-        "answer": "RETEALGORITHM"
-      },
-      {
-        "question": "A probabilistic technique for approximating the global optimum of a given function. Specifically, it is a metaheuristic to approximate global optimization in a large search space for an optimization problem.",
-        "answer": "SIMULATEDANNEALING"
-      },
-      {
-        "question": "An RDF query language—that is, a semantic query language for databases—able to retrieve and manipulate data stored in Resource Description Framework (RDF) format.",
-        "answer": "SPARQL"
-      },
-      {
-        "question": "A free and open-source software library for dataflow and differentiable programming across a range of tasks. It is a symbolic math library, and is also used for machine learning applications.",
-        "answer": "TENSORFLOW"
-      },
-      {
-        "question": "A heuristic for choosing actions that addresses the exploration-exploitation dilemma in the multi-armed bandit problem.",
-        "answer": "THOMPSONSAMPLING"
-      },
-      {
-        "question": "A large dataset of written or spoken material that can be used to train a machine to perform linguistic tasks.",
-        "answer": "CORPUS"
-      },
-      {
-        "question": "A symptom of machine learning training in which an algorithm is only able to work on or identify specific examples present in the training data. ",
-        "answer": "OVERFITTING"
-      },
-      {
-        "question": "A controlled, real-life experiment designed to compare two variants of a system or a model.",
-        "answer": "ABTESTING"
-      },
-      {
-        "question": "A type of Artificial Neural Network used to produce efficient representations of data in an unsupervised and non-linear manner, typically to reduce dimensionality.",
-        "answer": "AUTOENCODER"
-      },
-      {
-        "question": "An approximate methodology that uses repeated random sampling in order to generate synthetic simulated data.",
-        "answer": "MONTECARLO"
-      },
-      {
-        "question": "The process of introducing additional information in order to prevent overfitting.",
-        "answer": "REGULARIZATION"
-      },
-      {
-        "question": "In the context of training Deep Learning models, one pass of the full training data set.",
-        "answer": "EPOCH"
-      },
-      {
-        "question": "A measure of a model’s accuracy considering both the precision and the recall to compute the score.",
-        "answer": "FSCORE"
-      },
-      {
-        "question": "A configuration, external to the model and whose value cannot be estimated from data, that data scientists continuously tweak during the process of training a model.",
-        "answer": "HYPERPARAMETER"
-      },
-      {
-        "question": "A data structure that follows the Last In, First Out (LIFO) principle, often used for function call management in recursion.",
-        "answer": "STACK"
-      },
-      {
-        "question": "A searching algorithm that repeatedly divides the search space in half, requiring a sorted array as input.",
-        "answer": "BINARYSEARCH"
-      },
-      {
-        "question": "A network topology where each node is connected to exactly two other nodes, forming a circular data path.",
-        "answer": "RINGTOPOLOGY"
-      },
-      {
-        "question": "A programming paradigm based on the concept of objects that contain data and behavior.",
-        "answer": "OBJECTORIENTED"
-      },
-      {
-        "question": "A hashing technique used to handle collisions by storing multiple values in the same hash bucket.",
-        "answer": "CHAINING"
-      },
-      {
-        "question": "A popular version control system that tracks changes in source code and supports collaboration among developers.",
-        "answer": "GIT"
-      },
-      {
-        "question": "A traversal algorithm used for searching or traversing tree and graph data structures level by level.",
-        "answer": "BREADTHFIRSTSEARCH"
-      },
-      {
-        "question": "A fundamental principle in operating systems that ensures multiple processes execute without interfering with each other.",
-        "answer": "CONCURRENCY"
-      },
-      {
-        "question": "A database language used to manage and manipulate relational databases.",
-        "answer": "SQL"
-      },
-      {
-        "question": "A technique in computer memory management that stores frequently accessed data for quick retrieval.",
-        "answer": "CACHING"
+        "question": "Thuật toán nào sau đây là một chiến lược dựa trên xác suất để giải quyết bài toán \"multi-armed bandit\" bằng cách lấy mẫu từ phân phối hậu nghiệm của giá trị phần thưởng cho mỗi lựa chọn?",
+        "choice": ["Greedy", "Thompson Sampling", "Epsilon-Greedy", "Upper Confidence Bound"],
+        "answer_index": 1
       },
       {
         "question": "Trong lý thuyết đồ thị, thuật toán nào được sử dụng để tìm đường đi ngắn nhất từ một đỉnh đến tất cả các đỉnh khác trong đồ thị có trọng số không âm?",
-        "answer": "DIJKSTRA"
+        "choice": ["Ford-Bellman", "Dijkstra", "Floyd-Warshal", "Held-Karp"],
+        "answer_index": 1
       },
       {
         "question": "Tên của định lý khẳng định rằng mọi đồ thị đơn với số cạnh lớn hơn một nửa số đỉnh nhân với số đỉnh trừ một thì có ít nhất một chu trình Hamilton?",
-        "answer": "DIRACSTHEOREM"
-      },
-      {
-        "question": "Trong đại số Boolean, định luật nào phát biểu rằng A + (A·B) = A?",
-        "answer": "ABSORPTIONLAW"
-      },
-      {
-        "question": "Hàm số nào trong lý thuyết số được sử dụng để đếm số lượng ước số nguyên tố khác nhau của một số nguyên dương?",
-        "answer": "OMEGAFUNCTION"
+        "choice": ["Dirac", "Euler", "Ore", "Kuratowski"],
+        "answer_index": 0
       },
       {
         "question": "Hệ điều hành Linux có tên ban đầu là gì",
-        "answer": "FREAKS"
-      },
-      {
-        "question": "Trong lập trình Windows, cơ chế nào cho phép một tiến trình nhận thông điệp từ hệ thống hoặc từ các ứng dụng khác?",
-        "answer": "MESSAGEQUEUE"
-      },
-      {
-        "question": "Trong Windows API, hàm nào được sử dụng để tạo một luồng (thread) mới trong một tiến trình?",
-        "answer": "CREATETHREAD"
-      },
-      {
-        "question": "Trong NLP, quá trình loại bỏ các từ như 'và', 'hoặc', 'nhưng' khỏi văn bản được gọi là gì?",
-        "answer": "STOPWORDREMOVAL"
-      },
-      {
-        "question": "Kỹ thuật nào trong NLP được sử dụng để chuyển đổi một câu hoặc văn bản thành một vector số?",
-        "answer": "WORDVECTOR"
-      },
-      {
-        "question": "Trong xử lý ngôn ngữ tự nhiên, thuật toán nào phổ biến để phân loại văn bản thành các nhóm hoặc chủ đề?",
-        "answer": "NAIVEBAYES"
-      },
-      {
-        "question": "Tên của lỗ hổng bảo mật cho phép kẻ tấn công chiếm quyền điều khiển bộ nhớ chương trình bằng cách ghi đè địa chỉ trả về trong stack?",
-        "answer": "BUFFEROVERFLOW"
-      },
-      {
-        "question": "Trong bảo mật máy tính, phương pháp nào được sử dụng để xác thực tính toàn vẹn và nguồn gốc của dữ liệu bằng cách sử dụng khóa bí mật?",
-        "answer": "HMAC"
-      },
-      {
-        "question": "Trong mật mã học, phương pháp nào sử dụng cùng một khóa cho cả quá trình mã hóa và giải mã?",
-        "answer": "SYMMETRICENCRYPTION"
-      },
-      {
-        "question": "Trong bảo mật hệ thống, loại tấn công nào mà kẻ tấn công chặn và chỉnh sửa dữ liệu truyền giữa hai bên mà không bị phát hiện?",
-        "answer": "MANINTHEMIDDLE"
-      },
-      {
-        "question": "Cần cấp phát bộ nhớ ở đâu để khi tắt và mở lại chương trình ngay lập tức thì dữ liệu không bị mất",
-        "answer": "VIRTUALMEMORY"
-      },
-      {
-        "question": "Trong hệ thống máy tính, cơ chế nào cho phép nhiều tiến trình chia sẻ cùng một không gian địa chỉ mà vẫn duy trì tính độc lập?",
-        "answer": "VIRTUALMEMORY"
-      },
-      {
-        "question": "Trong hệ thống bộ nhớ đa cấp, thuật toán nào được sử dụng để quyết định trang nào sẽ bị thay thế khi bộ nhớ cache đầy?",
-        "answer": "LRU"
+        "choice": ["Freaks", "Linus's", "Xerox", "Unix"],
+        "answer_index": 0
       },
       {
         "question": "Phương pháp số nào được sử dụng để tìm nghiệm gần đúng của phương trình phi tuyến bằng cách lặp lại một giá trị gần đúng ban đầu?",
-        "answer": "NEWTONSRAPHSON"
+        "choice": ["Newton-Raphson", "Secant", "Bisection", "Fixed-Point Iteration"],
+        "answer_index": 0
       },
       {
         "question": "Phương pháp nào trong nội suy số sử dụng đa thức bậc cao để xấp xỉ một hàm dựa trên một tập hợp các điểm dữ liệu?",
-        "answer": "LAGRANGEINTERPOLATION"
+        "choice": ["Lagrange Interpolation", "Spline Interpolation", "Newton Interpolation", "Nearest-neighbor Interpolation"],
+        "answer_index": 0
       },
       {
-        "question": "Kỹ thuật nào trong đại số tuyến tính số được sử dụng để giải hệ phương trình tuyến tính",
-        "answer": "GAUSSELIMINATION"
+        "question": "Lớp các bài toán quyết định mà mọi bài toán trong NP đều có thể quy về trong thời gian đa thức được gọi là gì?",
+        "choice": ["NP-hard", "NP-complete", "P", "NP"],
+        "answer_index": 0
       },
       {
-        "question": "Phương pháp nào được sử dụng để xấp xỉ đạo hàm của một hàm dựa trên giá trị của nó tại một số điểm lân cận?",
-        "answer": "FINITEDIFFERENCE"
+        "question": "Thuật toán nào sau đây được sử dụng để tìm các thành phần liên thông mạnh trong một đồ thị có hướng?",
+        "choice": ["Kosaraju", "SPFA", "Kruskal", "Boruvka"],
+        "answer_index": 0
       },
       {
-        "question": "What is the complexity class that represents problems solvable by a deterministic Turing machine in polynomial time?",
-        "answer": "P"
+        "question": "Phép biến hình hình học nào bảo toàn tính thẳng hàng (collinearity) và tỷ lệ khoảng cách (ratio of distances) giữa các điểm?",
+        "choice": ["Affine Transformation", "Isometry", "Projective Transformation", "Z-buffer"],
+        "answer_index": 0
       },
       {
-        "question": "What is the term for a problem that is at least as hard as every problem in NP and is also in NP itself?",
-        "answer": "NPHARD"
+        "question": "Which company developed the C programming language?",
+        "choice": ["Bell", "Nokia", "Phillips", "IBM"],
+        "answer_index": 0
       },
       {
-        "question": "What is the name of the Linux kernel feature that enables running virtual machines efficiently by providing hardware-assisted virtualization support?",
-        "answer": "KVM"
+        "question": "Guido van Rossum, được biết đến là cha để của ngôn ngữ lập trình Python, là người Hà Lan. Thành phố nào là nơi sinh của ông",
+        "choice": ["Amsterdam", "Den Haag", "The Hague", "Rotterdam"],
+        "answer_index": 2
       },
       {
-        "question": "Which Linux kernel scheduling policy is designed for real-time tasks and ensures that the highest priority process always runs first?",
-        "answer": "SCHEDFIFO"
+        "question": "Thuật toán lập lịch CPU nào ưu tiên thực thi tiến trình có thời gian burst (thời gian thực thi dự kiến) ngắn nhất?",
+        "choice": ["Round Robin", "FCFS", "SJF", "Batch"],
+        "answer_index": 2
       },
       {
-        "question": "What is the name of the default init system used in most modern Linux distributions?",
-        "answer": "SYSTEMD"
+        "question": "Cấu trúc dữ liệu nào được sử dụng trong heap sort",
+        "choice": ["Binary heap", "Skew heap", "2-3 heap", "Splay tree"],
+        "answer_index": 0
       },
       {
-        "question": "Which POSIX function is used to create a new process by duplicating the calling process?",
-        "answer": "FORK"
+        "question": "Cấu trúc dữ liệu dạng cây nào thường được sử dụng để triển khai chỉ mục trong cơ sở dữ liệu, cho phép tìm kiếm, chèn và xóa hiệu quả?",
+        "choice": ["B+ tree", "2-3 tree", "Red-Black tree", "Wavelet tree"],
+        "answer_index": 0
       },
       {
-        "question": "Which system call in Linux allows a process to replace its memory image with a new executable?",
-        "answer": "EXECVE"
+        "question": "Thuật toán nào có khả năng phân tích thừa số nguyên tố trong O(n^k), được sử dụng trong máy tính lượng tử?",
+        "choice": ["Shor algorithm", "Pollard's rho algorithm", "Quadratic sieve", "Schnorr-Seysen-Lenstra algorithm"],
+        "answer_index": 0
       },
       {
-        "question": "What is the term for a function that maps input data to a fixed-size string and is used in cryptography?",
-        "answer": "HASHFUNCTION"
+        "question": "Loại dữ liệu nào dùng để lưu trữ số thực?",
+        "choice": ["float", "qubit", "nat", "char"],
+        "answer_index": 0
       },
       {
-        "question": "Which concept in distributed computing ensures that all nodes in a system agree on a single value despite failures?",
-        "answer": "CONSENSUSALGORITHM"
+        "question": "Thuật toán nào sau đây giúp sắp xếp trong thời gian O(n log n)?",
+        "choice": ["Merge sort", "Radix sort", "Bubble sort", "Sleep sort"],
+        "answer_index": 0
       },
       {
-        "question": "Trong hệ điều hành, cơ chế nào giúp nhiều tiến trình chia sẻ tài nguyên một cách an toàn mà không bị xung đột?",
-        "answer": "SYNCHRONIZATION"
-      },
-      {
-        "question": "Which algorithm is widely used for finding strongly connected components in a directed graph?",
-        "answer": "KOSARAJUALGORITHM"
-      },
-      {
-        "question": "Which security measure ensures that only authorized users can access certain data or resources?",
-        "answer": "ACCESSCONTROLMECHANISM"
-      },
-      {
-        "question": "What is the process of breaking a complex problem into smaller, more manageable parts to solve it more efficiently?",
-        "answer": "DECOMPOSITIONSTRATEGY"
-      },
-      {
-        "question": "What is the process of converting source code written in a high-level programming language into machine code?",
-        "answer": "COMPILATIONPROCESS"
-      },
-      {
-        "question": "Trong cơ sở dữ liệu, quá trình đảm bảo dữ liệu không bị mất hoặc lỗi trong trường hợp hệ thống gặp sự cố gọi là gì?",
-        "answer": "TRANSACTIONMANAGEMENT"
-      },
-      {
-        "question": "Which Windows kernel-mode error occurs when an invalid or nonexistent memory address is accessed by a driver or system process, often leading to a BSOD with the error code 0x0000000A?",
-        "answer": "IRQLNOTLESSOREQUAL"
-      },
-      {
-        "question": "Kết quả trên màn hình sau khi gọi hàm KeBugCheckEx trong bản Windows Insider là gì",
-        "answer": "GREENSCREENOFDEATH"
-      },
-      {
-        "question": "What is the name of the widely used multimedia container format that can store video, audio, and subtitles, commonly used in online streaming?",
-        "answer": "MATROSKAVIDEOCONTAINER"
-      },
-      {
-        "question": "Which Apple-developed audio codec is commonly used in iTunes and Apple Music for better compression efficiency than MP3?",
-        "answer": "ADVANCEDAUDIOCODEC"
-      },
-      {
-        "question": "Which low-level programming concept allows software to execute self-modifying code or anti-debugging techniques by altering its own instructions at runtime?",
-        "answer": "SELFREWRITINGEXECUTION"
-      },
-      {
-        "question": "Which process involves analyzing a compiled binary to reconstruct high-level source code, typically using tools like Ghidra or IDA Pro?",
-        "answer": "DECOMPILATIONANALYSIS"
-      },
-      {
-        "question": "Which technique, often used in malware analysis, involves executing a program in an isolated environment to observe its behavior without risk to the host system?",
-        "answer": "SANDBOXINGEMULATION"
-      },
-      {
-        "question": "Trong đồ họa máy tính, thuật toán nào được sử dụng để loại bỏ các phần của vật thể không hiển thị do bị che khuất bởi vật thể khác?",
-        "answer": "ZBUFFERALGORITHM"
-      },
-      {
-        "question": "Which anti-aliasing technique improves image quality by averaging multiple sample points to smooth jagged edges in rendered images?",
-        "answer": "SUPERSAMPLINGANTIALIASING"
-      },
-      {
-        "question": "Which mathematical transformation is commonly used in computer graphics to scale, rotate, and translate objects in a 3D space?",
-        "answer": "AFFINETRANSFORMATION"
-      },
-      {
-        "question": "Which rendering technique simulates realistic lighting effects by tracing the path of light as pixels in an image plane?",
-        "answer": "RAYTRACING"
-      },
-      {
-        "question": "What does API stand for?",
-        "answer": "APPLICATIONPROGRAMMINGINTERFACE"
-      },
-      {
-          "question": "Ngôn ngữ lập trình nào phổ biến trong phát triển ứng dụng Android?",
-          "answer": "KOTLIN"
-      },
-      {
-          "question": "Which data structure uses FILO principle?",
-          "answer": "STACK"
-      },
-      {
-          "question": "Giao thức nào được sử dụng để truyền tệp qua Internet?",
-          "answer": "FTP"
-      },
-      {
-          "question": "What does HTTP stand for?",
-          "answer": "HYPERTEXTTRANSFERPROTOCOL"
-      },
-      {
-          "question": "Hệ điều hành mã nguồn mở phổ biến nhất là gì?",
-          "answer": "LINUX"
-      },
-      {
-          "question": "Which memory type is used for temporary data storage?",
-          "answer": "RAM"
-      },
-      {
-          "question": "Lệnh nào trong SQL được dùng để lấy dữ liệu?",
-          "answer": "SELECT"
-      },
-      {
-          "question": "Thiết bị nào giúp kết nối mạng không dây?",
-          "answer": "ROUTER"
-      },
-      {
-          "question": "Which company developed the C programming language?",
-          "answer": "BELL"
-      },
-      {
-          "question": "Loại dữ liệu nào chỉ có hai giá trị TRUE hoặc FALSE?",
-          "answer": "BOOLEAN"
-      },
-      {
-          "question": "Which sorting algorithm has O(n^2) complexity in worst case?",
-          "answer": "BUBBLESORT"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào dùng để lưu trữ giá trị theo cặp khóa?",
-          "answer": "HASHMAP"
-      },
-      {
-          "question": "Cổng logic nào trả về 1 nếu cả hai đầu vào đều là 1?",
-          "answer": "AND"
-      },
-      {
-          "question": "Which protocol encrypts web traffic for security?",
-          "answer": "HTTPS"
-      },
-      {
-          "question_en": "Which programming language is widely used for web development?",
-          "answer": "JAVASCRIPT"
-      },
-      {
-          "question_vi": "Giao thức nào được sử dụng để gửi email?",
-          "answer": "SMTP"
-      },
-      {
-          "question_en": "What is the term for a self-replicating malicious program?",
-          "answer": "WORM"
-      },
-      {
-          "question_vi": "Loại phần mềm nào tương tác trực tiếp với phần cứng?",
-          "answer": "FIRMWARE"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào tối ưu cho biểu đồ có trọng số âm?",
-          "answer": "BELLMANFORD"
-      },
-      {
-          "question": "Which cryptographic algorithm is used in Bitcoin mining?",
-          "answer": "SHA256"
-      },
-      {
-          "question": "What theorem states that no program can determine if another halts?",
-          "answer": "HALTING"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào cho phép chèn và tìm kiếm O(log n)?",
-          "answer": "AVL"
-      },
-      {
-          "question": "Which type of automaton recognizes context-free languages?",
-          "answer": "PDA"
-      },
-      {
-          "question": "Which programming language supports dependent types?",
-          "answer": "AGDA"
-      },
-      {
-          "question": "What algorithm is used in public-key cryptography?",
-          "answer": "RSA"
-      },
-      {
-          "question": "Which theorem states P ≠ NP or P = NP?",
-          "answer": "PVSNP"
-      },
-      {
-          "question": "Which scheduling algorithm gives the shortest average waiting time?",
-          "answer": "SJF"
-      },
-      {
-          "question": "Lý thuyết nào mô tả độ phức tạp thuật toán tốt nhất?",
-          "answer": "BIGO"
-      },
-      {
-          "question": "Which protocol is used for email retrieval?",
-          "answer": "IMAP"
-      },
-      {
-          "question": "Thuật toán nào được sử dụng trong PageRank của Google?",
-          "answer": "MARKOV"
-      },
-      {
-          "question": "Which algorithm is used for finding strongly connected components?",
-          "answer": "KOSARAJU"
-      },
-      {
-          "question": "Bộ nhớ nào có tốc độ truy cập nhanh nhất?",
-          "answer": "CACHE"
-      },
-      {
-          "question": "What does ACID stand for in database transactions?",
-          "answer": "ATOMICITYCONSISTENCYISOLATIONDURABILITY"
-      },
-      {
-          "question": "Kỹ thuật nào giúp giảm thiểu sự lặp lại dữ liệu trong bộ nhớ?",
-          "answer": "MEMOIZATION"
-      },
-      {
-          "question": "Which scheduling algorithm prevents starvation?",
-          "answer": "AGINGSCHEDULING"
-      },
-      {
-          "question": "Mạng nào sử dụng mô hình xoay vòng (token passing)?",
-          "answer": "TOKENRING"
-      },
-      {
-          "question": "Which mathematical structure underlies functional programming?",
-          "answer": "LAMBDA"
-      },
-      {
-          "question": "Giao thức nào được sử dụng trong truyền phát video trực tiếp?",
-          "answer": "RTSP"
-      },
-      {
-          "question": "What technique is used to prevent SQL injection?",
-          "answer": "SANITIZATION"
-      },
-      {
-          "question": "What is the main purpose of a hypervisor?",
-          "answer": "VIRTUALIZATION"
-      },
-      {
-          "question": "Lớp nào trong mô hình OSI xử lý định tuyến?",
-          "answer": "NETWORK"
-      },
-      {
-          "question": "Which algorithm is used in TCP congestion control?",
-          "answer": "SLOWSTART"
-      },
-      {
-          "question": "Giao thức nào được sử dụng để bảo mật kết nối mạng?",
-          "answer": "TLS"
-      },
-      {
-          "question": "What is the key concept behind Byzantine Fault Tolerance?",
-          "answer": "CONSENSUS"
-      },
-      {
-          "question": "Loại máy học nào không có nhãn dữ liệu đầu vào?",
-          "answer": "UNSUPERVISED"
-      },
-      {
-          "question": "Which data structure is used in heap sort?",
-          "answer": "BINARYHEAP"
-      },
-      {
-          "question": "Giao thức nào hỗ trợ chuyển đổi địa chỉ IP động?",
-          "answer": "DHCP"
-      },
-      {
-          "question": "Cơ chế nào giúp hệ điều hành quản lý bộ nhớ hiệu quả?",
-          "answer": "PAGING"
-      },
-      {
-          "question": "Which machine learning model uses interconnected nodes?",
-          "answer": "NEURALNETWORK"
-      },
-      {
-          "question": "Giao thức nào được sử dụng trong mạng ngang hàng (P2P)?",
-          "answer": "BITTORRENT"
-      },
-      {
-          "question": "What database system supports eventual consistency?",
-          "answer": "NOSQL"
-      },
-      {
-          "question": "Which scheduling policy is commonly used in real-time systems?",
-          "answer": "ROUNDROBIN"
-      },
-      {
-          "question": "Phương pháp nào dùng để phát hiện xung đột dữ liệu?",
-          "answer": "LOCKING"
-      },
-      {
-          "question": "Which technique is used to prevent buffer overflow attacks?",
-          "answer": "CANARIES"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào hỗ trợ truy vấn hiệu quả trên tập dữ liệu lớn?",
-          "answer": "BPLUSTREE"
-      },
-      {
-          "question": "What theorem establishes the limits of computability?",
-          "answer": "CHURCHTURING"
-      },
-      {
-          "question": "Lý thuyết nào khẳng định không có thuật toán quyết định tổng quát?",
-          "answer": "INCOMPLETENESS"
-      },
-      {
-          "question": "Which protocol is fundamental for secure multiparty computation?",
-          "answer": "GMW"
-      },
-      {
-          "question": "Thuật toán nào dùng để tìm đường đi tối ưu trên đồ thị lượng tử?",
-          "answer": "GROVER"
-      },
-      {
-          "question": "What fundamental concept underlies quantum error correction?",
-          "answer": "ENTANGLEMENT"
-      },
-      {
-          "question": "Lý thuyết nào xác định giới hạn tính toán song song?",
-          "answer": "NC"
-      },
-      {
-          "question": "Which model is used in homomorphic encryption?",
-          "answer": "LATTICE"
-      },
-      {
-          "question": "Giao thức nào giúp đạt đồng thuận trong hệ thống phân tán?",
-          "answer": "PAXOS"
-      },
-      {
-          "question": "What principle limits the parallelization of a program?",
-          "answer": "AHLSLAW"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào hỗ trợ xác minh chứng minh không tiết lộ (ZKP)?",
-          "answer": "MERKLETREE"
-      },
-      {
-          "question": "Which logic system is foundational for automated theorem proving?",
-          "answer": "SEQUENTCALCULUS"
-      },
-      {
-          "question": "Which complexity class is known to be strictly harder than P?",
-          "answer": "EXPTIME"
-      },
-      {
-          "question": "Giao thức nào được sử dụng trong mạng lượng tử?",
-          "answer": "BB84"
-      },
-      {
-          "question": "Which algorithm solves the discrete logarithm problem in polynomial time?",
-          "answer": "SHOR"
-      },
-      {
-          "question": "Lý thuyết nào giúp đánh giá khả năng tổng quát hóa của mô hình AI?",
-          "answer": "VCDIMENSION"
-      },
-      {
-          "question": "Which cryptographic method enables privacy-preserving data queries?",
-          "answer": "PIR"
-      },
-      {
-          "question": "Giao thức nào được dùng để truyền dữ liệu không đồng bộ trong hệ phân tán?",
-          "answer": "GOSSIP"
-      },
-      {
-          "question": "What data structure is fundamental to zero-knowledge proofs?",
-          "answer": "SNARK"
-      },
-      {
-          "question": "Thuật toán nào tối ưu việc lập lịch công việc trên kiến trúc heterogenous?",
-          "answer": "WORKSTEALING"
-      },
-      {
-          "question": "Which framework underlies probabilistic programming?",
-          "answer": "BAYESIAN"
-      },
-      {
-          "question": "Lý thuyết nào định nghĩa khả năng nhận dạng của máy học?",
-          "answer": "PAC"
-      },
-      {
-          "question": "What is the main structure used in differential privacy?",
-          "answer": "LAPLACIANMECHANISM"
-      },
-      {
-          "question": "Which file system is commonly used in Linux?",
-          "answer": "EXT4"
-      },
-      {
-          "question": "Loại mạng nào kết nối các thiết bị trong phạm vi nhỏ?",
-          "answer": "LAN"
-      },
-      {
-          "question": "Loại dữ liệu nào dùng để lưu trữ số thực?",
-          "answer": "FLOAT"
-      },
-      {
-          "question": "Which Python keyword is used to define a function?",
-          "answer": "DEF"
-      },
-      {
-          "question": "What does DNS stand for?",
-          "answer": "DOMAINNAMESYSTEM"
-      },
-      {
-          "question": "Which operator is used to get the remainder of division?",
-          "answer": "MODULUS"
-      },
-      {
-          "question": "Bộ nhớ nào không bị mất dữ liệu khi tắt nguồn?",
-          "answer": "ROM"
-      },
-      {
-          "question": "Thuật toán nào giúp sắp xếp trong thời gian O(n log n)?",
-          "answer": "MERGESORT"
-      },
-      {
-          "question": "What is the name of a function that calls itself?",
-          "answer": "RECURSION"
-      },
-      {
-          "question": "What method converts an infix expression to postfix?",
-          "answer": "SHUNTINGYARD"
-      },
-      {
-          "question": "Lớp độ phức tạp nào chứa các bài toán có thể kiểm tra nhanh?",
-          "answer": "NP"
-      },
-      {
-          "question": "Which data structure efficiently supports LRU caching?",
-          "answer": "LINKEDLIST"
-      },
-      {
-          "question": "Mạng nơ-ron nào phổ biến cho xử lý ngôn ngữ tự nhiên?",
-          "answer": "TRANSFORMER"
-      },
-      {
-          "question": "Loại khóa nào dùng để mã hóa bất đối xứng?",
-          "answer": "PUBLICKEY"
-      },
-      {
-          "question": "Which problem classifies as NP-complete?",
-          "answer": "SATISFIABILITY"
-      },
-      {
-          "question": "Cấu trúc dữ liệu nào là nền tảng của hệ thống tập tin?",
-          "answer": "BPLUS"
-      },
-      {
-          "question": "Phép toán nào quan trọng trong mã hóa AES?",
-          "answer": "SUBSTITUTION"
-      },
-      {
-          "question": "What type of graph traversal uses a queue?",
-          "answer": "BFS"
-      },
-      {
-          "question": "Lý thuyết nào liên quan đến khả năng học máy?",
-          "answer": "VCDIMENSION"
-      },
-      {
-          "question": "Which algorithm detects and prevents deadlocks in OS?",
-          "answer": "BANKERS"
-      },
-      {
-          "question": "Thuật toán nào tìm cây bao khung nhỏ nhất?",
-          "answer": "PRIM"
-      },
-      {
-          "question": "Which hashing technique prevents collisions?",
-          "answer": "CHAINING"
-      },
-      {
-          "question": "Thuật toán nào giúp phát hiện chu trình trong đồ thị?",
-          "answer": "TARJAN"
+        "question": "Thuật toán nào sau đây được sử dụng để chuyển đổi một biểu thức toán học từ ký pháp trung tố (infix notation) sang ký pháp hậu tố (postfix notation) hoặc tiền tố (prefix notation)",
+        "choice": ["Shunting-yard Algorithm", "Yen's algorithm", "Bubble sort", "Sleep sort"],
+        "answer_index": 0
       },
       {
         "question": "Công nghệ truyền dữ liệu tốc độ cao, thay thế SATA, dùng trong SSD hiện đại",
-        "answer": "NVME"
+        "choice": ["NVME", "SCSI", "AHCI", "UFS"],
+        "answer_index": 0
       },
       {
         "question": "Đâu là tên một loại phần mềm cho phép nhiều máy ảo (vitual machine) có thể chạy trên một máy chủ vật lý, còn được biết đến là hệ thống quản lý máy ảo (virtual machine manager) hay hệ thống ảo hóa (virtualizer)",
-        "answer": "VMWAREESXI"
+        "choice": ["WMWare ESXi", "Microsoft HyperV", "Oracle Virtualbox", "QEMU"],
+        "answer_index": 0
       },
       {
         "question": "Khi hệ điều hành ảo hóa ESXi gặp lỗi nghiêm trọng, màn hình chẩn đoán lỗi có màu gì",
-        "answer": "PURPLE"
+        "choice": ["PURPLE", "RED", "BLACK", "BLUE"],
+        "answer_index": 0
       }
     ]
 }
