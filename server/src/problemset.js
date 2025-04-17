@@ -1,17 +1,18 @@
-const fs = require('fs')
-// import * as fs from "fs"
-// import fs from 'node:fs'
+import fs from 'fs';
 
-const questionsList = []
-const keywordsList = []
+//TODO FIX: asynchronousity messing up reading file 
+
+//type: json object
+export let questionsList = []
+//type: json object
+export let keywordsList = []
 
 //return false if failure, true if success
-async function loadQuestionsList(jsonFilename) {
+export async function loadQuestionsList(jsonFilename) {
     return new Promise((resolve) => {
         fs.readFile(jsonFilename, "utf8", (fileerr, data) => {
             if(fileerr) {
                 console.error("Error reading file:", fileerr.message);
-                returnStatus = false;
                 resolve(false);
                 return;
             } else {
@@ -38,14 +39,12 @@ async function loadQuestionsList(jsonFilename) {
 }
 
 //return false if failure, true if success
-async function loadKeywordsList(jsonFilename) {
+export async function loadKeywordsList(jsonFilename) {
     return new Promise((resolve) => {
         fs.readFile(jsonFilename, "utf8", (fileerr, data) => {
             if(fileerr) {
                 console.error("Error reading file:", fileerr.message);
-                returnStatus = false;
                 resolve(false);
-                return;
             } else {
                 keywordsList.length = 0;
                 let jsonData;
@@ -53,25 +52,24 @@ async function loadKeywordsList(jsonFilename) {
                     jsonData = JSON.parse(data);
                 } catch(jsonerror) {
                     console.error("Error parsing JSON:", jsonerror.message);
-                    resolve(false);
-                    return;
+                    resolve(undefined);
                 }
     
                 if (jsonData && jsonData["keywords"]) {
-                    keywordsList = jsonData["keywords"];
-                    resolve(true);
+                    // keywordsList = jsonData["keywords"];
+                    resolve(jsonData["keywords"]);
                 } else {
                     console.error("problemset.js -> loadKeywordsList: JSON does not contain 'keywords' array.");
-                    resolve(false);
+                    resolve(undefined);
                 }
             }
         })
-    })
+    }).then((data) => keywordsList = data);
 }
 
-module.exports = {
-    loadQuestionsList: loadQuestionsList,
-    loadKeywordsList: loadKeywordsList,
-    questionsList: questionsList,
-    keywordsList: keywordsList
-};
+// async function main() {
+//     await loadKeywordsList("../assets/keywords.json");
+//     console.log(keywordsList)
+// }
+
+// main();

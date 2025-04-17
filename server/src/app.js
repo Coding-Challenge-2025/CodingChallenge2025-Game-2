@@ -1,17 +1,14 @@
-//i'll stick to commonjs for now...
+//fuck commonjs
 
-const express = require("express");
-const expressWs = require("express-ws");
+import express from "express";
+import expressWs from "express-ws";
 const app = express();
 expressWs(app);
 
-const local_problemset_js = require("./problemset.js");
-const {
-  loadQuestionsList,
-  loadKeywordsList,
-  questionsList,
-  keywordsList
-} = local_problemset_js;
+import {
+    questionsList, keywordsList,
+    loadQuestionsList, loadKeywordsList
+} from "./problemset.js";
 
 const MAX_PLAYER = 4;
 const port = 3000;
@@ -22,7 +19,7 @@ const serverRoomId = "7761AA"
 let currentPlayerCount = 0
 
 async function boardcastClientWaitingForSignal() {
-    setInterval(() => {
+    return setInterval(() => {
         for (let client of clientList) {
             if (client[0].readyState === WebSocket.OPEN) {
                 client[0].send("Waiting for event...");
@@ -33,6 +30,7 @@ async function boardcastClientWaitingForSignal() {
 
 //Boardcast a JSON object to all active clients
 async function boardcastClient(object) {
+    //object is always json object already
     for (let client of clientList) {
         if (client[0].readyState === WebSocket.OPEN) {
             client[0].send(JSON.stringify(object));
@@ -65,8 +63,8 @@ app.ws("/", (ws, req) => {
             return
         }
 
-        clientName = jsonData["name"]
-        roomId = jsonData["id"]
+        let clientName = jsonData["name"]
+        let roomId = jsonData["id"]
 
         console.log(`Client name: ${clientName}\nClient ID: ${roomId}`);
 
@@ -79,10 +77,12 @@ app.ws("/", (ws, req) => {
             } else {
                 console.log(`Player ${clientName} refused. Room is full!`);
                 ws.send("Room is full!")
+                ws.close();
             }
         } else {
             console.log(`Player ${clientName} unauthorized`);
             ws.send("Invalid room id. Unauthorized")
+            ws.close();
         }
     });
 });
@@ -94,8 +94,8 @@ app.listen(port, () => {
 const clientResponseList = [];
 
 async function initGame() {
-    loadKeywordsList("assets/keywords.json")
-    loadQuestionsList("assets/questions.json")
+    await loadKeywordsList(process.cwd() + "/server/assets/keywords.json")
+    await loadQuestionsList(process.cwd() + "/server/assets/questions.json")
     //Reserve for response array
     clientResponseList.length = 0
     for(let i=0; i < MAX_PLAYER; i++) {
@@ -104,6 +104,14 @@ async function initGame() {
     //Empty players
     currentPlayerCount = 0;
     clientList.length = 0;
+    //Shuffle keywords clues
+    for(const ele of keywordsList) {
+        let innerCluesList = ele["clues"];      //assignment on array = reference, use = [...oldarr] to shallow copy
+        for(let i = innerCluesList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [innerCluesList[i], innerCluesList[j]] = [innerCluesList[j], innerCluesList[i]];
+        }
+    }
 }
 
 async function sendQuestion() {
@@ -120,11 +128,16 @@ async function sendKeyword() {
     boardcastClient(keyword_selected)
 }
 
+async function choosePiece(params) {
+    
+}
+
 async function startGame() {
     if(currentPlayerCount == MAX_PLAYER) {
 
-    }
+    } else console.log("Not enough players to start!");
 }
 
+initGame();
 //placeholder
-boardcastClientWaitingForSignal();
+let intervalHandle = boardcastClientWaitingForSignal();
