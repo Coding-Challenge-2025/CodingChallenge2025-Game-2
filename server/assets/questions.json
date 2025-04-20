@@ -190,6 +190,36 @@
         "question": "Khi hệ điều hành ảo hóa ESXi gặp lỗi nghiêm trọng, màn hình chẩn đoán lỗi có màu gì",
         "choice": ["PURPLE", "RED", "BLACK", "BLUE"],
         "answer_index": 0
+      },
+      {
+        "question": "Cho lược đồ quan hệ R(A, B, C, D, E) gồm các phụ thuộc hàm sau:\nF: AB->C, BC->D, C->E. hãy cho biết R có bao nhiêu superkey?",
+        "choice": ["7", "8", "9", "16"],
+        "answer_index": 1
+      },
+      {
+        "question": "Cho một mảng số nguyên kích thước n, mỗi phần tử có giá trị từ 0 đến n^3 - 1. Sử dụng thuật toán radix sort để sắp xếp tăng dần dãy số, hãy cho biết để thuật toán có độ phức tạp thời gian là O(n), ta cần chọn hệ cơ số nào là tối ưu nhất?",
+        "choice": ["không thể", "n", "3n", "2log3(n)"],
+        "answer_index": 1
+      },
+      {
+        "question": "Cục router nhận gói tin từ 3 máy tuân theo phân phối mũ (exponential) với tham số lambda lần lượt bằng 1, 2 và 3. Hỏi vậy ta có thể xem như cục router này đang nhận gói tin từ một nguồn theo phân phối lũy thừa với tham số lambda bằng bao nhiêu?",
+        "choice": ["1", "6", "3", "4"],
+        "answer_index": 1
+      },
+      {
+        "question": "Bạn Lan là một lập trình viên web hiện đang phát triển một ứng dụng cho phép trình duyệt gửi yêu cầu lấy dữ liệu từ một API trên miền khác. Tuy nhiên, Lan nhận thấy một số yêu cầu bị chặn vì lý do bảo mật. Cơ chế nào được trình duyệt sử dụng để kiểm soát việc chia sẻ tài nguyên giữa các miền khác nhau trong trường hợp này?",
+        "choice": ["Invalid call", "CORS", "Firewall", "Same-Origin Policy"],
+        "answer_index": 1
+      },
+      {
+        "question": "Bạn đang làm việc trên một máy chủ Linux và cần kiểm tra dung lượng đĩa còn trống của thư mục /var/www để đảm bảo đủ chỗ cho file mới của ứng dụng web. Lệnh nào được sử dụng để hiển thị dung lượng trống còn lại một cách dễ đọc (hiển thị dưới dạng đơn vị KB, MB, GB hoặc TB)?",
+        "choice": ["du -sh /var/www", "df -h /var/www", "ls -h /var/www", "cat /var/www"],
+        "answer_index": 1
+      },
+      {
+        "question": "Hai người chơi A và B chơi trò chơi với 50 quả bóng đen, 50 quả bóng trắng, và 2 cái hộp giống hệt nhau như sau: người chơi A chia 100 quả bóng vào hai hộp tùy ý sao cho hộp nào cũng có bóng; người chơi B không được biết cách chia của người chơi A và phải chọn một trong hai hộp, rồi ngẫu nhiên một quả bóng trong hộp đó; nếu quả bóng bốc ra là màu trắng thì A thắng, còn nếu là màu đen thì B thắng. Biết rằng A chơi tối ưu. Hỏi xác suất người chơi A thắng là bao nhiêu?",
+        "choice": ["0.5", "0.7475", "0.6667", "0.75"],
+        "answer_index": 1
       }
     ]
 }
