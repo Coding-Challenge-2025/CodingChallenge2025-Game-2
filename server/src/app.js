@@ -18,6 +18,7 @@ const clientAnswerList = new Map();         //consists of answer & client answer
 const clientScoreList = new Map();         //store client's answer
 const clientMessageListenerList = new Map();
 const clientTimeoutList = new Map();
+let resultArr = [];   //update each play turn, json array contain wsobj, answer, epoch, point
 const ANSWER_TIMEOUT = 30000 
 
 let serverRoomId
@@ -48,6 +49,16 @@ function randomShuffleArray(arr) {
     }
 }
 
+function updateClientScore(wsObj, scoreAdded) {
+    if(clientScoreList.has(wsObj)) {
+        let currentClientScore = clientScoreList.get(wsObj);
+        currentClientScore += scoreAdded;
+        clientScoreList.set(wsObj, currentClientScore);
+    } else {
+        console.error(`updateClientScore(): No such object`);
+    }
+}
+
 async function boardcastClientWaitingForSignal() {
     return setInterval(() => {
         for (let client of clientList) {
@@ -58,17 +69,15 @@ async function boardcastClientWaitingForSignal() {
     }, 3000);
 }
 
-//Boardcast a JSON object to all active clients
-async function boardcastClient(object) {
-    //object is always json object already
-    for (let client of clientList) {
-        if (client[0].readyState === WebSocket.OPEN) {
-            client[0].send(JSON.stringify(object));
-        }
+function checkClientTimepoint(clientTimepoint, serverTimepoint) {
+    if(Number.isInteger(clientTimepoint)) {
+        const diff = clientTimepoint - serverTimepoint;
+        if(0 < diff && diff < ANSWER_TIMEOUT*1000) return true;
     }
+    return false;
 }
 
-async function broadcastQuestion(questionObject) {
+async function broadcastQuestion(questionObject, serverTimepoint) {
     //Every resolve call mark each client completion
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if (wsObject.readyState !== WebSocket.OPEN) {
@@ -76,48 +85,99 @@ async function broadcastQuestion(questionObject) {
         }
         return new Promise(resolve => {
             wsObject.send(JSON.stringify(questionObject));
-            clientAnswerList.set(wsObject, null);
-            clientWorkingStateList.set(wsObject, true);
+            clientAnswerList.set(wsObject, undefined);
             console.log(`Question sent to player ${playerName}`)
-
-            // const innerMessageListener = (playerAnswer) => {
-            //     clientAnswerList.set(wsObject, JSON.parse(playerAnswer));
-            //     console.log(`Player ${clientList.get(wsObject)} answered: ${playerAnswer}`);
-            //     wsObject.off('message', innerMessageListener);
-            //     clientMessageListenerList.set(wsObject, null);
-            //     clientWorkingStateList.set(wsObject, false);
-            // };
-
-            // wsObject.once('message', innerMessageListener);
-            // clientMessageListenerList.set(wsObject, innerMessageListener);
-            // clientTimeoutList.set(wsObject, setTimeout(() => {
-            //     clientTimeoutList.set(wsObject, null);
-            //     clientAnswerList.set(wsObject, { answer: "", time: 0 });
-            //     console.log(`Player ${clientList.get(wsObject)} timeouted:`);
-            // }, 20000));
 
             const timeoutId = setTimeout(() => {
                 console.log(`No response from client ${playerName}`);
-                clientWorkingStateList.set(wsObject, false);
+                const clientAnswerJson = {"answer": "", "time": serverTimepoint};
+                clientAnswerList.set(wsObject, clientAnswerJson);
                 resolve()
             }, ANSWER_TIMEOUT);
 
-            wsObject.once('message', clientAnswer => {
-                clearTimeout(timeoutId);
-                clientWorkingStateList.set(wsObject, false);
+            //Client shall sent its answer timepoint. If none or invalid provided, server timepoint is used
+            const answerListener = (clientAnswer) => {
                 try {
+                    let capturedTimepoint = Date.now();
                     const clientAnswerJson = JSON.parse(clientAnswer.toString());
-                    clientAnswerList.set(wsObject, clientAnswerJson);
-                    console.log(`Answer from client ${playerName}: ${clientAnswerJson["answer"]}`);
+                    if(clientAnswerJson["answer"] !== undefined) {
+                        clearTimeout(timeoutId);
+                        console.log(`Client ${playerName} sent answer`);
+                        wsObject.off("message", answerListener);
+                        //Check client timepoint
+                        if(!checkClientTimepoint(clientAnswerJson["time"], serverTimepoint)) {
+                            clientAnswerJson["time"] = capturedTimepoint;
+                        }
+                        clientAnswerList.set(wsObject, clientAnswerJson);
+                        resolve();
+                    }
                 } catch(error) {
                     console.error(`Error parsing answer from client ${playerName}: `, error);
                 }
-                resolve();
-            });
+            }
+
+            wsObject.on("message", answerListener);
+
         })
     })
 
     // Await *all* the client‑promises before returning
+    await Promise.all(sendPromises);
+}
+
+async function broadcastAnswer(originalQuestionObject, serverTimepoint) {
+    resultArr = [];
+    //Notify user first, then build result array later
+    const correctAnswer = originalQuestionObject["choice"][originalQuestionObject["answer_index"]];
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        //Client shall sent its answer timepoint. If none provided, server timepoint is used
+        const playerAnswerObj = clientAnswerList.get(wsObject);
+        const playerAnswer = playerAnswerObj["answer"];
+        const playerTimepoint = playerAnswerObj["time"];
+        if(playerAnswer === correctAnswer) {
+            // console.log(`Client ${playerName} give correct answer: ${playerAnswer}`);
+            wsObject.send(`Correct answer!`);
+        } else {
+            // console.log(`Client ${playerName} give incorrect answer: ${playerAnswer}`);
+            wsObject.send(`Wrong answer. Correct answer is ${correctAnswer}`);
+        }
+        resultArr.push({"wsobj": wsObject, "answer": playerAnswer, "epoch": playerTimepoint - serverTimepoint, "point": 0});
+        return Promise.resolve();
+    });
+    
+    await Promise.all(sendPromises);
+
+    resultArr.sort((a, b) => {
+        const timea = a["epoch"];
+        const timeb = b["epoch"];
+        return timea - timeb;
+    });
+
+    let tpoint = 40;
+    for(let ele of resultArr) {
+        if(ele["answer"] === correctAnswer) {
+            ele["point"] = tpoint;
+            updateClientScore(ele["wsobj"], tpoint);
+            tpoint -= 10;
+        }
+    }
+}
+
+async function broadcastResultBoard() {
+    let tstr = "";
+    tstr += toString()
+}
+
+async function broadcastLeaderboard() {
+    let leaderboardString = "Leaderboard:\n";
+    Array.from(clientScoreList).map(([wsObject, score]) => {
+        leaderboardString += `${clientList.get(wsObject)}: ${score}\n`;
+    })
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        wsObject.send(leaderboardString);
+        Promise.resolve();
+    });
+
     await Promise.all(sendPromises);
 }
 
@@ -224,20 +284,36 @@ async function choosePiece(params) {
 
 }
 
+async function prepareClientQuestion(originalQuestionObject) {
+    let newObject = JSON.parse(JSON.stringify(originalQuestionObject));
+    newObject["answer_index"] = undefined;
+    randomShuffleArray(newObject["choice"]);
+    return newObject;
+} 
+
 async function ingame() {
     for (let i = 0; i < 12; i++) {
         let givenIndex = getRandomIndex(questionsList);
-        let questionObject = { ...questionsList[givenIndex] };
+        let originalQuestionObject = { ...questionsList[givenIndex] };  ////still a json object
         questionsList.splice(givenIndex, 1);
-        questionObject.answer_index = undefined;
-        randomShuffleArray(questionObject.choice);
-        await broadcastQuestion(questionObject);
+
+        let questionObject = await prepareClientQuestion(originalQuestionObject);
+
+        let serverTimepoint = Date.now();
+        await broadcastQuestion(questionObject, serverTimepoint);
+        await broadcastAnswer(originalQuestionObject, serverTimepoint);
+        await broadcastResultBoard()
+        await broadcastLeaderboard();
         //for-loop is still synchronous, need to hold back
         //In practice there would be a button to choose question from UI, this is for testing
         const delayBetweenQuestion = 3000;
         console.log(`Cooldown between question: ${delayBetweenQuestion}ms`)
         await new Promise(dummy => setTimeout(dummy, delayBetweenQuestion));
     }
+}
+
+function getConnectedPlayerName() {
+    return Array.from(clientList);
 }
 
 async function startGame() {
@@ -252,7 +328,7 @@ async function startGame() {
                 client[0].send("Waiting for event...");
             }
         }
-        if (currentPlayerCount > 0) {
+        if (currentPlayerCount > 2) {
             clearInterval(intervalHandle);
             console.log("Starting game...")
             for (let client of clientList) {
