@@ -164,8 +164,17 @@ async function broadcastAnswer(originalQuestionObject, serverTimepoint) {
 }
 
 async function broadcastResultBoard() {
-    let tstr = "";
-    tstr += toString()
+    let resultString = "Result:\n";
+    resultArr.map(({wsobj, answer, epoch, point}) => {
+        let epochInSecond = epoch/1000;
+        resultString += `${epochInSecond.toFixed(3)}s ~ ${clientList.get(wsobj)}: ${answer} => +${point}\n`;
+    })
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        wsObject.send(resultString);
+        Promise.resolve();
+    });
+
+    await Promise.all(sendPromises);
 }
 
 async function broadcastLeaderboard() {
