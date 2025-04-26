@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 import routes from '~react-pages'
 import './index.css'
+import { WebSocketProvider } from '@/hooks/useWebSocketContext';
 
 function App() {
   return (
@@ -18,7 +19,9 @@ function App() {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <WebSocketProvider url="ws://echo.websocket.org">
+        <App />
+      </WebSocketProvider>
     </BrowserRouter>
   </StrictMode>,
 )
