@@ -110,6 +110,26 @@
         "imageDir": "computer-graphics.png",
         "keyword": "COMPUTERGRAPHICS",
         "clues": ["Ray-tracing", "Rasterization", "Utah teapot", "CGI", "Z-buffer", "Anti-aliasing", "Polygon", "NURBS", "Subsurface scattering", "Ambient lighting", "Voodoo", "Fractal"]
+      },
+      {
+        "imageDir": "ai-driven-dev.png",
+        "keyword": "AIDRIVENDEVELOPMENT",
+        "clues": ["Vibe coding", "Code generation", "Automation", "Collaboration", "AIDD", "ML", "Natural language processing", "ChatGPT", "Code optimization", "Software development", "Copilot", "Virtual assistant"]
+      },
+      {
+        "imageDir": "cdn.png",
+        "keyword": "CONTENTDELIVERYNETWORK",
+        "clues": ["Edge", "Caching", "DDOS protection", "Latency reduction", "Global", "Proxy", "Cloudfare", "Akamai", "Image Optimization", "points of presence", "high availability", "Speed"]
+      },
+      {
+        "imageDir": "divideandconquer.png",
+        "keyword": "DIVIDEANDCONQUER",
+        "clues": ["Algorithm", "Binary search", "Partition", "Decomposition", "Merge sort", "Subproblem", "Quicksort", "Fragmentation", "Recursive", "Karatsuba's algorithm", "Dynamic programming", "Combine solutions"]
+      },
+      {
+        "imageDir": "overflow.png",
+        "keyword": "BUFFEROVERFLOW",
+        "clues": ["Memory corruption", "Heartbleed bug", "Segmentation fault", "Canary", "Data overrun", "Overwrite", "Array limits", "Vulnerability", "C scanf", "Bounds checking", "Security exploit", "NOP slide"]
       }
     ]
 }
