@@ -3,7 +3,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link } from 'react-router-dom'
 import { Users, User, Eye } from "lucide-react"
 
+import React, { useEffect, useState } from 'react';
+import { useWebSocketContext } from '../hooks/useWebSocketContext';
+
 export default function Home() {
+  const { sendMessage, subscribe } = useWebSocketContext();
+
+  useEffect(() => {
+    const messageHandler = (msg) => {
+      console.log('recv:', msg.data);
+      setTimeout(() => { sendMessage("hello!") }, 1000);
+    };
+
+    const unsubscribe = subscribe(messageHandler);
+    return () => {
+      unsubscribe();
+    };
+  }, [subscribe]);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-100 p-4">
       <div className="max-w-4xl w-full">
