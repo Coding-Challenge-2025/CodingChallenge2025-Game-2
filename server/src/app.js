@@ -10,6 +10,11 @@ import {
     loadQuestionsList, loadKeywordsList
 } from "./problemset.js";
 
+import {
+    getRandomRoomId, getRandomIndex,
+    randomShuffleArray, checkClientTimepoint
+} from "./utilities.js";
+
 const MAX_PLAYER = 4;
 const port = 3000;
 const clientList = new Map();               //store websocket object & name
@@ -22,32 +27,7 @@ let resultArr = [];   //update each play turn, json array contain wsobj, answer,
 const ANSWER_TIMEOUT = 30000 
 
 let serverRoomId
-
 let currentPlayerCount = 0
-
-function getRandomRoomId(len) {
-    const charlist = 'ABCDEF0123456789';
-    let result = '';
-    for (let i = 0; i < len; i++) {
-        result += charlist.charAt(Math.floor(Math.random() * charlist.length));
-    }
-    return result;
-}
-
-function getRandomIndex(arr) {
-    if (!arr || arr.length === 0) {
-        return undefined; // Handle empty or non-array input
-    }
-    const randomIndex = Math.floor(Math.random() * arr.length);
-    return randomIndex;
-}
-
-function randomShuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-}
 
 function updateClientScore(wsObj, scoreAdded) {
     if(clientScoreList.has(wsObj)) {
@@ -59,22 +39,62 @@ function updateClientScore(wsObj, scoreAdded) {
     }
 }
 
-async function boardcastClientWaitingForSignal() {
-    return setInterval(() => {
-        for (let client of clientList) {
-            if (client[0].readyState === WebSocket.OPEN) {
-                client[0].send("Waiting for event...");
-            }
-        }
-    }, 3000);
+function getPlayerNameFromHandle(wsObject) {
+    return clientList.get(wsObject);
 }
 
-function checkClientTimepoint(clientTimepoint, serverTimepoint) {
-    if(Number.isInteger(clientTimepoint)) {
-        const diff = clientTimepoint - serverTimepoint;
-        if(0 < diff && diff < ANSWER_TIMEOUT*1000) return true;
+function getLeaderboard() {
+    let jsonLeaderboard = [];
+    Array.from(clientScoreList).map(([wsObject, score]) => {
+        jsonLeaderboard.push({"name": getPlayerNameFromHandle(wsObject), "score": score});
+    })
+    return jsonLeaderboard;
+}
+
+const STATUS_CONNECTION_ACCEPT = "ACCEPT";
+const STATUS_CONNECTION_DENIED = "DENIED";
+const STATUS_CONNECTION_NOTIFY = "NOTIFY";
+const STATUS_CONNECTION_GAMESTART = "GS";
+const STATUS_CONNECTION_GAMEEND = "GE";
+
+async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
+    if(wsObject.readyState == WebSocket.OPEN) {
+        if(statusMessage === undefined) await wsObject.send(JSON.stringify({"status": statusCode}));
+        else await wsObject.send(JSON.stringify({"status": statusCode, "message": statusMessage}));
     }
-    return false;
+}
+
+async function sendConnectionAccepted(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_ACCEPT);
+}
+
+async function sendConnectionRoomIsFull(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_DENIED, "Room is full");
+}
+
+async function sendConnectionInvalidID(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_DENIED, "Invalid room ID");
+}
+
+async function sendConnectionWaitingForEvent(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_NOTIFY, "Waiting for event...");
+}
+
+async function sendConnectionGameStart(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_GAMESTART, "Starting game...");
+}
+
+async function sendConnectionGameStop(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_GAMEEND, "Stopping game...");
+}
+
+async function broadcastKeywordLength(keywordObject) {
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        wsObject.send(JSON.stringify({"keyword_length": keywordObject["keyword"].length}))
+        Promise.resolve();
+    });
+
+    await Promise.all(sendPromises);
 }
 
 async function broadcastQuestion(questionObject, serverTimepoint) {
@@ -134,13 +154,14 @@ async function broadcastAnswer(originalQuestionObject, serverTimepoint) {
         const playerAnswerObj = clientAnswerList.get(wsObject);
         const playerAnswer = playerAnswerObj["answer"];
         const playerTimepoint = playerAnswerObj["time"];
-        if(playerAnswer === correctAnswer) {
-            // console.log(`Client ${playerName} give correct answer: ${playerAnswer}`);
-            wsObject.send(`Correct answer!`);
-        } else {
-            // console.log(`Client ${playerName} give incorrect answer: ${playerAnswer}`);
-            wsObject.send(`Wrong answer. Correct answer is ${correctAnswer}`);
-        }
+        wsObject.send(JSON.stringify({"is_correct": (playerAnswer === correctAnswer ? 1 : 0), "correct_answer": correctAnswer}))
+        // if(playerAnswer === correctAnswer) {
+        //     console.log(`Client ${playerName} give correct answer: ${playerAnswer}`);
+        //     wsObject.send(`Correct answer!`);
+        // } else {
+        //     console.log(`Client ${playerName} give incorrect answer: ${playerAnswer}`);
+        //     wsObject.send(`Wrong answer. Correct answer is ${correctAnswer}`);
+        // }
         resultArr.push({"wsobj": wsObject, "answer": playerAnswer, "epoch": playerTimepoint - serverTimepoint, "point": 0});
         return Promise.resolve();
     });
@@ -154,23 +175,43 @@ async function broadcastAnswer(originalQuestionObject, serverTimepoint) {
     });
 
     let tpoint = 40;
+    let tbool = false;
     for(let ele of resultArr) {
         if(ele["answer"] === correctAnswer) {
+            tbool = true;
             ele["point"] = tpoint;
             updateClientScore(ele["wsobj"], tpoint);
             tpoint -= 10;
         }
     }
+
+    return tbool;
+}
+
+async function broadcastClue(keywordObject, doSendClue) {
+    let selectedIndex = getRandomIndex(keywordObject["clues"]);
+    let clueWord = null;
+    if(doSendClue) {
+        clueWord = keywordObject["clues"][selectedIndex];
+    }
+    //discard for nothing in case of all incorrect answer
+    keywordObject["clues"].splice(selectedIndex, 1);       
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        wsObject.send(JSON.stringify({"clue": clueWord}));
+    })
+
+    await Promise.all(sendPromises);
 }
 
 async function broadcastResultBoard() {
-    let resultString = "Result:\n";
+    let sendJsonResultArr = [];
     resultArr.map(({wsobj, answer, epoch, point}) => {
         let epochInSecond = epoch/1000;
-        resultString += `${epochInSecond.toFixed(3)}s ~ ${clientList.get(wsobj)}: ${answer} => +${point}\n`;
+        console.log(`${epochInSecond.toFixed(3)}s ~ ${getPlayerNameFromHandle(wsobj)}: ${answer} => +${point}`);
+        sendJsonResultArr.push({"epoch": epochInSecond, "name": getPlayerNameFromHandle(wsobj), "answer": answer, "point": point});
     })
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        wsObject.send(resultString);
+        wsObject.send(JSON.stringify(sendJsonResultArr));
         Promise.resolve();
     });
 
@@ -178,12 +219,9 @@ async function broadcastResultBoard() {
 }
 
 async function broadcastLeaderboard() {
-    let leaderboardString = "Leaderboard:\n";
-    Array.from(clientScoreList).map(([wsObject, score]) => {
-        leaderboardString += `${clientList.get(wsObject)}: ${score}\n`;
-    })
+    console.log(getLeaderboard());
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        wsObject.send(leaderboardString);
+        wsObject.send(JSON.stringify(getLeaderboard()));
         Promise.resolve();
     });
 
@@ -196,7 +234,7 @@ app.ws("/", (ws, req) => {
 
     ws.on("close", () => {
         if (clientList.has(ws)) {
-            console.log(`Player ${clientList.get(ws)} disconnected`);
+            console.log(`Player ${getPlayerNameFromHandle(ws)} disconnected`);
             clientList.delete(ws);
             clientWorkingStateList.delete(ws);
             clientAnswerList.delete(ws);
@@ -232,16 +270,16 @@ app.ws("/", (ws, req) => {
                 clientAnswerList.set(ws, undefined);
                 clientScoreList.set(ws, 0);
                 console.log(`Player ${clientName} authorized`);
-                ws.send("Authorized!");
+                sendConnectionAccepted(ws);
                 currentPlayerCount++;
             } else {
                 console.log(`Player ${clientName} refused. Room is full!`);
-                ws.send("Room is full!")
+                sendConnectionRoomIsFull(ws);
                 ws.close();
             }
         } else {
             console.log(`Player ${clientName} unauthorized`);
-            ws.send("Invalid room id. Unauthorized")
+            sendConnectionInvalidID(ws);
             ws.close();
         }
     });
@@ -275,19 +313,6 @@ async function initGame() {
     }
 }
 
-async function sendQuestion() {
-    const randomIndex = Math.floor(Math.random() * keywordsList.length);
-    const question_selected = questionsList[randomIndex];
-    questionsList.splice(randomIndex, 1);
-    await boardcastClient(question_selected)
-}
-
-async function sendKeyword() {
-    const randomIndex = Math.floor(Math.random() * keywordsList.length);
-    const keyword_selected = keywordsList[randomIndex];
-    keywordsList.splice(randomIndex, 1);
-    await boardcastClient(keyword_selected)
-}
 
 async function choosePiece(params) {
 
@@ -301,6 +326,11 @@ async function prepareClientQuestion(originalQuestionObject) {
 } 
 
 async function ingame() {
+    let selectedKeywordObject = keywordsList[getRandomIndex(keywordsList)];
+    console.log(`Selected keyword: ${selectedKeywordObject["keyword"]}`)
+    randomShuffleArray(selectedKeywordObject["clues"]);
+    await broadcastKeywordLength(selectedKeywordObject);
+
     for (let i = 0; i < 12; i++) {
         let givenIndex = getRandomIndex(questionsList);
         let originalQuestionObject = { ...questionsList[givenIndex] };  ////still a json object
@@ -310,8 +340,9 @@ async function ingame() {
 
         let serverTimepoint = Date.now();
         await broadcastQuestion(questionObject, serverTimepoint);
-        await broadcastAnswer(originalQuestionObject, serverTimepoint);
+        let anyCorrectAnswerGiven = await broadcastAnswer(originalQuestionObject, serverTimepoint);
         await broadcastResultBoard()
+        await broadcastClue(selectedKeywordObject, anyCorrectAnswerGiven);
         await broadcastLeaderboard();
         //for-loop is still synchronous, need to hold back
         //In practice there would be a button to choose question from UI, this is for testing
@@ -333,17 +364,13 @@ async function startGame() {
     
     let intervalHandle = setInterval(() => {
         for (let client of clientList) {
-            if (client[0].readyState === WebSocket.OPEN) {
-                client[0].send("Waiting for event...");
-            }
+            sendConnectionWaitingForEvent(client[0]);
         }
-        if (currentPlayerCount > 2) {
+        if (currentPlayerCount >= 2) {
             clearInterval(intervalHandle);
             console.log("Starting game...")
             for (let client of clientList) {
-                if (client[0].readyState === WebSocket.OPEN) {
-                    client[0].send("Starting game...!");
-                }
+                sendConnectionGameStart(client[0]);
             }
             ingame();       //setInterval is async, need to make function call to execute synchorously
         }
