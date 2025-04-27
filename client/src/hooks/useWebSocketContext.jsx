@@ -10,7 +10,6 @@ export const WebSocketProvider = ({ url, children }) => {
     onOpen: () => console.log('WebSocket open.'),
     onError: (error) => {
       console.error('WebSocket error:', error);
-      setReadyState(ReadyState.CLOSED);
     },
     onMessage: (event) => {
       messageListeners.forEach((listener) => {
