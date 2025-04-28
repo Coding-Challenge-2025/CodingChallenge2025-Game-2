@@ -12,19 +12,24 @@ import {
 
 import {
     getRandomRoomId, getRandomIndex,
-    randomShuffleArray, checkClientTimepoint
+    randomShuffleArray, checkClientTimepoint, imageFileToBase64,
+    waitForAnyKey
 } from "./utilities.js";
 
 const MAX_PLAYER = 4;
 const port = 3000;
+//all clientXXX store key as wsObject
 const clientList = new Map();               //store websocket object & name
-const clientWorkingStateList = new Map();   //store boolean client is answering
+const clientNameList = new Map();           //store name & websocket object
+const clientActiveStateList = new Map();    //store boolean client is still able to participate in the game
 const clientAnswerList = new Map();         //consists of answer & client answer time 
-const clientScoreList = new Map();         //store client's answer
-const clientMessageListenerList = new Map();
-const clientTimeoutList = new Map();
+const clientScoreList = new Map();          //leaderboard list
 let resultArr = [];   //update each play turn, json array contain wsobj, answer, epoch, point
+let permitKeywordAnswer = false;
+const keywordAnswerQueue = [];
+const keywordAnswerRecord = new Map();      //store name as key
 const ANSWER_TIMEOUT = 30000 
+const KEYWORD_CORRECT_POINT = 80
 
 let serverRoomId
 let currentPlayerCount = 0
@@ -43,6 +48,14 @@ function getPlayerNameFromHandle(wsObject) {
     return clientList.get(wsObject);
 }
 
+function getHandleFromPlayerName(playerName) {
+    return clientNameList.get(playerName);
+}
+
+function isPlayerActive(wsObject) {
+    return clientActiveStateList.get(wsObject) === true ? true : false;
+}
+
 function getLeaderboard() {
     let jsonLeaderboard = [];
     Array.from(clientScoreList).map(([wsObject, score]) => {
@@ -56,11 +69,12 @@ const STATUS_CONNECTION_DENIED = "DENIED";
 const STATUS_CONNECTION_NOTIFY = "NOTIFY";
 const STATUS_CONNECTION_GAMESTART = "GS";
 const STATUS_CONNECTION_GAMEEND = "GE";
+const STATUS_CONNECTION_PLAYERELOSE = "LOSE";
+const STATUS_CONNECTION_PLAYERWIN = "WIN";
 
 async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
     if(wsObject.readyState == WebSocket.OPEN) {
-        if(statusMessage === undefined) await wsObject.send(JSON.stringify({"status": statusCode}));
-        else await wsObject.send(JSON.stringify({"status": statusCode, "message": statusMessage}));
+        await wsObject.send(JSON.stringify({"status": statusCode, "message": statusMessage}));
     }
 }
 
@@ -76,6 +90,10 @@ async function sendConnectionInvalidID(wsObject) {
     await sendStatus(wsObject, STATUS_CONNECTION_DENIED, "Invalid room ID");
 }
 
+async function sendConnectionDuplicateName(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_DENIED, "Name already existed");
+}
+
 async function sendConnectionWaitingForEvent(wsObject) {
     await sendStatus(wsObject, STATUS_CONNECTION_NOTIFY, "Waiting for event...");
 }
@@ -84,20 +102,43 @@ async function sendConnectionGameStart(wsObject) {
     await sendStatus(wsObject, STATUS_CONNECTION_GAMESTART, "Starting game...");
 }
 
-async function sendConnectionGameStop(wsObject) {
-    await sendStatus(wsObject, STATUS_CONNECTION_GAMEEND, "Stopping game...");
+//game stop, send leaderboard
+async function sendConnectionGameEnd(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_GAMEEND, JSON.stringify(getLeaderboard()));
 }
 
-async function broadcastKeywordLength(keywordObject) {
+async function sendConnectionPlayerLose(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_PLAYERELOSE);
+}
+
+async function sendConnectionPlayerWin(wsObject) {
+    await sendStatus(wsObject, STATUS_CONNECTION_PLAYERWIN);
+}
+
+async function broadcastKeywordProperties(keywordObject) {
+    let base64Image = await imageFileToBase64("assets/"+keywordObject["image_dir"]);
+
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        wsObject.send(JSON.stringify({"keyword_length": keywordObject["keyword"].length}))
+        wsObject.send(JSON.stringify({"keyword_length": keywordObject["keyword"].length, "image": base64Image}))
         Promise.resolve();
     });
 
     await Promise.all(sendPromises);
 }
 
-async function broadcastQuestion(questionObject, serverTimepoint) {
+async function broadcastImpl(callback) {
+    const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        if (wsObject.readyState !== WebSocket.OPEN || !isPlayerActive(wsObject)) {
+            return Promise.resolve();
+        }
+        return new Promise(resolve => {
+            callback(resolve, wsObject, playerName);
+        });
+    });
+    await Promise.all(sendPromises);
+}
+
+async function broadcastQuestion(questionObject, serverTimepoint, forceWaiting = false) {
     //Every resolve call mark each client completion
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if (wsObject.readyState !== WebSocket.OPEN) {
@@ -108,38 +149,48 @@ async function broadcastQuestion(questionObject, serverTimepoint) {
             clientAnswerList.set(wsObject, undefined);
             console.log(`Question sent to player ${playerName}`)
 
-            const timeoutId = setTimeout(() => {
-                console.log(`No response from client ${playerName}`);
+            if(isPlayerActive(wsObject)) {
+                const timeoutId = setTimeout(() => {
+                    console.log(`No response from client ${playerName}`);
+                    const clientAnswerJson = {"answer": "", "time": serverTimepoint};
+                    clientAnswerList.set(wsObject, clientAnswerJson);
+                    resolve()
+                }, ANSWER_TIMEOUT);
+
+                //Client shall sent its answer timepoint. If none or invalid provided, server timepoint is used
+                const answerListener = (clientAnswer) => {
+                    try {
+                        let capturedTimepoint = Date.now();
+                        const clientAnswerJson = JSON.parse(clientAnswer.toString());
+                        if(clientAnswerJson["answer"] !== undefined) {
+                            clearTimeout(timeoutId);
+                            console.log(`Client ${playerName} sent answer`);
+                            wsObject.off("message", answerListener);
+                            //Check client timepoint
+                            if(!checkClientTimepoint(clientAnswerJson["time"], serverTimepoint)) {
+                                clientAnswerJson["time"] = capturedTimepoint;
+                            }
+                            clientAnswerList.set(wsObject, clientAnswerJson);
+                            resolve();
+                        }
+                    } catch(error) {
+                        console.error(`Error parsing answer from client ${playerName}: `, error);
+                    }
+                };
+                wsObject.on("message", answerListener);
+            } else {
                 const clientAnswerJson = {"answer": "", "time": serverTimepoint};
                 clientAnswerList.set(wsObject, clientAnswerJson);
-                resolve()
-            }, ANSWER_TIMEOUT);
-
-            //Client shall sent its answer timepoint. If none or invalid provided, server timepoint is used
-            const answerListener = (clientAnswer) => {
-                try {
-                    let capturedTimepoint = Date.now();
-                    const clientAnswerJson = JSON.parse(clientAnswer.toString());
-                    if(clientAnswerJson["answer"] !== undefined) {
-                        clearTimeout(timeoutId);
-                        console.log(`Client ${playerName} sent answer`);
-                        wsObject.off("message", answerListener);
-                        //Check client timepoint
-                        if(!checkClientTimepoint(clientAnswerJson["time"], serverTimepoint)) {
-                            clientAnswerJson["time"] = capturedTimepoint;
-                        }
-                        clientAnswerList.set(wsObject, clientAnswerJson);
-                        resolve();
-                    }
-                } catch(error) {
-                    console.error(`Error parsing answer from client ${playerName}: `, error);
-                }
+                resolve();
             }
-
-            wsObject.on("message", answerListener);
-
         })
     })
+
+    if(forceWaiting) {
+        const outerTimeoutHandle = setTimeout(() => {
+            clearTimeout(outerTimeoutHandle);
+        }, ANSWER_TIMEOUT);
+    }
 
     // Await *all* the client‑promises before returning
     await Promise.all(sendPromises);
@@ -228,6 +279,52 @@ async function broadcastLeaderboard() {
     await Promise.all(sendPromises);
 }
 
+//answer keyword by connecting to this endpoint with josn data: name, keyword
+app.ws("/submitkeyword", (ws, req) => {
+    ws.once('message', (msg) => {
+        if(permitKeywordAnswer) {
+            let jsonData
+            try {
+                jsonData = JSON.parse(msg);
+            } catch (error) {
+                return
+            }
+
+            let clientName = jsonData["name"];
+            let clientKeyword = jsonData["keyword"];
+            if(getHandleFromPlayerName(clientName) === undefined || 
+                !isPlayerActive(getHandleFromPlayerName(clientName)) || 
+                    keywordAnswerRecord.get(clientName) != undefined) {
+                    return;
+            } else {
+                console.log(`Player ${clientName} answer keyword`);
+                keywordAnswerQueue.push(jsonData);
+                keywordAnswerRecord.set(clientName, clientKeyword);
+            }
+        }
+    })
+});
+
+async function resolveKeywordAnswer(keywordString) {
+    for(let ele of keywordAnswerQueue) {
+        let clientName = ele["name"];
+        let clientKeyword = ele["keyword"];
+
+        clientActiveStateList.set(getHandleFromPlayerName(clientName), false);
+        if(clientKeyword === keywordString) {
+            console.log(`Player ${clientName} keyword ${clientKeyword} correct!`);
+            updateClientScore(getHandleFromPlayerName(clientName), KEYWORD_CORRECT_POINT);
+            sendConnectionPlayerWin(getHandleFromPlayerName(clientName));
+            return true;
+        } else {
+            console.log(`Player ${clientName} keyword ${clientKeyword} incorrect`);
+            sendConnectionPlayerLose(getHandleFromPlayerName(clientName));
+        }
+    }
+    keywordAnswerQueue.splice(0);
+    return false;
+}
+
 app.ws("/", (ws, req) => {
     let clientRemoveAddress = req.socket.remoteAddress
     console.log(`A client has connected from address ${clientRemoveAddress}. Waiting for identification`);
@@ -236,11 +333,9 @@ app.ws("/", (ws, req) => {
         if (clientList.has(ws)) {
             console.log(`Player ${getPlayerNameFromHandle(ws)} disconnected`);
             clientList.delete(ws);
-            clientWorkingStateList.delete(ws);
+            clientActiveStateList.delete(ws);
             clientAnswerList.delete(ws);
             clientScoreList.delete(ws);
-            clientMessageListenerList.delete(ws);
-            clientTimeoutList.delete(ws);
             currentPlayerCount--;
         }
     });
@@ -263,25 +358,33 @@ app.ws("/", (ws, req) => {
 
         console.log(`Client name: ${clientName}\nClient ID: ${roomId}`);
 
-        if (roomId == serverRoomId) {
-            if (currentPlayerCount <= MAX_PLAYER) {
-                clientList.set(ws, clientName)
-                clientWorkingStateList.set(ws, false);
-                clientAnswerList.set(ws, undefined);
-                clientScoreList.set(ws, 0);
-                console.log(`Player ${clientName} authorized`);
-                sendConnectionAccepted(ws);
-                currentPlayerCount++;
-            } else {
-                console.log(`Player ${clientName} refused. Room is full!`);
-                sendConnectionRoomIsFull(ws);
-                ws.close();
-            }
-        } else {
+        if(roomId !== serverRoomId) {
             console.log(`Player ${clientName} unauthorized`);
             sendConnectionInvalidID(ws);
             ws.close();
+            return;
         }
+        if(currentPlayerCount >= MAX_PLAYER) {
+            console.log(`Player ${clientName} refused. Room is full!`);
+            sendConnectionRoomIsFull(ws);
+            ws.close();
+            return;
+        }
+        if(getHandleFromPlayerName(clientName) !== undefined) {
+            console.log(`Player ${clientName} refused. Duplicated name`);
+            sendConnectionDuplicateName(ws);
+            ws.close();
+            return;
+        }
+
+        clientList.set(ws, clientName)
+        clientNameList.set(clientName, ws);
+        clientActiveStateList.set(ws, true);
+        clientAnswerList.set(ws, undefined);
+        clientScoreList.set(ws, 0);
+        console.log(`Player ${clientName} authorized`);
+        sendConnectionAccepted(ws);
+        currentPlayerCount++;
     });
 });
 
@@ -318,38 +421,68 @@ async function choosePiece(params) {
 
 }
 
-async function prepareClientQuestion(originalQuestionObject) {
+async function prepareClientQuestion(originalQuestionObject, questionIndex) {
     let newObject = JSON.parse(JSON.stringify(originalQuestionObject));
     newObject["answer_index"] = undefined;
+    newObject["question_index"] = questionIndex;
     randomShuffleArray(newObject["choice"]);
     return newObject;
-} 
+}
+
+//waiting for ui...
+async function verifyAnswer() {
+
+}
 
 async function ingame() {
+    permitKeywordAnswer = true;
     let selectedKeywordObject = keywordsList[getRandomIndex(keywordsList)];
     console.log(`Selected keyword: ${selectedKeywordObject["keyword"]}`)
     randomShuffleArray(selectedKeywordObject["clues"]);
-    await broadcastKeywordLength(selectedKeywordObject);
+    await broadcastKeywordProperties(selectedKeywordObject);
 
     for (let i = 0; i < 12; i++) {
         let givenIndex = getRandomIndex(questionsList);
         let originalQuestionObject = { ...questionsList[givenIndex] };  ////still a json object
         questionsList.splice(givenIndex, 1);
 
-        let questionObject = await prepareClientQuestion(originalQuestionObject);
+        let questionObject = await prepareClientQuestion(originalQuestionObject, i+1);
 
         let serverTimepoint = Date.now();
         await broadcastQuestion(questionObject, serverTimepoint);
         let anyCorrectAnswerGiven = await broadcastAnswer(originalQuestionObject, serverTimepoint);
+        await waitForAnyKey("Press any key to result");
         await broadcastResultBoard()
         await broadcastClue(selectedKeywordObject, anyCorrectAnswerGiven);
+
+        if(keywordAnswerQueue.length > 0) await waitForAnyKey("Press any key to resolve keyword answer");
+        let winnerFound = await resolveKeywordAnswer(selectedKeywordObject["keyword"]);
+        if(winnerFound) {
+            broadcastImpl((resolve, wsObject) => {
+                sendConnectionGameEnd(wsObject)
+                resolve();
+            });
+            permitKeywordAnswer = false
+            return;
+        }
+
+        await waitForAnyKey("Press any key for leaderboard");
         await broadcastLeaderboard();
         //for-loop is still synchronous, need to hold back
         //In practice there would be a button to choose question from UI, this is for testing
-        const delayBetweenQuestion = 3000;
-        console.log(`Cooldown between question: ${delayBetweenQuestion}ms`)
-        await new Promise(dummy => setTimeout(dummy, delayBetweenQuestion));
+        // const delayBetweenQuestion = 3000;
+        // console.log(`Cooldown between question: ${delayBetweenQuestion}ms`)
+        // await new Promise(dummy => setTimeout(dummy, delayBetweenQuestion));
+
+        await waitForAnyKey("Press any key to next question");
     }
+
+    //can be a long delay here
+    permitKeywordAnswer = false;
+    broadcastImpl((resolve, wsObject) => {
+        sendConnectionGameEnd(wsObject)
+        resolve();
+    });
 }
 
 function getConnectedPlayerName() {
