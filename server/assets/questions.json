@@ -1,225 +1,180 @@
 {
-  "questions":
-    [
-      {
-        "question": "Máy tính điện tử đầu tiên được sản xuất vào năm mấy?",
-        "choice": ["1943", "1945", "1642", "1837"],
-        "answer_index": 1
-      },
-      {
-        "question": "Tên viết tắt của máy tính điện tử đầu tiên được sản xuất?",
-        "choice": ["ENIAC", "ZOTAC", "THERAC", "Z3"],
-        "answer_index": 0
-      },
-      {
-        "question": "Một công cụ tìm kiếm được phát triển để nâng cao độ bảo mật của người dùng?",
-        "choice": ["Duck Duck Go", "Brave", "Zen", "Coccoc"],
-        "answer_index": 0
-      },
-      {
-        "question": "Phương pháp thiết kế phần mềm phát triển bởi Harlan Mills, đề cao việc xây dựng phần mềm mang tính bền bỉ, ít lỗi nhất có thể?",
-        "choice": ["Agile", "CLEANROOM", "Spiral", "Waterfall"],
-        "answer_index": 1
-      },
-      {
-        "question": "Tín hiệu gửi đến bộ vi xử lý để yêu cầu xử lý tức thì?",
-        "choice": ["Interrupt", "Halt", "SEND", "syscall"],
-        "answer_index": 0
-      },
-      {
-        "question": "Cho 2 điểm A(x1, y1) và B(x2, y2). Khoảng cách d(A, B) = |x1 - x2| + |y1 - y2|. Đây là độ đo khoảng cách gì?",
-        "choice": ["Euclidean", "Manhattan", "Euclidean", "Minkowski"],
-        "answer_index": 1
-      },
-      {
-        "question": "Ngôn ngữ lập trình nào được thiết kế tại Google bởi Lars Bak và Kasper Lund?",
-        "choice": ["Carbon", "Go", "Kotlin", "Dart"],
-        "answer_index": 3
-      },
-      {
-        "question": "Một giao thức chuẩn TCP/IP được dùng để truyền tải thư điện tử (e-mail) trên mạng Internet?",
-        "choice": ["SMP", "SMTP", "NNTP", "IRC"],
-        "answer_index": 1
-      },
-      {
-        "question": "Một loại định dạng ký tự Unicode được dùng phổ biến trên phần lớn các trang web hiện nay?",
-        "choice": ["UCS-2", "UTF-16", "UTF-8", "ASCII"],
-        "answer_index": 2
-      },
-      {
-        "question": "Hệ điều hành MS-DOS thường gán các ổ cứng ký tự từ C trở đi, vậy các chữ cái A và B được dành cho thiết bị nào?",
-        "choice": ["Đĩa mềm", "Đĩa ảo", "Máy fax", "Switch"],
-        "answer_index": 0
-      },
-      {
-        "question": "Một loại design pattern diễn tả một nhóm đối tượng có thể được dùng như một đối tượng chung lớp với nhau.",
-        "choice": ["Composite", "Decorator", "Observer", "Flyweight"],
-        "answer_index": 0
-      },
-      {
-        "question": "This is an open-source, cross-platform, back-end Javascript runtime environment that runs on V8 engine and executes Javascript code outside a web browser.",
-        "choice": ["NodeJS", "WebAssembly", "Ruby on Rails", "Java"],
-        "answer_index": 0
-      },
-      {
-        "question": "Tên của mô hình điện toán phân tán, đưa tính toán và lưu trữ dữ liệu đến gần vị trí cần thiết hơn, để cải thiện thời gian phản hồi và tiết kiệm băng thông?",
-        "choice": ["Cloud computing", "Mainframe computing", "Node computing", "Edge computing"],
-        "answer_index": 3
-      },
-      {
-        "question": "Hệ thống quản lý tập tin thường được sử dụng trên các hệ điều hành Windows hiện nay (bắt đầu từ Windows NT 3.1)",
-        "choice": ["ReFS", "ReiserFS", "NTFS", "exFAT"],
-        "answer_index": 2
-      },
-      {
-        "question": "5V - hãy cho biết tính chất còn thiếu trong 5 tính chất quan trọng của Big Data: Volume, Variety, Velocity, Value và ...",
-        "choice": ["VERACITY", "VISCOSITY", "Verifiable", "Void"],
-        "answer_index": 0
-      },
-      {
-        "question": "Chương trình chơi cờ vây thông minh phát triển bởi David Wu",
-        "choice": ["AlphaGo", "Fuego", "MoGo", "KataGo"],
-        "answer_index": 3
-      },
-      {
-        "question": "Nguyên tắc triết học nào khuyến khích việc lựa chọn giả thuyết đơn giản nhất nhưng vẫn giải thích đầy đủ các bằng chứng?",
-        "choice": ["Relativity Theory", "Butterfly Effect", "Zeno's Paradox", "Ockham's Razor"],
-        "answer_index": 3
-      },
-      {
-        "question": "Thuật toán nào sau đây là một chiến lược dựa trên xác suất để giải quyết bài toán \"multi-armed bandit\" bằng cách lấy mẫu từ phân phối hậu nghiệm của giá trị phần thưởng cho mỗi lựa chọn?",
-        "choice": ["Greedy", "Thompson Sampling", "Epsilon-Greedy", "Upper Confidence Bound"],
-        "answer_index": 1
-      },
-      {
-        "question": "Trong lý thuyết đồ thị, thuật toán nào được sử dụng để tìm đường đi ngắn nhất từ một đỉnh đến tất cả các đỉnh khác trong đồ thị có trọng số không âm?",
-        "choice": ["Ford-Bellman", "Dijkstra", "Floyd-Warshal", "Held-Karp"],
-        "answer_index": 1
-      },
-      {
-        "question": "Tên của định lý khẳng định rằng mọi đồ thị đơn với số cạnh lớn hơn một nửa số đỉnh nhân với số đỉnh trừ một thì có ít nhất một chu trình Hamilton?",
-        "choice": ["Dirac", "Euler", "Ore", "Kuratowski"],
-        "answer_index": 0
-      },
-      {
-        "question": "Hệ điều hành Linux có tên ban đầu là gì",
-        "choice": ["Freaks", "Linus's", "Xerox", "Unix"],
-        "answer_index": 0
-      },
-      {
-        "question": "Phương pháp số nào được sử dụng để tìm nghiệm gần đúng của phương trình phi tuyến bằng cách lặp lại một giá trị gần đúng ban đầu?",
-        "choice": ["Newton-Raphson", "Secant", "Bisection", "Fixed-Point Iteration"],
-        "answer_index": 0
-      },
-      {
-        "question": "Phương pháp nào trong nội suy số sử dụng đa thức bậc cao để xấp xỉ một hàm dựa trên một tập hợp các điểm dữ liệu?",
-        "choice": ["Lagrange Interpolation", "Spline Interpolation", "Newton Interpolation", "Nearest-neighbor Interpolation"],
-        "answer_index": 0
-      },
-      {
-        "question": "Lớp các bài toán quyết định mà mọi bài toán trong NP đều có thể quy về trong thời gian đa thức được gọi là gì?",
-        "choice": ["NP-hard", "NP-complete", "P", "NP"],
-        "answer_index": 0
-      },
-      {
-        "question": "Thuật toán nào sau đây được sử dụng để tìm các thành phần liên thông mạnh trong một đồ thị có hướng?",
-        "choice": ["Kosaraju", "SPFA", "Kruskal", "Boruvka"],
-        "answer_index": 0
-      },
-      {
-        "question": "Phép biến hình hình học nào bảo toàn tính thẳng hàng (collinearity) và tỷ lệ khoảng cách (ratio of distances) giữa các điểm?",
-        "choice": ["Affine Transformation", "Isometry", "Projective Transformation", "Z-buffer"],
-        "answer_index": 0
-      },
-      {
-        "question": "Which company developed the C programming language?",
-        "choice": ["Bell", "Nokia", "Phillips", "IBM"],
-        "answer_index": 0
-      },
-      {
-        "question": "Guido van Rossum, được biết đến là cha để của ngôn ngữ lập trình Python, là người Hà Lan. Thành phố nào là nơi sinh của ông",
-        "choice": ["Amsterdam", "Den Haag", "The Hague", "Rotterdam"],
-        "answer_index": 2
-      },
-      {
-        "question": "Thuật toán lập lịch CPU nào ưu tiên thực thi tiến trình có thời gian burst (thời gian thực thi dự kiến) ngắn nhất?",
-        "choice": ["Round Robin", "FCFS", "SJF", "Batch"],
-        "answer_index": 2
-      },
-      {
-        "question": "Cấu trúc dữ liệu nào được sử dụng trong heap sort",
-        "choice": ["Binary heap", "Skew heap", "2-3 heap", "Splay tree"],
-        "answer_index": 0
-      },
-      {
-        "question": "Cấu trúc dữ liệu dạng cây nào thường được sử dụng để triển khai chỉ mục trong cơ sở dữ liệu, cho phép tìm kiếm, chèn và xóa hiệu quả?",
-        "choice": ["B+ tree", "2-3 tree", "Red-Black tree", "Wavelet tree"],
-        "answer_index": 0
-      },
-      {
-        "question": "Thuật toán nào có khả năng phân tích thừa số nguyên tố trong O(n^k), được sử dụng trong máy tính lượng tử?",
-        "choice": ["Shor algorithm", "Pollard's rho algorithm", "Quadratic sieve", "Schnorr-Seysen-Lenstra algorithm"],
-        "answer_index": 0
-      },
-      {
-        "question": "Loại dữ liệu nào dùng để lưu trữ số thực?",
-        "choice": ["float", "qubit", "nat", "char"],
-        "answer_index": 0
-      },
-      {
-        "question": "Thuật toán nào sau đây giúp sắp xếp trong thời gian O(n log n)?",
-        "choice": ["Merge sort", "Radix sort", "Bubble sort", "Sleep sort"],
-        "answer_index": 0
-      },
-      {
-        "question": "Thuật toán nào sau đây được sử dụng để chuyển đổi một biểu thức toán học từ ký pháp trung tố (infix notation) sang ký pháp hậu tố (postfix notation) hoặc tiền tố (prefix notation)",
-        "choice": ["Shunting-yard Algorithm", "Yen's algorithm", "Bubble sort", "Sleep sort"],
-        "answer_index": 0
-      },
-      {
-        "question": "Công nghệ truyền dữ liệu tốc độ cao, thay thế SATA, dùng trong SSD hiện đại",
-        "choice": ["NVME", "SCSI", "AHCI", "UFS"],
-        "answer_index": 0
-      },
-      {
-        "question": "Đâu là tên một loại phần mềm cho phép nhiều máy ảo (vitual machine) có thể chạy trên một máy chủ vật lý, còn được biết đến là hệ thống quản lý máy ảo (virtual machine manager) hay hệ thống ảo hóa (virtualizer)",
-        "choice": ["WMWare ESXi", "Microsoft HyperV", "Oracle Virtualbox", "QEMU"],
-        "answer_index": 0
-      },
-      {
-        "question": "Khi hệ điều hành ảo hóa ESXi gặp lỗi nghiêm trọng, màn hình chẩn đoán lỗi có màu gì",
-        "choice": ["PURPLE", "RED", "BLACK", "BLUE"],
-        "answer_index": 0
-      },
-      {
-        "question": "Cho lược đồ quan hệ R(A, B, C, D, E) gồm các phụ thuộc hàm sau:\nF: AB->C, BC->D, C->E. hãy cho biết R có bao nhiêu superkey?",
-        "choice": ["7", "8", "9", "16"],
-        "answer_index": 1
-      },
-      {
-        "question": "Cho một mảng số nguyên kích thước n, mỗi phần tử có giá trị từ 0 đến n^3 - 1. Sử dụng thuật toán radix sort để sắp xếp tăng dần dãy số, hãy cho biết để thuật toán có độ phức tạp thời gian là O(n), ta cần chọn hệ cơ số nào là tối ưu nhất?",
-        "choice": ["không thể", "n", "3n", "2log3(n)"],
-        "answer_index": 1
-      },
-      {
-        "question": "Cục router nhận gói tin từ 3 máy tuân theo phân phối mũ (exponential) với tham số lambda lần lượt bằng 1, 2 và 3. Hỏi vậy ta có thể xem như cục router này đang nhận gói tin từ một nguồn theo phân phối lũy thừa với tham số lambda bằng bao nhiêu?",
-        "choice": ["1", "6", "3", "4"],
-        "answer_index": 1
-      },
-      {
-        "question": "Bạn Lan là một lập trình viên web hiện đang phát triển một ứng dụng cho phép trình duyệt gửi yêu cầu lấy dữ liệu từ một API trên miền khác. Tuy nhiên, Lan nhận thấy một số yêu cầu bị chặn vì lý do bảo mật. Cơ chế nào được trình duyệt sử dụng để kiểm soát việc chia sẻ tài nguyên giữa các miền khác nhau trong trường hợp này?",
-        "choice": ["Invalid call", "CORS", "Firewall", "Same-Origin Policy"],
-        "answer_index": 1
-      },
-      {
-        "question": "Bạn đang làm việc trên một máy chủ Linux và cần kiểm tra dung lượng đĩa còn trống của thư mục /var/www để đảm bảo đủ chỗ cho file mới của ứng dụng web. Lệnh nào được sử dụng để hiển thị dung lượng trống còn lại một cách dễ đọc (hiển thị dưới dạng đơn vị KB, MB, GB hoặc TB)?",
-        "choice": ["du -sh /var/www", "df -h /var/www", "ls -h /var/www", "cat /var/www"],
-        "answer_index": 1
-      },
-      {
-        "question": "Hai người chơi A và B chơi trò chơi với 50 quả bóng đen, 50 quả bóng trắng, và 2 cái hộp giống hệt nhau như sau: người chơi A chia 100 quả bóng vào hai hộp tùy ý sao cho hộp nào cũng có bóng; người chơi B không được biết cách chia của người chơi A và phải chọn một trong hai hộp, rồi ngẫu nhiên một quả bóng trong hộp đó; nếu quả bóng bốc ra là màu trắng thì A thắng, còn nếu là màu đen thì B thắng. Biết rằng A chơi tối ưu. Hỏi xác suất người chơi A thắng là bao nhiêu?",
-        "choice": ["0.5", "0.7475", "0.6667", "0.75"],
-        "answer_index": 1
-      }
+    "questions": [
+        {
+            "question": "Máy tính điện tử đầu tiên được sản xuất vào năm mấy?",
+            "answer": "1945"
+        },
+        {
+            "question": "Tên viết tắt của máy tính điện tử đầu tiên được sản xuất?",
+            "answer": "ENIAC"
+        },
+        {
+            "question": "Một công cụ tìm kiếm được phát triển để nâng cao độ bảo mật của người dùng?",
+            "answer": "Duck Duck Go"
+        },
+        {
+            "question": "Phương pháp thiết kế phần mềm phát triển bởi Harlan Mills, đề cao việc xây dựng phần mềm mang tính bền bỉ, ít lỗi nhất có thể?",
+            "answer": "CLEANROOM"
+        },
+        {
+            "question": "Tín hiệu gửi đến bộ vi xử lý để yêu cầu xử lý tức thì?",
+            "answer": "Interrupt"
+        },
+        {
+            "question": "Cho 2 điểm A(x1, y1) và B(x2, y2). Khoảng cách d(A, B) = |x1 - x2| + |y1 - y2|. Đây là độ đo khoảng cách gì?",
+            "answer": "Manhattan"
+        },
+        {
+            "question": "Ngôn ngữ lập trình nào được thiết kế tại Google bởi Lars Bak và Kasper Lund?",
+            "answer": "Dart"
+        },
+        {
+            "question": "Một giao thức chuẩn TCP/IP được dùng để truyền tải thư điện tử (e-mail) trên mạng Internet?",
+            "answer": "SMTP"
+        },
+        {
+            "question": "Một loại định dạng ký tự Unicode được dùng phổ biến trên phần lớn các trang web hiện nay?",
+            "answer": "UTF-8"
+        },
+        {
+            "question": "Hệ điều hành MS-DOS thường gán các ổ cứng ký tự từ C trở đi, vậy các chữ cái A và B được dành cho thiết bị nào?",
+            "answer": "Đĩa mềm"
+        },
+        {
+            "question": "Một loại design pattern diễn tả một nhóm đối tượng có thể được dùng như một đối tượng chung lớp với nhau.",
+            "answer": "Composite"
+        },
+        {
+            "question": "This is an open-source, cross-platform, back-end Javascript runtime environment that runs on V8 engine and executes Javascript code outside a web browser.",
+            "answer": "NodeJS"
+        },
+        {
+            "question": "Tên của mô hình điện toán phân tán, đưa tính toán và lưu trữ dữ liệu đến gần vị trí cần thiết hơn, để cải thiện thời gian phản hồi và tiết kiệm băng thông?",
+            "answer": "Edge computing"
+        },
+        {
+            "question": "Hệ thống quản lý tập tin thường được sử dụng trên các hệ điều hành Windows hiện nay (bắt đầu từ Windows NT 3.1)",
+            "answer": "NTFS"
+        },
+        {
+            "question": "5V - hãy cho biết tính chất còn thiếu trong 5 tính chất quan trọng của Big Data: Volume, Variety, Velocity, Value và ...",
+            "answer": "VERACITY"
+        },
+        {
+            "question": "Chương trình chơi cờ vây thông minh phát triển bởi David Wu",
+            "answer": "KataGo"
+        },
+        {
+            "question": "Nguyên tắc triết học nào khuyến khích việc lựa chọn giả thuyết đơn giản nhất nhưng vẫn giải thích đầy đủ các bằng chứng?",
+            "answer": "Ockham's Razor"
+        },
+        {
+            "question": "Thuật toán nào sau đây là một chiến lược dựa trên xác suất để giải quyết bài toán \"multi-armed bandit\" bằng cách lấy mẫu từ phân phối hậu nghiệm của giá trị phần thưởng cho mỗi lựa chọn?",
+            "answer": "Thompson Sampling"
+        },
+        {
+            "question": "Trong lý thuyết đồ thị, thuật toán nào được sử dụng để tìm đường đi ngắn nhất từ một đỉnh đến tất cả các đỉnh khác trong đồ thị có trọng số không âm?",
+            "answer": "Dijkstra"
+        },
+        {
+            "question": "Tên của định lý khẳng định rằng mọi đồ thị đơn với số cạnh lớn hơn một nửa số đỉnh nhân với số đỉnh trừ một thì có ít nhất một chu trình Hamilton?",
+            "answer": "Dirac"
+        },
+        {
+            "question": "Hệ điều hành Linux có tên ban đầu là gì",
+            "answer": "Freaks"
+        },
+        {
+            "question": "Phương pháp số nào được sử dụng để tìm nghiệm gần đúng của phương trình phi tuyến bằng cách lặp lại một giá trị gần đúng ban đầu?",
+            "answer": "Newton-Raphson"
+        },
+        {
+            "question": "Phương pháp nào trong nội suy số sử dụng đa thức bậc cao để xấp xỉ một hàm dựa trên một tập hợp các điểm dữ liệu?",
+            "answer": "Lagrange Interpolation"
+        },
+        {
+            "question": "Lớp các bài toán quyết định mà mọi bài toán trong NP đều có thể quy về trong thời gian đa thức được gọi là gì?",
+            "answer": "NP-hard"
+        },
+        {
+            "question": "Thuật toán nào sau đây được sử dụng để tìm các thành phần liên thông mạnh trong một đồ thị có hướng?",
+            "answer": "Kosaraju"
+        },
+        {
+            "question": "Phép biến hình hình học nào bảo toàn tính thẳng hàng (collinearity) và tỷ lệ khoảng cách (ratio of distances) giữa các điểm?",
+            "answer": "Affine Transformation"
+        },
+        {
+            "question": "Which company developed the C programming language?",
+            "answer": "Bell"
+        },
+        {
+            "question": "Guido van Rossum, được biết đến là cha để của ngôn ngữ lập trình Python, là người Hà Lan. Thành phố nào là nơi sinh của ông",
+            "answer": "The Hague"
+        },
+        {
+            "question": "Thuật toán lập lịch CPU nào ưu tiên thực thi tiến trình có thời gian burst (thời gian thực thi dự kiến) ngắn nhất?",
+            "answer": "SJF"
+        },
+        {
+            "question": "Cấu trúc dữ liệu nào được sử dụng trong heap sort",
+            "answer": "Binary heap"
+        },
+        {
+            "question": "Cấu trúc dữ liệu dạng cây nào thường được sử dụng để triển khai chỉ mục trong cơ sở dữ liệu, cho phép tìm kiếm, chèn và xóa hiệu quả?",
+            "answer": "B+ tree"
+        },
+        {
+            "question": "Thuật toán nào có khả năng phân tích thừa số nguyên tố trong O(n^k), được sử dụng trong máy tính lượng tử?",
+            "answer": "Shor algorithm"
+        },
+        {
+            "question": "Loại dữ liệu nào dùng để lưu trữ số thực?",
+            "answer": "float"
+        },
+        {
+            "question": "Thuật toán nào sau đây giúp sắp xếp trong thời gian O(n log n)?",
+            "answer": "Merge sort"
+        },
+        {
+            "question": "Thuật toán nào sau đây được sử dụng để chuyển đổi một biểu thức toán học từ ký pháp trung tố (infix notation) sang ký pháp hậu tố (postfix notation) hoặc tiền tố (prefix notation)",
+            "answer": "Shunting-yard Algorithm"
+        },
+        {
+            "question": "Công nghệ truyền dữ liệu tốc độ cao, thay thế SATA, dùng trong SSD hiện đại",
+            "answer": "NVME"
+        },
+        {
+            "question": "Đâu là tên một loại phần mềm cho phép nhiều máy ảo (vitual machine) có thể chạy trên một máy chủ vật lý, còn được biết đến là hệ thống quản lý máy ảo (virtual machine manager) hay hệ thống ảo hóa (virtualizer)",
+            "answer": "WMWare ESXi"
+        },
+        {
+            "question": "Khi hệ điều hành ảo hóa ESXi gặp lỗi nghiêm trọng, màn hình chẩn đoán lỗi có màu gì",
+            "answer": "PURPLE"
+        },
+        {
+            "question": "Cho lược đồ quan hệ R(A, B, C, D, E) gồm các phụ thuộc hàm sau:\nF: AB->C, BC->D, C->E. hãy cho biết R có bao nhiêu superkey?",
+            "answer": "8"
+        },
+        {
+            "question": "Cho một mảng số nguyên kích thước n, mỗi phần tử có giá trị từ 0 đến n^3 - 1. Sử dụng thuật toán radix sort để sắp xếp tăng dần dãy số, hãy cho biết để thuật toán có độ phức tạp thời gian là O(n), ta cần chọn hệ cơ số nào là tối ưu nhất?",
+            "answer": "3n"
+        },
+        {
+            "question": "Cục router nhận gói tin từ 3 máy tuân theo phân phối mũ (exponential) với tham số lambda lần lượt bằng 1, 2 và 3. Hỏi vậy ta có thể xem như cục router này đang nhận gói tin từ một nguồn theo phân phối lũy thừa với tham số lambda bằng bao nhiêu?",
+            "answer": "6"
+        },
+        {
+            "question": "Bạn Lan là một lập trình viên web hiện đang phát triển một ứng dụng cho phép trình duyệt gửi yêu cầu lấy dữ liệu từ một API trên miền khác. Tuy nhiên, Lan nhận thấy một số yêu cầu bị chặn vì lý do bảo mật. Cơ chế nào được trình duyệt sử dụng để kiểm soát việc chia sẻ tài nguyên giữa các miền khác nhau trong trường hợp này?",
+            "answer": "CORS"
+        },
+        {
+            "question": "Bạn đang làm việc trên một máy chủ Linux và cần kiểm tra dung lượng đĩa còn trống của thư mục /var/www để đảm bảo đủ chỗ cho file mới của ứng dụng web. Lệnh nào được sử dụng để hiển thị dung lượng trống còn lại một cách dễ đọc (hiển thị dưới dạng đơn vị KB, MB, GB hoặc TB)?",
+            "answer": "df -h /var/www"
+        },
+        {
+            "question": "Hai người chơi A và B chơi trò chơi với 50 quả bóng đen, 50 quả bóng trắng, và 2 cái hộp giống hệt nhau như sau: người chơi A chia 100 quả bóng vào hai hộp tùy ý sao cho hộp nào cũng có bóng; người chơi B không được biết cách chia của người chơi A và phải chọn một trong hai hộp, rồi ngẫu nhiên một quả bóng trong hộp đó; nếu quả bóng bốc ra là màu trắng thì A thắng, còn nếu là màu đen thì B thắng. Biết rằng A chơi tối ưu. Hỏi xác suất người chơi A thắng là bao nhiêu?",
+            "answer": "0.7475"
+        }
     ]
 }
