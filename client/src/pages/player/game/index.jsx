@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import PuzzleBoard from "@/components/puzzle-board"
 import RankingBoard from "@/components/ranking-board"
 import { Clock, Send, AlertCircle } from "lucide-react"
+import Timer from "@/components/timer"
 
 export default function PlayerGame() {
   const navigate = useNavigate()
@@ -288,10 +289,7 @@ export default function PlayerGame() {
             {gamePhase === "final" ? "Game Complete" : `Round ${currentRound} of ${rounds.length}`}
           </h1>
           {(gamePhase === "question" || gamePhase === "answered") && !waitingForHost && (
-            <div className="flex items-center bg-white px-3 py-1 rounded-full shadow">
-              <Clock className="mr-1 h-4 w-4 text-blue-600" />
-              <span className="font-bold text-lg">{timeLeft}s</span>
-            </div>
+            <Timer timeLeft={timeLeft} />
           )}
         </div>
 

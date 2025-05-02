@@ -1,71 +1,27 @@
-import { useState, useEffect } from "react";
-
-export default function PuzzleBoard({ questions, revealedPieces, currentRound, audienceView = false }) {
-  const [pieces, setPieces] = useState([]);
-
-  useEffect(() => {
-    // Create puzzle pieces from the questions
-    const newPieces = questions.map((question) => ({
-      id: question.id,
-      revealed: revealedPieces.includes(question.id),
-    }));
-
-    setPieces(newPieces);
-  }, [questions, revealedPieces]);
-
-  // Create a 4x3 grid layout
-  const gridLayout = [
-    [1, 2, 3, 4],
-    [5, 6, 7, 8],
-    [9, 10, 11, 12],
-  ];
-
+export default function PuzzleBoard({ revealed, imageData }) {
   return (
-    <div className="w-full">
-      <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
-        {/* Background image that will be revealed */}
-        <div className="absolute inset-0">
-          <img
-            src={`/placeholder.jpg?round=${currentRound}`}
-            alt={`Round ${currentRound} image`}
-            className="w-full h-full object-cover"
-          />
-        </div>
+    <div class="relative mx-auto aspect-[16/9] w-full max-w-4xl overflow-hidden bg-gray-100">
+      <img alt="Round 1 image" class="absolute inset-0 h-full w-full object-cover" src={imageData} style="background-color: red" />
 
-        {/* Puzzle grid */}
-        <div className="absolute inset-0 grid grid-rows-3 gap-1 p-1">
-          {gridLayout.map((row, rowIndex) => (
-            <div key={rowIndex} className="grid grid-cols-4 gap-1">
-              {row.map((pieceId) => {
-                const piece = pieces.find((p) => p.id === pieceId);
-                return (
-                  <div
-                    key={pieceId}
-                    className={`relative flex items-center justify-center ${piece?.revealed ? "opacity-0" : "bg-blue-400"
-                      } border border-blue-500 transition-opacity duration-300`}
-                  >
-                    {!piece?.revealed && <span className="text-white text-xl font-bold">{pieceId}</span>}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
+      {revealed[0] && <div class="absolute top-0 left-0 flex h-1/2 w-1/2 items-center justify-center border border-blue-500 bg-blue-400" style="clip-path: polygon(0 0, 100% 0, 100% 52%, 52% 52%, 52% 100%, 0 100%)">
+        <span class="pb-20 text-xl font-bold text-white">1</span>
+      </div>}
 
-      {/* Keywords display */}
-      <div className="mt-2 grid grid-cols-2 gap-1 text-sm">
-        {pieces
-          .filter((p) => p.revealed)
-          .map((piece) => {
-            const question = questions.find((q) => q.id === piece.id);
-            return (
-              <div key={piece.id} className="bg-blue-100 p-1 rounded border border-blue-300 text-center">
-                <span className="font-medium text-blue-800">{question?.keyword}</span>
-              </div>
-            );
-          })}
-      </div>
+      {revealed[1] && <div class="absolute top-0 right-0 flex h-1/2 w-1/2 items-center justify-center border border-blue-500 bg-blue-400" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 48% 100%, 48% 52%, 0 52%)">
+        <span class="pb-20 text-xl font-bold text-white">2</span>
+      </div>}
+
+      {revealed[2] && <div class="absolute right-0 bottom-0 flex h-1/2 w-1/2 items-center justify-center border border-blue-500 bg-blue-400" style="clip-path: polygon(48% 0, 100% 0, 100% 100%, 0 100%, 0 48%, 48% 48%)">
+        <span class="pt-20 text-xl font-bold text-white">3</span>
+      </div>}
+
+      {revealed[3] && <div class="absolute bottom-0 left-0 flex h-1/2 w-1/2 items-center justify-center border border-blue-500 bg-blue-400" style="clip-path: polygon(0 0, 52% 0, 52% 48%, 100% 48%, 100% 100%, 0 100%)">
+        <span class="pt-20 text-xl font-bold text-white">4</span>
+      </div>}
+
+      {revealed[4] && <div class="absolute top-1/4 left-1/4 flex h-1/2 w-1/2 items-center justify-center border border-blue-500 bg-blue-400">
+        <span class="text-xl font-bold text-white">5</span>
+      </div>}
     </div>
   );
 }
