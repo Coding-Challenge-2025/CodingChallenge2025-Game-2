@@ -73,3 +73,92 @@ export async function imageFileToBase64(filePath) {
         return null;
     }
 }
+
+//filename-friendly iso8601 timestamp
+export function getLocalTimeISO8601() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+    const offsetMinutes = now.getTimezoneOffset();
+    const offsetHours = Math.abs(Math.floor(offsetMinutes / 60));
+    const offsetRemainderMinutes = Math.abs(offsetMinutes % 60);
+    const offsetSign = offsetMinutes < 0 ? '+' : '-';
+    const offsetString = `${offsetSign}${String(offsetHours).padStart(2, '0')}${String(offsetRemainderMinutes).padStart(2, '0')}`;
+    
+    return `${year}-${month}-${day}T${hours}-${minutes}-${seconds}.${milliseconds}${offsetString}`;
+}
+
+const LOGGING_CATEGORY = {
+    INFO: "INFO",
+    ERROR: "ERROR",
+}
+
+function formatLogging(loggingCategory, ...args) {
+    const timestamp = getLocalTimeISO8601();
+    let fullMessage = `${timestamp} - [${loggingCategory}] ${args.join(' ')}`;
+    return fullMessage;
+}
+
+//return true if created, false otherwise
+async function createDirectory(directoryPath) {
+    try {
+        await nodefs.access(directoryPath);
+        return false; // Directory exists
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            await nodefs.mkdir(directoryPath, { recursive: true });
+            return true;
+        }
+        throw error;
+    }
+}
+
+export async function startLogging() {
+    const logFileRoot = process.cwd() + "/log/";
+    try {
+        await createDirectory(logFileRoot);
+    } catch(error) {
+        console.error(formatLogging(LOGGING_CATEGORY.ERROR, "Couldn't create directory", error))
+        return undefined;
+    }
+
+    const timestamp = getLocalTimeISO8601();
+    let filename = nodepath.resolve(logFileRoot, timestamp + ".log");
+    nodefs.writeFile(filename, formatLogging(LOGGING_CATEGORY.INFO, "Logging initialized") + "\n", 'utf8').catch(e => {
+        console.error(formatLogging(LOGGING_CATEGORY.ERROR, "startLogging() error:", e))
+    });
+    return filename;
+}
+
+export async function logging(filename, ...args) {
+    let fullMessage = formatLogging(LOGGING_CATEGORY.INFO, args)
+    console.log(fullMessage);
+    if(filename) {
+        try {
+            await nodefs.appendFile(filename, fullMessage + '\n', 'utf8');
+        } catch (e) {
+            console.error(formatLogging(LOGGING_CATEGORY.ERROR, "logging() error: ", e));
+        }
+    } else {
+        console.error(formatLogging(LOGGING_CATEGORY.ERROR, "logging() error: file not found"));
+    }
+}
+
+export async function loggingError(filename, ...args) {
+    let fullMessage = formatLogging(LOGGING_CATEGORY.ERROR, args)
+    console.error(fullMessage);
+    if(filename) {
+        try {
+            await nodefs.appendFile(filename, fullMessage + '\n', 'utf8');
+        } catch (e) {
+            console.error(formatLogging(LOGGING_CATEGORY.ERROR, "loggingError() error: ", e));
+        }
+    } else {
+        console.error(formatLogging(LOGGING_CATEGORY.ERROR, "loggingError() error: file not found"));
+    }
+}
