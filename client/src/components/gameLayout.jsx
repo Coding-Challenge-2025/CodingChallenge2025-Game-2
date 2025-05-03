@@ -6,7 +6,7 @@ export default function GameLayout({ children }) {
     <div className="min-h-screen p-2">
       <div className="max-w-full mx-auto">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
           {/* Left column - Puzzle */}
           <Panel title="Puzzle Board">
             <PuzzleBoard revealed={[true, false, false, false, true]} imageData="" />

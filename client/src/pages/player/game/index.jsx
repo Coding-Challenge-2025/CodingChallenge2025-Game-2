@@ -15,6 +15,7 @@ import Timer from "@/components/timer"
 import GameLayout from "../../../components/gameLayout"
 import AnswerCard from "../../../components/game/answerCard"
 import KeywordCard from "../../../components/game/keywordCard"
+import Panel from "../../../components/game/panel"
 
 export default function PlayerGame() {
   const navigate = useNavigate()
@@ -288,6 +289,9 @@ export default function PlayerGame() {
     <GameLayout>
       <AnswerCard currentQuestion={{ id: 3, text: "What's ligma?" }} submitAnswer={submitAnswer} />
       <KeywordCard keywordLength={12} submitKeyword={submitKeyPhrase} />
+      <Panel title="Rankings">
+        <RankingBoard players={players} />
+      </Panel>
     </GameLayout >
   )
 
