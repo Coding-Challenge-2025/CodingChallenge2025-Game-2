@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.piece-1 {
+	clip-path: polygon(0 0, 100% 0, 100% 52%, 52% 52%, 52% 100%, 0 100%);
+}
+.piece-2 {
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 48% 100%, 48% 52%, 0 52%);
+}
+.piece-3 {
+	clip-path: polygon(48% 0, 100% 0, 100% 100%, 0 100%, 0 48%, 48% 48%);
+}
+.piece-4 {
+	clip-path: polygon(0 0, 52% 0, 52% 48%, 100% 48%, 100% 100%, 0 100%);
+}
+
+body {
+	background-image: url("/bg.png");
+	background-size: cover;
+}
+.puzzleboard {
+	background-image: url("/frame.png");
+	background-size: cover;
+}

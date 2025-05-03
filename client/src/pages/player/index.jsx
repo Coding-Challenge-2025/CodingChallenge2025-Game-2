@@ -40,11 +40,11 @@ export default function PlayerJoin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-indigo-100">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-purple-900">
-            {step === 1 ? "Join a Game" : "Create Your Profile"}
+            {step === 1 ? "Join a Game" : "Pick a name"}
           </CardTitle>
           <CardDescription>
             {step === 1 ? "Enter the room code to join" : "Choose a username for the game"}

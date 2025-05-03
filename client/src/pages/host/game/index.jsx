@@ -297,7 +297,7 @@ export default function HostGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-2">
       <div className="max-w-full mx-auto">
-        <div className="flex justify-between items-center mb-2">
+        <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold text-blue-900">
             {gamePhase === "final" ? "Game Complete" : `Round ${currentRound} of ${rounds.length}`}
           </h1>

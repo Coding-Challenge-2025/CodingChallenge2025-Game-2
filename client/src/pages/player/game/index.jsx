@@ -12,6 +12,9 @@ import PuzzleBoard from "@/components/puzzle-board"
 import RankingBoard from "@/components/ranking-board"
 import { Clock, Send, AlertCircle } from "lucide-react"
 import Timer from "@/components/timer"
+import GameLayout from "../../../components/gameLayout"
+import AnswerCard from "../../../components/game/answerCard"
+import KeywordCard from "../../../components/game/keywordCard"
 
 export default function PlayerGame() {
   const navigate = useNavigate()
@@ -280,6 +283,13 @@ export default function PlayerGame() {
   }
 
   const currentRoundData = rounds[currentRound - 1]
+
+  return (
+    <GameLayout>
+      <AnswerCard currentQuestion={{ id: 3, text: "What's ligma?" }} submitAnswer={submitAnswer} />
+      <KeywordCard keywordLength={12} submitKeyword={submitKeyPhrase} />
+    </GameLayout >
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-2">
