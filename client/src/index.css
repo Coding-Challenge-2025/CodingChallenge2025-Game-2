@@ -16,7 +16,7 @@
 }
 
 body {
-	background-image: url("/bg.png");
+	background-image: url("/bg.jpg");
 	background-size: cover;
 }
 .puzzleboard {
