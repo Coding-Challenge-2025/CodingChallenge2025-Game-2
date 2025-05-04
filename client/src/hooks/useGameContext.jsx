@@ -31,7 +31,7 @@ const ClientMessageType = {
 const initialGameState = {
   phase: GamePhase.CONNECTING,
   isPlayer: false,
-  revealed: [false, false, false, false, false],
+  revealed: Array(12).fill(false),
   score: 0,
 };
 
