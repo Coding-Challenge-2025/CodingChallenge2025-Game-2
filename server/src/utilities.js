@@ -36,12 +36,13 @@ export function randomShuffleArray(arr) {
     }
 }
 
-export function checkClientTimepoint(clientTimepoint, serverTimepoint) {
-    if(Number.isInteger(clientTimepoint)) {
-        const diff = clientTimepoint - serverTimepoint;
-        if(0 < diff && diff < ANSWER_TIMEOUT*1000) return true;
+export function fixClientTimepoint(timePointObject) {
+    if(!Number.isInteger(timePointObject["client_start"]) || timePointObject["client_start"] < timePointObject["server_start"]) {
+        timePointObject["client_start"] = timePointObject["server_start"]
     }
-    return false;
+    if(!Number.isInteger(timePointObject["client_end"]) || timePointObject["client_end"] > timePointObject["server_end"]) {
+        timePointObject["client_end"] = timePointObject["server_end"]
+    }
 }
 
 export async function imageFileToBase64(filePath) {

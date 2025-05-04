@@ -1,7 +1,5 @@
 import fs from 'fs';
 
-//TODO FIX: asynchronousity messing up reading file 
-
 //type: json object
 export let questionsList = []
 //type: json object
