@@ -7,6 +7,7 @@ import {
 import routes from '~react-pages'
 import './index.css'
 import { WebSocketProvider } from '@/hooks/useWebSocketContext';
+import { GameContextProvider } from '@/hooks/useGameContext'
 
 function App() {
   return (
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <WebSocketProvider url="ws://echo.websocket.org">
-        <App />
+        <GameContextProvider>
+          <App />
+        </GameContextProvider>
       </WebSocketProvider>
     </BrowserRouter>
   </StrictMode>,

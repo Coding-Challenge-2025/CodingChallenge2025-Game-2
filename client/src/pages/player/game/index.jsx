@@ -16,8 +16,11 @@ import GameLayout from "../../../components/gameLayout"
 import AnswerCard from "../../../components/game/answerCard"
 import KeywordCard from "../../../components/game/keywordCard"
 import Panel from "../../../components/game/panel"
+import { Label } from "@radix-ui/react-label"
+import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
 
 export default function PlayerGame() {
+  const { gameState } = useGameContext()
   const navigate = useNavigate()
   const [currentRound, setCurrentRound] = useState(1)
   const [timeLeft, setTimeLeft] = useState(15)
@@ -286,13 +289,22 @@ export default function PlayerGame() {
   const currentRoundData = rounds[currentRound - 1]
 
   return (
-    <GameLayout>
-      <AnswerCard currentQuestion={{ id: 3, text: "What's ligma?" }} submitAnswer={submitAnswer} />
-      <KeywordCard keywordLength={12} submitKeyword={submitKeyPhrase} />
-      <Panel title="Rankings">
-        <RankingBoard players={players} />
-      </Panel>
-    </GameLayout >
+    <GameLayout revealed={gameState.revealed}>
+      {gameState.phase === GamePhase.CONNECTING &&
+        <Panel title="Connecting to server...">
+          {gameState.error ?? "Waiting for server response..."}
+        </Panel>
+      }
+      {gameState.phase === GamePhase.PLAY &&
+        <AnswerCard currentQuestion={{ id: 3, text: "What's ligma?" }} submitAnswer={gameState.isPlayer ? submitAnswer : null} />
+      }
+      {gameState.phase === GamePhase.QUESTION_RESULTS &&
+        <Panel title="Rankings">
+          <RankingBoard players={players} />
+        </Panel>
+      }
+      <KeywordCard keywordLength={12} submitKeyword={gameState.isPlayer ? submitKeyPhrase : null} />
+    </GameLayout>
   )
 
   return (

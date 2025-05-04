@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react";
 import { Send, Ellipsis } from "lucide-react";
 
-export default function AnswerPanel({ submitAnswer }) {
+export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 	const [answer, setAnswer] = useState("");
 	const [answered, setAnswered] = useState(false);
 
 	const onSubmit = (e) => {
-		if (!answered) {
+		if (!answered && (!checkValidInput || checkValidInput(answer))) {
 			console.log("submission:", answer);
 			setAnswered(true);
 			submitAnswer(answer);

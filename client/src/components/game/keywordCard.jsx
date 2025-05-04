@@ -6,7 +6,8 @@ export default function KeywordCard({ keywordLength, submitKeyword }) {
 		<Panel title="Guess the keyword">
 			<h3 className="p-4">Answer is <strong>{keywordLength}</strong> characters long. Try your luck!</h3>
 
-			<AnswerPanel submitAnswer={submitKeyword} />
+			<AnswerPanel submitAnswer={submitKeyword}
+				checkValidInput={(input) => input.replace(/[\s-]/g, "").length === keywordLength} />
 		</Panel>
 	)
 }

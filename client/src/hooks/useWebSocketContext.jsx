@@ -6,7 +6,7 @@ const WebSocketContext = createContext(null);
 export const WebSocketProvider = ({ url, children }) => {
   const [messageListeners, setMessageListeners] = useState(new Set());
 
-  const { sendMessage, getWebSocket, readyState, lastMessage } = useWebSocket(url, {
+  const { sendJsonMessage, getWebSocket, readyState, lastMessage } = useWebSocket(url, {
     onOpen: () => console.log('WebSocket open.'),
     onError: (error) => {
       console.error('WebSocket error:', error);
@@ -31,7 +31,7 @@ export const WebSocketProvider = ({ url, children }) => {
   }, [setMessageListeners]);
 
   const value = {
-    sendMessage,
+    sendMessage: sendJsonMessage,
     lastMessage,
     readyState,
     getWebSocket,
