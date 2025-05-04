@@ -2,9 +2,9 @@ export default function RankingBoard({ players }) {
   return (
     <div className="w-full">
       <div className="space-y-1">
-        {players.map((player, index) => (
+        {players.slice(0).sort((a, b) => b.score - a.score).map((player, index) => (
           <div
-            key={player.id}
+            key={player.name}
             className={`flex items-center p-2 rounded-lg ${index === 0
               ? "bg-yellow-50 border border-yellow-200"
               : index === 1

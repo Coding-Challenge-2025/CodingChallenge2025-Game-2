@@ -20,7 +20,7 @@ function App() {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <WebSocketProvider url="ws://echo.websocket.org">
+      <WebSocketProvider url="ws://localhost:3000">
         <GameContextProvider>
           <App />
         </GameContextProvider>

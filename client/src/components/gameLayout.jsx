@@ -1,7 +1,7 @@
 import Panel from "./game/panel"
 import PuzzleBoard from "./puzzle-board"
 
-export default function GameLayout({ children, revealed }) {
+export default function GameLayout({ children, revealed, imageData }) {
   return (
     <div className="min-h-screen p-2">
       <div className="max-w-full mx-auto">
@@ -9,7 +9,7 @@ export default function GameLayout({ children, revealed }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
           {/* Left column - Puzzle */}
           <Panel title="Puzzle Board">
-            <PuzzleBoard revealed={revealed} imageData="" />
+            <PuzzleBoard revealed={revealed} imageData={imageData} />
           </Panel>
 
           {/* Right column - Questions and answers */}

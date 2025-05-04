@@ -11,14 +11,19 @@ export const GamePhase = {
 const ServerMessageType = {
   CONNECTION_ACCEPTED: "ACCEPT",
   CONNECTION_DENIED: "DENIED",
-  QUESTION: "QUESTION",
-  LEADERBOARD: "LEADERBOARD",
-  QUESTION_RESULTS: "RESULTS",
+  QUESTION_LOAD: "QLOAD",
+  KEYWORD_PROPERTIES: "KEYIMG",
+  QUESTION_START: "QRUN",
+  END_LEADERBOARD: "LEADERBOARD",
+  QUESTION_RESULTS: "ROUNDSCORE",
+  CLUE: "CLUE",
+  CHECK_ANSWER: "ANSCHECK",
+  CHECK_KEYWORD: "KEYCHECK",
 };
 
 const ClientMessageType = {
-  AUTHENTICATE: "AUTHENTICATE",
-  AUTHENTICATE_HOST: "AUTHENTICATE_HOST",
+  AUTHENTICATE: "LOGIN",
+  AUTHENTICATE_HOST: "LOGIN_HOST",
   SUBMIT_ANSWER: "ANSWER",
   SUBMIT_KEYWORD: "KEYWORD",
 };
@@ -35,13 +40,42 @@ const gameReducer = (state, action) => {
     case ServerMessageType.CONNECTION_DENIED:
       return { ...state, error: action.message };
     case ServerMessageType.CONNECTION_ACCEPTED:
-      return { ...state, phase: GamePhase.WAITING, isPlayer: true };
-    case ServerMessageType.QUESTION_RESULTS:
-      // TODO
-      return { ...state, question: { ...question, results: action } };
+      return { ...state, phase: GamePhase.PLAY, isPlayer: true };
+    case ServerMessageType.QUESTION_LOAD:
+      return {
+        ...state, phase: GamePhase.PLAY,
+        question: {
+          ...state.question,
+          text: action.message.question,
+          id: action.message.piece_index
+        }
+      };
+    case ServerMessageType.KEYWORD_PROPERTIES:
+      return {
+        ...state,
+        keywordLength: action.message.keyword_length,
+        image: action.message.image
+      };
+    case ServerMessageType.CLUE:
+      if (!action.message.clue)
+        return { ...state };
+      let revealed = state.revealed.slice(0);
+      revealed[state.question.id] = true;
+      return { ...state, revealed: revealed };
+    case ServerMessageType.END_LEADERBOARD:
+      return { ...state, phase: GamePhase.GAME_COMPLETE, players: action.message };
+    case ServerMessageType.QUESTION_START:
+      return { ...state, timeStart: Date.now() };
+    case ServerMessageType.CHECK_ANSWER:
+      return {
+        ...state, question: {
+          ...state.question, correct: action.message.is_correct,
+          answer: action.message.correct_answer
+        }
+      };
     default:
       console.warn("Invalid message from server:", action);
-      return state;
+      return { ...state };
   }
 };
 
@@ -78,24 +112,28 @@ export const GameContextProvider = ({ children }) => {
     if (authenticated)
       return;
     setAuthenticated(true);
-    sendMessage({ "status": ClientMessageType.AUTHENTICATE, "id": roomID, "name": username });
+    sendMessage({
+      "status": ClientMessageType.AUTHENTICATE,
+      "message": { "id": roomID, "name": username }
+    });
   });
   const authenticateHost = useCallback((roomID, password) => {
     if (authenticated)
       return;
     setAuthenticated(true);
-    sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, "id": roomID, "password": password });
+    // TODO
+    // sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, "id": roomID, "password": password });
   });
   const submitAnswer = useCallback((value) => {
     if (!authenticated)
       return false;
-    sendMessage({ "status": ClientMessageType.SUBMIT_ANSWER, "value": value });
+    sendMessage({ "status": ClientMessageType.SUBMIT_ANSWER, "message": { "answer": value } });
     return true;
   });
   const submitKeyword = useCallback((value) => {
     if (!authenticated)
       return false;
-    sendMessage({ "status": ClientMessageType.SUBMIT_KEYWORD, "value": value });
+    sendMessage({ "status": ClientMessageType.SUBMIT_KEYWORD, "message": { "keyword": value } });
     return true;
   });
 

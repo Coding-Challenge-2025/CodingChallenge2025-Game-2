@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useGameContext } from "../../hooks/useGameContext"
 
 export default function PlayerJoin() {
+  const { authenticate } = useGameContext();
   const [roomId, setRoomId] = useState("")
   const [username, setUsername] = useState("")
   const [step, setStep] = useState(1)
@@ -36,6 +38,7 @@ export default function PlayerJoin() {
 
     // In a real app, you would register the player in the room
     // For this demo, we'll just navigate to the game page
+    authenticate(roomId, username);
     navigate("/player/game")
   }
 
