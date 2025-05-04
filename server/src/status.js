@@ -34,31 +34,31 @@ export async function sendStatusAccepted(wsObject) {
 }
 
 export async function sendStatusRoomIsFull(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, "Room is full");
+    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Room is full"});
 }
 
 export async function sendStatusInvalidID(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, "Invalid room ID");
+    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Invalid room ID"});
 }
 
 export async function sendStatusDuplicateName(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, "Name already existed");
+    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Name already existed"});
 }
 
 export async function sendStatusGameAlreadyRunning(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, "Game already running!");
+    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Game already running!"});
 }
 
 export async function sendStatusWaitingForEvent(wsObject) {
-    await sendStatus(wsObject, STATUS_NOTIFY, "Waiting for event...");
+    await sendStatus(wsObject, STATUS_NOTIFY, {"message:": "Waiting for event..."});
 }
 
 export async function sendStatusGameStart(wsObject) {
-    await sendStatus(wsObject, STATUS_GAMESTART, "Starting game...");
+    await sendStatus(wsObject, STATUS_GAMESTART);
 }
 
 export async function sendStatusGameEnd(wsObject) {
-    await sendStatus(wsObject, STATUS_GAMEEND, JSON.stringify(getLeaderboard()));
+    await sendStatus(wsObject, STATUS_GAMEEND);
 }
 
 export async function sendStatusPlayerLose(wsObject) {
@@ -69,34 +69,41 @@ export async function sendStatusPlayerWin(wsObject) {
     await sendStatus(wsObject, STATUS_PLAYERWIN);
 }
 
+//{keyword_length: int, image: base64string}
 export async function sendStatusKeyImage(wsObject, keyImageObject) {
-    await sendStatus(wsObject, STATUS_KEYIMAGE, JSON.stringify(keyImageObject));
+    await sendStatus(wsObject, STATUS_KEYIMAGE, keyImageObject);
 }
 
+//{question: string, piece_index: int}
 export async function sendStatusLoadQuestion(wsObject, questionObject) {
-    await sendStatus(wsObject, STATUS_QUESTIONLOAD, JSON.stringify(questionObject));
+    await sendStatus(wsObject, STATUS_QUESTIONLOAD, questionObject);
 }
 
 export async function sendStatusRunQuestion(wsObject) {
     await sendStatus(wsObject, STATUS_QUESTIONRUN);
 }
 
+//{is_correct: 0 or 1, correct_answer: string}
 export async function sendStatusCheckAnswer(wsObject, checkObject) {
-    await sendStatus(wsObject, STATUS_CHECKANSWER, JSON.stringify(checkObject));
+    await sendStatus(wsObject, STATUS_CHECKANSWER, checkObject);
 }
 
+//{is_correct: 0 or 1}
 export async function sendStatusCheckKeyword(wsObject, checkObject) {
-    await sendStatus(wsObject, STATUS_CHECKKEYWORD, JSON.stringify(checkObject));
+    await sendStatus(wsObject, STATUS_CHECKKEYWORD, checkObject);
 }
 
+//{clue: string}
 export async function sendStatusClue(wsObject, clueObject) {
-    await sendStatus(wsObject, STATUS_CLUE, JSON.stringify(clueObject));
+    await sendStatus(wsObject, STATUS_CLUE, clueObject);
 }
 
+//array of {name: string, score: int}
 export async function sendStatusLeaderboard(wsObject, leaderboardObject) {
-    await sendStatus(wsObject, STATUS_LEADERBOARD, JSON.stringify(leaderboardObject));
+    await sendStatus(wsObject, STATUS_LEADERBOARD, leaderboardObject);
 }
 
+//array of {epoch: float, name: string, answer: string, point: int}
 export async function sendStatusRoundScore(wsObject, roundScoreObject) {
-    await sendStatus(wsObject, STATUS_ROUNDSCORE, JSON.stringify(roundScoreObject));
+    await sendStatus(wsObject, STATUS_ROUNDSCORE, roundScoreObject);
 }

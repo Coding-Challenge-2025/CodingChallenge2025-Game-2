@@ -252,7 +252,7 @@ async function broadcastRoundScore() {
         sendJsonResultArr.push({"epoch": epochInSecond, "name": getPlayerNameFromHandle(wsobj), "answer": answer, "point": point});
     })
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        return status.sendStatusRoundScore(wsObject, JSON.stringify(sendJsonResultArr))
+        return status.sendStatusRoundScore(wsObject, sendJsonResultArr)
     });
 
     await Promise.all(sendPromises);
@@ -402,24 +402,17 @@ app.ws("/", (ws, req) => {
         let clientStatus = jsonData["status"];
         let clientMessage = jsonData["message"];
         //For now, all status from client have message data, so let it here
-        let jsonClientMessage;
-        try {
-            jsonClientMessage = JSON.parse(clientMessage);
-        } catch(error) {
-            loggingError(loggingFilename, "Error parsing JSON from client:", error.message);
-            return
-        }
         switch(clientStatus) {
             case status.STATUS_LOGIN: {
-                handleStatusLogin(ws, jsonClientMessage);
+                handleStatusLogin(ws, clientMessage);
                 break;
             }
             case status.STATUS_ANSWER: {
-                handleStatusAnswer(ws, jsonClientMessage);
+                handleStatusAnswer(ws, clientMessage);
                 break;
             }
             case status.STATUS_KEYWORD: {
-                handleStatusKeyword(ws, jsonClientMessage);
+                handleStatusKeyword(ws, clientMessage);
                 break;
             }
         }
