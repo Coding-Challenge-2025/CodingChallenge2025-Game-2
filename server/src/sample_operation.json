@@ -1,0 +1,8 @@
+{
+    "status": "LOGIN", 
+    "message": {"name": "hieu", "id": "FA90", "score": 50}
+}
+
+{"status": "ANSWER", "message": {"answer": "aaaaa"}}
+
+{"status": "KEYWORD", "message": {"keyword": "aaaaa"}}
