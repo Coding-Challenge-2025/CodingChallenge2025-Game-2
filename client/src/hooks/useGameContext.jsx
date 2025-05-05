@@ -19,6 +19,7 @@ const ServerMessageType = {
   CLUE: "CLUE",
   CHECK_ANSWER: "ANSCHECK",
   CHECK_KEYWORD: "KEYCHECK",
+  GAME_END: "END",
 };
 
 const ClientMessageType = {
@@ -31,24 +32,26 @@ const ClientMessageType = {
 const initialGameState = {
   phase: GamePhase.CONNECTING,
   isPlayer: false,
-  revealed: [false, false, false, false, false],
+  revealed: Array(12).fill(false),
   score: 0,
+  questionsAnswered: 0,
 };
 
 const gameReducer = (state, action) => {
   switch (action.status) {
     case ServerMessageType.CONNECTION_DENIED:
-      return { ...state, error: action.message };
+      return { ...state, error: action.message.reason };
     case ServerMessageType.CONNECTION_ACCEPTED:
       return { ...state, phase: GamePhase.PLAY, isPlayer: true };
+    case ServerMessageType.GAME_END:
+      return { ...state, phase: GamePhase.GAME_COMPLETE };
     case ServerMessageType.QUESTION_LOAD:
       return {
         ...state, phase: GamePhase.PLAY,
         question: {
-          ...state.question,
           text: action.message.question,
           id: action.message.piece_index
-        }
+        }, timeStart: undefined,
       };
     case ServerMessageType.KEYWORD_PROPERTIES:
       return {
@@ -63,7 +66,7 @@ const gameReducer = (state, action) => {
       revealed[state.question.id] = true;
       return { ...state, revealed: revealed };
     case ServerMessageType.END_LEADERBOARD:
-      return { ...state, phase: GamePhase.GAME_COMPLETE, players: action.message };
+      return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
       return { ...state, timeStart: Date.now() };
     case ServerMessageType.CHECK_ANSWER:
@@ -71,8 +74,12 @@ const gameReducer = (state, action) => {
         ...state, question: {
           ...state.question, correct: action.message.is_correct,
           answer: action.message.correct_answer
-        }
+        },
       };
+    case ServerMessageType.QUESTION_RESULTS:
+      return { ...state, questionsAnswered: state.questionsAnswered + 1 };
+    case ServerMessageType.GAME_END:
+      return { ...state, phase: GamePhase.GAME_COMPLETE };
     default:
       console.warn("Invalid message from server:", action);
       return { ...state };
@@ -91,8 +98,30 @@ export const useGameContext = () => {
 export const GameContextProvider = ({ children }) => {
   const [gameState, dispatch] = useReducer(gameReducer, initialGameState);
   const [authenticated, setAuthenticated] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(undefined);
 
   const { subscribe, sendMessage, isConnected } = useWebSocketContext();
+
+  useEffect(() => {
+    if (gameState.timeStart !== undefined) {
+      setTimeLeft(20 - Math.floor((Date.now() - gameState.timeStart) / 1000));
+
+      const intervalId = setInterval(() => {
+        setTimeLeft(prevTimeLeft => {
+          if (prevTimeLeft > 0) {
+            return prevTimeLeft - 1;
+          } else {
+            clearInterval(intervalId);
+            return 0;
+          }
+        });
+      }, 1000);
+
+      return () => clearInterval(intervalId);
+    } else {
+      setTimeLeft(undefined);
+    }
+  }, [gameState.timeStart]);
 
   useEffect(() => {
     const unsubscribe = subscribe((rawMsg) => {
@@ -138,7 +167,7 @@ export const GameContextProvider = ({ children }) => {
   });
 
   return (
-    <GameContext.Provider value={{ gameState, authenticate, authenticateHost, submitAnswer, submitKeyword }}>
+    <GameContext.Provider value={{ gameState, authenticate, authenticateHost, submitAnswer, submitKeyword, timeLeft }}>
       {children}
     </GameContext.Provider>
   );
