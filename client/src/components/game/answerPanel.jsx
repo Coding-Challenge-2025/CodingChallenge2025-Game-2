@@ -8,7 +8,7 @@ export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 	const [answered, setAnswered] = useState(false);
 
 	const onSubmit = (e) => {
-		if (!answered && submitAnswer && (!checkValidInput || checkValidInput(answer))) {
+		if (answer.length > 0 && !answered && submitAnswer && (!checkValidInput || checkValidInput(answer))) {
 			console.log("submission:", answer);
 			setAnswered(true);
 			submitAnswer(answer);

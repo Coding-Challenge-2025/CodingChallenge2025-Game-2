@@ -66,7 +66,7 @@ const gameReducer = (state, action) => {
       revealed[state.question.id] = true;
       return { ...state, revealed: revealed };
     case ServerMessageType.END_LEADERBOARD:
-      return { ...state, phase: GamePhase.GAME_COMPLETE, players: action.message };
+      return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
       return { ...state, timeStart: Date.now() };
     case ServerMessageType.CHECK_ANSWER:
@@ -78,6 +78,8 @@ const gameReducer = (state, action) => {
       };
     case ServerMessageType.QUESTION_RESULTS:
       return { ...state, questionsAnswered: state.questionsAnswered + 1 };
+    case ServerMessageType.GAME_END:
+      return { ...state, phase: GamePhase.GAME_COMPLETE };
     default:
       console.warn("Invalid message from server:", action);
       return { ...state };
