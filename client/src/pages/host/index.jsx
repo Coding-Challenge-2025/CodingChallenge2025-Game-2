@@ -1,59 +1,112 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Lock } from "lucide-react"
+"use client"
 
+import { useState } from "react"
+import { useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useGameContext } from "../../hooks/useGameContext"
 
-export default function HostLogin() {
+export default function HostJoin() {
+  const { authenticateHost } = useGameContext();
+  const [roomId, setRoomId] = useState("")
   const [password, setPassword] = useState("")
+  const [step, setStep] = useState(1)
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
-  const handleLogin = (e) => {
+  const handleRoomSubmit = (e) => {
     e.preventDefault()
-    if (password === "hostpass") {
-      navigate("/host/room")
-    } else {
-      setError("Invalid password")
+    if (!roomId.trim()) {
+      setError("Please enter a room code")
+      return
     }
+
+    // In a real app, you would validate the room ID against a database
+    // For this demo, we'll just move to the next step
+    setStep(2)
+    setError("")
+  }
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (!password.trim()) {
+      setError("Please enter a password")
+      return
+    }
+
+    // In a real app, you would register the player in the room
+    // For this demo, we'll just navigate to the game page
+    authenticateHost(roomId, password);
+    navigate("/host/game")
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-indigo-100">
         <CardHeader className="text-center">
-          <div className="mx-auto bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-            <Lock className="h-8 w-8 text-indigo-600" />
-          </div>
-          <CardTitle className="text-2xl text-indigo-900">Host Login</CardTitle>
-          <CardDescription>Enter your password to access the host dashboard</CardDescription>
+          <CardTitle className="text-2xl text-blue-900">
+            {step === 1 ? "Join host dashboard" : "Enter password"}
+          </CardTitle>
+          <CardDescription>
+            {step === 1 ? "Enter the room code to join" : "Enter host password"}
+          </CardDescription>
         </CardHeader>
-        <form onSubmit={handleLogin}>
-          <CardContent>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter host password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+
+        {step === 1 ? (
+          <form onSubmit={handleRoomSubmit}>
+            <CardContent>
+              <div className="grid w-full items-center gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="roomId">Room Code</Label>
+                  <Input
+                    id="roomId"
+                    placeholder="Enter room code (e.g., ABC123)"
+                    value={roomId}
+                    onChange={(e) => setRoomId(e.target.value.toUpperCase())}
+                    maxLength={6}
+                    className="text-center text-xl font-bold"
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
               </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
-              Login
-            </Button>
-          </CardFooter>
-        </form>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                Join Room
+              </Button>
+            </CardFooter>
+          </form>
+        ) : (
+          <form onSubmit={handlePasswordSubmit}>
+            <CardContent>
+              <div className="grid w-full items-center gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    maxLength={64}
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2">
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                Join Game
+              </Button>
+              <Button type="button" variant="outline" className="w-full" onClick={() => setStep(1)}>
+                Back
+              </Button>
+            </CardFooter>
+          </form>
+        )}
       </Card>
     </div>
   )
 }
+

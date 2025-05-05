@@ -22,7 +22,7 @@ export default function PlayerGame() {
         <>
           {gameState.question && timeLeft !== undefined &&
             <AnswerCard currentQuestion={gameState.question}
-              submitAnswer={(gameState.isPlayer && timeLeft > 0) ? submitAnswer : null}
+              submitAnswer={timeLeft > 0 ? submitAnswer : null}
               timeLeft={timeLeft}>
               {gameState.question.correct !== undefined &&
                 <h3 className={clsx("text-lg font-bold p-4 text-red-500",
@@ -46,7 +46,7 @@ export default function PlayerGame() {
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
           questionsAnswered={gameState.questionsAnswered}
-          submitKeyword={gameState.isPlayer ? submitKeyword : null} />
+          submitKeyword={submitKeyword} />
       }
     </GameLayout>
   )

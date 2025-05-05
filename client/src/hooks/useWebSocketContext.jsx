@@ -12,6 +12,7 @@ export const WebSocketProvider = ({ url, children }) => {
       console.error('WebSocket error:', error);
     },
     onMessage: (event) => {
+      console.log(event);
       messageListeners.forEach((listener) => {
         listener(event);
       });

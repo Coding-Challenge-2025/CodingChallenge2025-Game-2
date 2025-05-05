@@ -20,18 +20,29 @@ const ServerMessageType = {
   CHECK_ANSWER: "ANSCHECK",
   CHECK_KEYWORD: "KEYCHECK",
   GAME_END: "END",
+
+  HOST_KEYWORD_PROPERTIES: "HOSTKEYIMG",
+  HOST_KEYWORD_QUEUE: "KEYQUEUE",
+  HOST_ANSWER_QUEUE: "ANSQUEUE",
 };
 
 const ClientMessageType = {
   AUTHENTICATE: "LOGIN",
-  AUTHENTICATE_HOST: "LOGIN_HOST",
+  AUTHENTICATE_HOST: "HLOGIN",
   SUBMIT_ANSWER: "ANSWER",
   SUBMIT_KEYWORD: "KEYWORD",
+
+  START_GAME: "HOSTGS",
+  END_GAME: "HOSTGE",
+  SELECT_QUESTION: "CHOOSEPIECE",
+  START_QUESTION: "HOSTQRUN",
+  OPEN_CLUE: "OCLUE",
+  WINNER_FOUND: "KEYRESOLVE",
 };
 
 const initialGameState = {
+  gameStarted: false,
   phase: GamePhase.CONNECTING,
-  isPlayer: false,
   revealed: Array(12).fill(false),
   score: 0,
   questionsAnswered: 0,
@@ -42,9 +53,11 @@ const gameReducer = (state, action) => {
     case ServerMessageType.CONNECTION_DENIED:
       return { ...state, error: action.message.reason };
     case ServerMessageType.CONNECTION_ACCEPTED:
-      return { ...state, phase: GamePhase.PLAY, isPlayer: true };
+      return { ...state, phase: GamePhase.PLAY };
+    case ServerMessageType.GAME_START:
+      return { ...state, gameStarted: true };
     case ServerMessageType.GAME_END:
-      return { ...state, phase: GamePhase.GAME_COMPLETE };
+      return { ...state, phase: GamePhase.GAME_COMPLETE, gameStarted: false };
     case ServerMessageType.QUESTION_LOAD:
       return {
         ...state, phase: GamePhase.PLAY,
@@ -52,6 +65,7 @@ const gameReducer = (state, action) => {
           text: action.message.question,
           id: action.message.piece_index
         }, timeStart: undefined,
+        keywords: undefined, answers: undefined, // host
       };
     case ServerMessageType.KEYWORD_PROPERTIES:
       return {
@@ -78,8 +92,13 @@ const gameReducer = (state, action) => {
       };
     case ServerMessageType.QUESTION_RESULTS:
       return { ...state, questionsAnswered: state.questionsAnswered + 1 };
-    case ServerMessageType.GAME_END:
-      return { ...state, phase: GamePhase.GAME_COMPLETE };
+
+    case ServerMessageType.HOST_KEYWORD_PROPERTIES:
+      return { ...state, ...action.message };
+    case ServerMessageType.HOST_KEYWORD_QUEUE:
+      return { ...state, keywords: action.message };
+    case ServerMessageType.HOST_ANSWER_QUEUE:
+      return { ...state, answers: action.message };
     default:
       console.warn("Invalid message from server:", action);
       return { ...state };
@@ -125,7 +144,6 @@ export const GameContextProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = subscribe((rawMsg) => {
-      console.log(rawMsg);
       dispatch(JSON.parse(rawMsg.data));
     });
     return unsubscribe;
@@ -137,6 +155,7 @@ export const GameContextProvider = ({ children }) => {
       setAuthenticated(false);
   }, [isConnected]);
 
+  // TODO: ???
   const authenticate = useCallback((roomID, username) => {
     if (authenticated)
       return;
@@ -145,13 +164,6 @@ export const GameContextProvider = ({ children }) => {
       "status": ClientMessageType.AUTHENTICATE,
       "message": { "id": roomID, "name": username }
     });
-  });
-  const authenticateHost = useCallback((roomID, password) => {
-    if (authenticated)
-      return;
-    setAuthenticated(true);
-    // TODO
-    // sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, "id": roomID, "password": password });
   });
   const submitAnswer = useCallback((value) => {
     if (!authenticated)
@@ -166,8 +178,75 @@ export const GameContextProvider = ({ children }) => {
     return true;
   });
 
+  const authenticateHost = useCallback((roomID, password) => {
+    if (authenticated)
+      return;
+    setAuthenticated(true);
+    sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, message: { "id": roomID, "password": password } });
+  });
+
+  const startGame = useCallback(() => {
+    if (!isConnected) {
+      console.log("startGame called but not connected.");
+      return;
+    }
+    sendMessage({ "status": ClientMessageType.START_GAME });
+  });
+  const endGame = useCallback(() => {
+    if (!isConnected) {
+      console.log("endGame called but not connected.");
+      return;
+    }
+    sendMessage({ "status": ClientMessageType.END_GAME });
+  });
+  const selectQuestion = useCallback((id) => {
+    if (!isConnected) {
+      console.log("selectQuestion called but not connected.");
+      return;
+    }
+    sendMessage({ status: ClientMessageType.SELECT_QUESTION, message: { piece_index: id } });
+  });
+  const startQuestion = useCallback(() => {
+    if (!isConnected) {
+      console.log("startQuestion called but not connected.");
+      return;
+    }
+    sendMessage({ status: ClientMessageType.START_QUESTION });
+  });
+  const revealClue = useCallback((id) => {
+    if (!isConnected) {
+      console.log("revealClue called but not connected.");
+      return;
+    }
+    sendMessage({ status: ClientMessageType.OPEN_CLUE, message: { piece_index: id } });
+  });
+  const notifyCorrectKeyword = useCallback((name) => {
+    if (!isConnected) {
+      console.log("notifyCorrectKeyword called but not connected.");
+      return;
+    }
+    sendMessage({ status: ClientMessageType.WINNER_FOUND, message: { name: name } });
+  });
+
+  const value = {
+    gameState,
+    timeLeft,
+
+    authenticate,
+    submitAnswer,
+    submitKeyword,
+
+    authenticateHost,
+    startGame,
+    endGame,
+    selectQuestion,
+    startQuestion,
+    revealClue,
+    notifyCorrectKeyword,
+  };
+
   return (
-    <GameContext.Provider value={{ gameState, authenticate, authenticateHost, submitAnswer, submitKeyword, timeLeft }}>
+    <GameContext.Provider value={value}>
       {children}
     </GameContext.Provider>
   );
