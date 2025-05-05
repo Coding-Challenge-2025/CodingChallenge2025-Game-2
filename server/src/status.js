@@ -16,6 +16,8 @@ export const STATUS_ROUNDSCORE = "ROUNDSCORE"
 export const STATUS_LEADERBOARD = "LEADERBOARD"
 
 //Server send these to Host UI 
+//Notify the host with a string message
+export const STATUS_HOSTNOTIFY = "HOSTNOTIFY"
 //Load question for host. Send {question: string, answer: string, piece_index: int}
 export const STATUS_HOSTQUESTIONLOAD = "HOSTQLOAD"
 //Send {image: base64string, keyword: string}
@@ -24,6 +26,8 @@ export const STATUS_HOSTKEYIMAGE = "HOSTKEYIMG"
 export const STATUS_HOSTNOTIFYKEYWORD = "KEYNOTIFY"
 //time's up
 export const STATUS_HOSTNOTIFYTIMESUP = "TIMESUP"
+//Send {audiences: array of string, players: array of string}
+export const STATUS_HOSTGIVECLIENTS = "CLIENTSLIST"
 //Send keywordAnswerQueue (array of {name: string, keyword: string}). order: first-come-first-serve
 export const STATUS_HOSTKEYWORDQUEUE = "KEYQUEUE"
 //Send array of {name: string, answer: string, epoch: float}
@@ -48,11 +52,11 @@ export const STATUS_HOSTLOGIN = "HLOGIN"
 //Host send to start/end game
 export const STATUS_HOSTGAMESTART = "HOSTGS"
 export const STATUS_HOSTGAMEEND = "HOSTGE"
-//Send {piece_index: int}   - piece_index start from 1
+//Send {piece_index: int}   - piece_index start from 0
 export const STATUS_CHOOSEPIECE = "CHOOSEPIECE"
 //Host send to start question
 export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
-//get keyword queue
+//get keyword queue. 
 export const STATUS_GETKEYWORDQUEUE = "GETKEYQUEUE"
 //If no data given, no winner. otherwise send {name: string, keyword: string} as winner
 export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
@@ -68,6 +72,8 @@ export const STATUS_OPENCLUE = "OCLUE"
 export const STATUS_NOCLUE = "NCLUE"
 //Send {name: string, score: int}
 export const STATUS_SETSCORE = "SETSCORE"
+//Send
+export const STATUS_GETCLIENTS = "GETCLIENTS"
 //Send 
 // export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
 
@@ -178,4 +184,12 @@ export async function sendStatusHostKeywordQueue(wsObject, keywordQueueObject) {
 
 export async function sendStatusHostAnswerQueue(wsObject, answerQueueObject) {
     await sendStatus(wsObject, STATUS_HOSTANSWERQUEUE, answerQueueObject);
+}
+
+export async function sendStatusHostClientsList(wsObject, convertedClientsListObject) {
+    await sendStatus(wsObject, STATUS_HOSTGIVECLIENTS, convertedClientsListObject);
+}
+
+export async function sendStatusHostNotify(wsObject, notifyString) {
+    await sendStatus(wsObject, STATUS_HOSTNOTIFY, notifyString);
 }

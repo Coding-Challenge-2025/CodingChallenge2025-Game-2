@@ -1,8 +1,74 @@
+//Client workflow
+
 {
     "status": "LOGIN", 
-    "message": {"name": "hieu", "id": "FA90", "score": 50}
+    "message": {"name": "hieu", "id": "4998", "score": 50}
 }
 
-{"status": "ANSWER", "message": {"answer": "aaaaa"}}
+{"status": "ANSWER", "message": {"answer": "aaaaa"}} 
 
 {"status": "KEYWORD", "message": {"keyword": "aaaaa"}}
+
+//Server workflow
+
+{
+    "status": "HLOGIN", 
+    "message": {"password": "C0d1nCh@llenge25", "id": "0360"}
+}
+
+{
+    "status": "HOSTGS"
+}
+
+{
+    "status": "CHOOSEPIECE",
+    "message": {"piece_index": 2}
+}
+
+{
+    "status": "GETCLIENTS"
+}
+
+
+{
+    "status": "HOSTQRUN"
+}
+
+{
+    "status": "GETANSQUEUE"
+}
+
+{
+    "status": "ANSRESOLVE", 
+    "message": [
+    {
+      "name": "hieu",
+      "answer": "",
+      "epoch": 30001,
+      "point": 0
+    }
+  ]
+}
+
+{
+    "status": "GETKEYQUEUE"
+}
+
+{
+    "status": "KEYRESOLVE"
+}
+
+{
+    "status":"NCLUE"
+}
+
+{
+    "status":"OCLUE",
+    "piece_index": 1
+}
+
+
+{
+    "status": "SETSCORE",
+  "message":{"name":"hieu", "score":1000}
+}
