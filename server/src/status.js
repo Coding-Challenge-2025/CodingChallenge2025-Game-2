@@ -15,13 +15,17 @@ export const STATUS_CHECKKEYWORD = "KEYCHECK"
 export const STATUS_ROUNDSCORE = "ROUNDSCORE"
 export const STATUS_LEADERBOARD = "LEADERBOARD"
 
-//Client send these
+//Player send these
 //Send {name: string, id: string, score: integer}
 export const STATUS_LOGIN = "LOGIN"
 //Send {answer: string}
 export const STATUS_ANSWER = "ANSWER"
 //Send {keyword: string}
 export const STATUS_KEYWORD = "KEYWORD"
+
+//Audience
+//Send {name: string, id: string}
+export const STATUS_AUDIENCELOGIN = "AALOGIN"
 
 async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
     if(wsObject.readyState == WebSocket.OPEN) {
