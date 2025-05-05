@@ -8,7 +8,7 @@ export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 	const [answered, setAnswered] = useState(false);
 
 	const onSubmit = (e) => {
-		if (!answered && (!checkValidInput || checkValidInput(answer))) {
+		if (!answered && submitAnswer && (!checkValidInput || checkValidInput(answer))) {
 			console.log("submission:", answer);
 			setAnswered(true);
 			submitAnswer(answer);
@@ -22,9 +22,9 @@ export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 				value={answer}
 				onChange={(e) => setAnswer(e.target.value)}
 				onKeyDown={(e) => e.key === "Enter" && onSubmit()}
-				disabled={answered}
+				disabled={answered || !submitAnswer}
 			/>
-			<Button onClick={onSubmit} disabled={answered} className="bg-blue-600 hover:bg-blue-700">
+			<Button onClick={onSubmit} disabled={answered || !submitAnswer} className="bg-blue-600 hover:bg-blue-700">
 				{!answered && <Send className="h-4 w-4" />}
 				{answered && <Ellipsis className="h-4 w-4" />}
 			</Button>

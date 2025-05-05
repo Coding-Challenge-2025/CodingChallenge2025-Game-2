@@ -6,9 +6,10 @@ import AnswerCard from "../../../components/game/answerCard"
 import KeywordCard from "../../../components/game/keywordCard"
 import Panel from "../../../components/game/panel"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
+import clsx from "clsx"
 
 export default function PlayerGame() {
-  const { gameState, submitAnswer, submitKeyword } = useGameContext()
+  const { gameState, submitAnswer, submitKeyword, timeLeft } = useGameContext()
 
   return (
     <GameLayout revealed={gameState.revealed} imageData={gameState.image}>
@@ -19,9 +20,14 @@ export default function PlayerGame() {
       }
       {gameState.phase === GamePhase.PLAY &&
         <>
-          {gameState.question &&
+          {gameState.question && timeLeft !== undefined &&
             <AnswerCard currentQuestion={gameState.question}
-              submitAnswer={gameState.isPlayer ? submitAnswer : null} />
+              submitAnswer={(gameState.isPlayer && timeLeft > 0) ? submitAnswer : null}
+              timeLeft={timeLeft}>
+              {gameState.question.correct !== undefined &&
+                <h3 className={clsx("text-lg font-bold p-4 text-red-500",
+                  gameState.question.correct && "text-green-500")}>Answer: {gameState.question.answer}</h3>}
+            </AnswerCard>
           }
           {!gameState.question &&
             <Panel title="Waiting for host">
@@ -39,6 +45,7 @@ export default function PlayerGame() {
       {(gameState.phase === GamePhase.PLAY || gameState.phase === GamePhase.QUESTION_RESULTS)
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
+          questionsAnswered={gameState.questionsAnswered}
           submitKeyword={gameState.isPlayer ? submitKeyword : null} />
       }
     </GameLayout>
