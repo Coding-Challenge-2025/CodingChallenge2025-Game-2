@@ -148,12 +148,14 @@ const gameReducer = (state, action) => {
       return { ...state, keywordQueue: [] };
     case InternalMessageType.MARK_ANSWER: {
       let queue = state.answerQueue.slice(0);
-      queue[action.message.id].correct = !queue[action.message.id].correct;
+      console.log(action);
+      queue[action.message.id].correct = true;
+      console.log(queue);
       return { ...state, answerQueue: queue };
     }
     case InternalMessageType.MARK_KEYWORD: {
       let queue = state.keywordQueue.slice(0);
-      queue[action.message.id].correct = !queue[action.message.id].correct;
+      queue[action.message.id].correct = true; // TODO: react strict mode runs flip twice
       return { ...state, keywordQueue: queue };
     }
     default:
@@ -284,7 +286,7 @@ export const GameContextProvider = ({ children }) => {
       console.log("revealClue called but not connected.");
       return;
     }
-    sendMessage({ status: ClientMessageType.OPEN_CLUE, message: { piece_index: id } });
+    sendMessage({ status: ClientMessageType.OPEN_CLUE });
   });
   const resolveAnswers = useCallback(() => {
     if (!isConnected) {
@@ -315,6 +317,7 @@ export const GameContextProvider = ({ children }) => {
       console.log("revealRoundScore called but not connected.");
       return;
     }
+    console.log("Revealing round score");
     sendMessage({ status: ClientMessageType.REVEAL_ROUND_SCORE });
   });
   const revealLeaderboards = useCallback(() => {
@@ -322,12 +325,13 @@ export const GameContextProvider = ({ children }) => {
       console.log("revealLeaderboards called but not connected.");
       return;
     }
+    console.log("Revealing leaderboards");
     sendMessage({ status: ClientMessageType.REVEAL_LEADERBOARDS });
   });
   const markAnswer = useCallback((id) =>
-    sendMessage({ status: InternalMessageType.MARK_ANSWER, message: { id: id } }));
+    dispatch({ status: InternalMessageType.MARK_ANSWER, message: { id: id } }));
   const markKeyword = useCallback((id) =>
-    sendMessage({ status: InternalMessageType.MARK_KEYWORD, message: { id: id } }));
+    dispatch({ status: InternalMessageType.MARK_KEYWORD, message: { id: id } }));
 
   const value = {
     gameState,

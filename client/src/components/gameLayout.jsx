@@ -14,9 +14,9 @@ export default function GameLayout({ children, revealed, imageData, notification
             </Panel>
             {notifications?.length > 0 &&
               <Panel title="Notifications">
-                {notifications.forEach((value, id) => {
-                  <div key={value}>{value.time.toLocaleString()} - {value.message}</div>
-                })}
+                {notifications.map((value, id) =>
+                  <div key={value.time + value.message}>{value.time.toLocaleString()} - {value.message}</div>
+                )}
               </Panel>
             }
           </div>

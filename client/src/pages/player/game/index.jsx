@@ -18,15 +18,19 @@ export default function PlayerGame() {
           {gameState.error ?? "Waiting for server response..."}
         </Panel>
       }
+      {/*{JSON.stringify(gameState)}*/}
       {gameState.phase === GamePhase.PLAY &&
         <>
           {gameState.question && timeLeft !== undefined &&
             <AnswerCard currentQuestion={gameState.question}
               submitAnswer={(gameState.isPlayer && timeLeft) > 0 ? submitAnswer : null}
               timeLeft={timeLeft}>
-              {gameState.question.correct !== undefined &&
-                <h3 className={clsx("text-lg font-bold p-4 text-red-500",
-                  gameState.question.correct && "text-green-500")}>Answer: {gameState.question.answer}</h3>}
+              {gameState.question.answer &&
+                <h3 className={clsx("text-lg font-bold p-4",
+                  gameState.question.correct && "text-green-500",
+                  !gameState.question.correct && "text-red-500")}>
+                  Answer: {gameState.question.answer}
+                </h3>}
             </AnswerCard>
           }
           {!gameState.question &&

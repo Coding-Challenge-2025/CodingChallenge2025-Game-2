@@ -47,10 +47,10 @@ export default function HostGame() {
                 <Button onClick={revealLeaderboards}>Reveal Leaderboards</Button>
                 <Button onClick={revealClue}>Reveal Clue</Button>
               </div>
+              <Button onClick={resolveAnswers}>Finish and Reveal Answers</Button>
               {gameState.answerQueue.length > 0 &&
                 <div>
-                  <Button onClick={resolveAnswers}>Finish and Reveal Answers</Button>
-                  {gameState.answerQueue.forEach((value, id) =>
+                  {gameState.answerQueue.map((value, id) =>
                     <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
                       onClick={() => markAnswer(id)}>
                       {value.name}: <strong>{value.answer}</strong>
@@ -64,7 +64,7 @@ export default function HostGame() {
             <Panel title="Keyword Received">
               <div>
                 <Button onClick={resolveKeywords}>Announce Results</Button>
-                {gameState.keywordQueue.forEach((value, id) =>
+                {gameState.keywordQueue.map((value, id) =>
                   <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
                     onClick={() => markKeyword(id)}>
                     {value.name}: <strong>{value.keyword}</strong>
