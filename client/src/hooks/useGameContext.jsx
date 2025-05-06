@@ -55,6 +55,8 @@ const InternalMessageType = {
   SET_AUDIENCE: "SET_AUDIENCE",
   CLEAR_ANSWER_QUEUE: "CLEAR_ANSWER_QUEUE",
   CLEAR_KEYWORD_QUEUE: "CLEAR_KEYWORD_QUEUE",
+  MARK_ANSWER: "MARK_ANSWER",
+  MARK_KEYWORD: "MARK_KEYWORD",
 };
 
 const initialGameState = {
@@ -90,10 +92,12 @@ const gameReducer = (state, action) => {
         }, timeStart: undefined,
         keywords: undefined, answers: undefined, answerQueue: [],// host
       };
+    case ServerMessageType.HOST_KEYWORD_PROPERTIES:
     case ServerMessageType.KEYWORD_PROPERTIES:
       return {
         ...state,
         keywordLength: action.message.keyword_length,
+        keyword: action.message.keyword,
         image: action.message.image
       };
     case ServerMessageType.CLUE:
@@ -118,8 +122,6 @@ const gameReducer = (state, action) => {
         ...state, phase: GamePhase.QUESTION_RESULTS,
         questionsAnswered: state.questionsAnswered + 1, players: action.message
       };
-    case ServerMessageType.HOST_KEYWORD_PROPERTIES:
-      return { ...state, ...action.message };
     case ServerMessageType.HOST_KEYWORD_NOTIFY:
       return { ...state, keywordQueue: [...state.keywordQueue, action.message] };
     case ServerMessageType.HOST_ANSWER_QUEUE:
@@ -132,10 +134,14 @@ const gameReducer = (state, action) => {
     case ServerMessageType.PLAYER_WIN:
     case ServerMessageType.PLAYER_LOSE:
       return { ...state, isPlayer: false };
+
     case InternalMessageType.CLEAR_ANSWER_QUEUE:
       return { ...state, answerQueue: [] };
     case InternalMessageType.CLEAR_KEYWORD_QUEUE:
       return { ...state, keywordQueue: [] };
+    // case InternalMessageType.MARK_ANSWER:
+    //   let queue = answerQueue.slice(0);
+    //   return {...state, answerQueue}
     default:
       console.warn("Invalid message from server:", action);
       return { ...state };

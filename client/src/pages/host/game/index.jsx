@@ -2,6 +2,7 @@
 
 import GameLayout from "../../../components/gameLayout"
 import Panel from "../../../components/game/panel"
+import AnswerCard from "@/components/game/answerCard"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
@@ -37,15 +38,16 @@ export default function HostGame() {
               timeLeft={timeLeft}>
               {gameState.question.answer &&
                 <h3 className="text-lg font-bold p-4">Answer: {gameState.question.answer}</h3>}
-              <Button onClick={startQuestion}>Start question countdown</Button>
-              <Button onClick={revealRoundScore}>Reveal round score</Button>
-              <Button onClick={revealLeaderboards}>Reveal leaderboards</Button>
-              <Button onClick={revealClue}>Reveal clue</Button>
+              <Button onClick={startQuestion}>Start Question</Button>
+              <Button onClick={revealRoundScore}>Reveal Scores</Button>
+              <Button onClick={revealLeaderboards}>Reveal Leaderboards</Button>
+              <Button onClick={revealClue}>Reveal Clue</Button>
             </AnswerCard>
           }
           <Panel title="Main Controls">
             <div>
-              Players: {gameState.connectedPlayers?.toString()}
+              <div>Players: <strong>{gameState.connectedPlayers?.toString()}</strong></div>
+              {gameState.keyword && <div>Keyword: <strong>{gameState.keyword}</strong></div>}
             </div>
             {!gameState.gameStarted && <Button onClick={startGame}>Start Game</Button>}
             {gameState.gameStarted &&
@@ -61,7 +63,7 @@ export default function HostGame() {
           </Panel>
         </>
       }
-    </GameLayout >
+    </GameLayout>
   )
 }
 
