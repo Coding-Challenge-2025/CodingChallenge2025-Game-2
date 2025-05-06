@@ -313,6 +313,7 @@ async function broadcastClue(keywordObject, doSendClue) {
 
 async function broadcastRoundScore() {
     roundScoreArray = [];
+    logging(loggingFilename, "Log round score:")
     answerQueue.map(({wsobj, answer, epoch, point}) => {
         let epochInSecond = epoch/1000;
         logging(loggingFilename, `${epochInSecond.toFixed(3)}s ~ ${getClientNameFromHandle(wsobj)}: ${answer} => +${point}`);
@@ -327,7 +328,7 @@ async function broadcastRoundScore() {
 
 async function broadcastLeaderboard() {
     let leaderboardJSONString = JSON.stringify(getLeaderboard()); 
-    logging(loggingFilename, leaderboardJSONString);
+    logging(loggingFilename, `Log leaderboard: ${leaderboardJSONString}`);
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusLeaderboard(wsObject, getLeaderboard());
     });
@@ -611,7 +612,7 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_GETROUNDSCORE: {
-                // broadcastRoundScore()    //currently broken
+                broadcastRoundScore()    //currently broken
                 break;
             }
             case status.STATUS_GETCLIENTS: {
