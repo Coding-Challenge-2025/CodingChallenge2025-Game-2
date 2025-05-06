@@ -2,7 +2,7 @@
 
 {
     "status": "LOGIN", 
-    "message": {"name": "hieu", "id": "4998", "score": 50}
+    "message": {"name": "hieu", "id": "FC58", "score": 50}
 }
 
 {"status": "ANSWER", "message": {"answer": "aaaaa"}} 
@@ -13,7 +13,7 @@
 
 {
     "status": "HLOGIN", 
-    "message": {"password": "C0d1nCh@llenge25", "id": "0360"}
+    "message": {"password": "C0d1nCh@llenge25", "id": "4137"}
 }
 
 {
@@ -22,7 +22,7 @@
 
 {
     "status": "CHOOSEPIECE",
-    "message": {"piece_index": 2}
+    "message": {"piece_index": 0}
 }
 
 {
@@ -41,18 +41,29 @@
 {
     "status": "ANSRESOLVE", 
     "message": [
-    {
-      "name": "hieu",
-      "answer": "",
-      "epoch": 30001,
-      "point": 0
-    }
-  ]
+        {
+            "name": "thinh",
+            "answer": "dfgsdffsdf",
+            "epoch": 29090,
+            "point": 0
+        },
+        {
+            "name": "hieu",
+            "answer": "",
+            "epoch": 20001,
+            "point": 0
+        }
+    ]
+}
+
+{
+    "status": "GETROUNDSCORE"
 }
 
 {
     "status": "GETKEYQUEUE"
 }
+
 
 {
     "status": "KEYRESOLVE"
@@ -67,6 +78,11 @@
     "piece_index": 1
 }
 
+{
+    "status": "GETLEADERBOARD"
+}
+
+//set score
 
 {
     "status": "SETSCORE",

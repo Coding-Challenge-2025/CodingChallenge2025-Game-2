@@ -59,7 +59,7 @@ let permitKeywordAnswer = false;
 let permitQuestionAnswer = false;
 let flagIngame = false;
 const keywordQueue = [];
-const ANSWER_TIMEOUT = 30000 
+const ANSWER_TIMEOUT = 20000 
 const KEYWORD_CORRECT_POINT = 80
 
 let roundScoreArray = []
@@ -212,6 +212,7 @@ async function broadcastSignalStartQuestion() {
 
     permitQuestionAnswer = true;
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
+        if(isPlayerAudience(wsObject)) return resolve();
         let serverStartTimepoint = Date.now();
         clientAnswerList.set(wsObject, "");
         clientTimerList.set(wsObject, {"start_time": serverStartTimepoint});
@@ -245,6 +246,7 @@ function prepareAnswerQueue() {
     answerQueue = [];
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
+        if(isPlayerAudience(wsObject)) return;
         const playerAnswer = clientAnswerList.get(wsObject);
         const playerStartTimepoint = clientTimerList.get(wsObject)["start_time"];
         const playerEndTimepoint = clientTimerList.get(wsObject)["end_time"];
@@ -286,8 +288,9 @@ async function broadcastRoundScore() {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusRoundScore(wsObject, getRoundScore())
     });
+    const sendPromiseHost = status.sendStatusRoundScore(hostHandle, getRoundScore());
 
-    await Promise.all(sendPromises);
+    await Promise.all([sendPromises, sendPromiseHost]);
 }
 
 async function broadcastLeaderboard() {
@@ -296,24 +299,27 @@ async function broadcastLeaderboard() {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusLeaderboard(wsObject, getLeaderboard());
     });
+    const sendPromiseHost = status.sendStatusLeaderboard(hostHandle, getLeaderboard());
 
-    await Promise.all(sendPromises);
+    await Promise.all([sendPromises, sendPromiseHost]);
 }
 
-async function resolveKeyword(keywordString) {
+async function resolveKeyword(correctKeywordObject) {
+    let foundWinner = false;
+    let winnerClientName = correctKeywordObject === undefined ? undefined : correctKeywordObject["name"];
+    let winnerClientKeyword = correctKeywordObject === undefined ? undefined : correctKeywordObject["keyword"];
+
     for(let ele of keywordQueue) {
         let clientName = ele["name"];
         let clientKeyword = ele["keyword"];
-
         let wsobj = getHandleFromClientName(clientName);
-
         clientActiveStateList.set(wsobj, false);
-        if(clientKeyword === keywordString) {
+        if(clientName === winnerClientName && clientKeyword === winnerClientKeyword) {
             logging(loggingFilename, `Player ${clientName} keyword ${clientKeyword} correct!`);
             updateClientScore(wsobj, KEYWORD_CORRECT_POINT);
             status.sendStatusCheckKeyword({"is_correct": 1});
             status.sendStatusPlayerWin(wsobj);
-            return true;
+            foundWinner = true;
         } else {
             logging(loggingFilename, `Player ${clientName} keyword ${clientKeyword} incorrect`);
             status.sendStatusCheckKeyword({"is_correct": 0});
@@ -321,7 +327,7 @@ async function resolveKeyword(keywordString) {
         }
     }
     keywordQueue.splice(0);
-    return false;
+    return foundWinner;
 }
 
 async function handleStatusAudienceLogin(ws, jsonData) {
@@ -541,9 +547,6 @@ app.ws("/", (ws, req) => {
             case status.STATUS_ANSWERRESOLVE: {
                 const tempWrapper = async() => {
                     await resolveAnswer(clientMessage);
-                    //also broadcast round score & leaderboard for player immediately after
-                    await broadcastRoundScore();
-                    await broadcastLeaderboard();
                 }
                 tempWrapper();
                 break;
@@ -572,11 +575,11 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_GETLEADERBOARD: {
-                status.sendStatusLeaderboard(hostHandle, getLeaderboard());
+                broadcastLeaderboard()
                 break;
             }
             case status.STATUS_GETROUNDSCORE: {
-                status.sendStatusRoundScore(hostHandle, getRoundScore());
+                broadcastRoundScore()
                 break;
             }
             case status.STATUS_GETCLIENTS: {
@@ -613,13 +616,10 @@ async function initGame() {
 
 async function resolveAnswer(resolvedAnswerQueue) {
     const correctAnswer = selectedQuestionObject["answer"];
-    const sendPromises = Array.from(resolvedAnswerQueue).map(({name, answer, epoch, point}) => {
+    answerQueue.length = 0;     //reload the server answer queue
+    const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, answer, epoch, point}) => {
         let wsobj = getHandleFromClientName(name);
-        if(isPlayerAudience(wsobj)) {
-            status.sendStatusCheckAnswer(wsobj, {"is_correct": 1, "correct_answer": correctAnswer});
-            return Promise.resolve();
-        }
-
+        answerQueue.push({"wsobj": wsobj, "answer": answer, "epoch": epoch, "point": point});
         if(point === 0) {
             status.sendStatusCheckAnswer(wsobj, {"is_correct": 0, "correct_answer": correctAnswer});
         } else {
@@ -628,8 +628,15 @@ async function resolveAnswer(resolvedAnswerQueue) {
         }
         return Promise.resolve();
     })
+
+    const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
+        if(isPlayerAudience(wsObject)) {
+            status.sendStatusCheckAnswer(wsObject, {"is_correct": 1, "correct_answer": correctAnswer});
+        }
+        resolve();
+    })
     
-    await Promise.all(sendPromises);
+    await Promise.all([sendPromisesPlayers, sendPromisesAudiences]);
 }
 
 async function choosePiece(piece_index) {

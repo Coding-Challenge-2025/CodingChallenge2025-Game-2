@@ -56,9 +56,9 @@ export const STATUS_HOSTGAMEEND = "HOSTGE"
 export const STATUS_CHOOSEPIECE = "CHOOSEPIECE"
 //Host send to start question
 export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
-//get keyword queue. 
+//get keyword queue. Array of {name: string, keyword: string}
 export const STATUS_GETKEYWORDQUEUE = "GETKEYQUEUE"
-//If no data given, no winner. otherwise send {name: string, keyword: string} as winner
+//If no data send back, no winner. otherwise send single object {name: string, keyword: string} as winner
 export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
 //GETANSWERQUEUE to get and check the answer manually
 export const STATUS_GETANSWERQUEUE = "GETANSQUEUE"
