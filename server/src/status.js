@@ -103,7 +103,7 @@ export async function sendStatusGameAlreadyRunning(wsObject) {
 }
 
 export async function sendStatusWaitingForEvent(wsObject) {
-    await sendStatus(wsObject, STATUS_NOTIFY, {"message": "Waiting for event..."});
+    // await sendStatus(wsObject, STATUS_NOTIFY, {"message": "Waiting for event..."});
 }
 
 export async function sendStatusNotify(wsObject, message) {
