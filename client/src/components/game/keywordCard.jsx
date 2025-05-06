@@ -1,5 +1,6 @@
 import Panel from "./panel";
 import AnswerPanel from "./answerPanel"
+import { Badge } from "@/components/ui/badge"
 
 export default function KeywordCard({ keywordLength, submitKeyword, questionsAnswered, wrongKeywords }) {
 	return (

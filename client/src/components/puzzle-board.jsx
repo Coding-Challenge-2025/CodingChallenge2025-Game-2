@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { Badge } from "@/components/ui/badge"
 
 export default function PuzzleBoard({ revealed, imageData }) {
   return (
