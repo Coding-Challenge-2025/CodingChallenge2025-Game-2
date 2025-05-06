@@ -207,6 +207,13 @@ async function broadcastQuestion(questionObject) {
     await Promise.all(sendPromises);
 }
 
+async function broadcastShowKeyword(keywordObject) {
+    broadcastImpl((resolve, wsObject, playerName) => {
+        status.sendStatusShowKeyword(wsObject, keywordObject);
+        resolve()
+    });
+}
+
 //major overhaul
 async function broadcastSignalStartQuestion() {
 
@@ -304,25 +311,24 @@ async function broadcastLeaderboard() {
     await Promise.all([sendPromises, sendPromiseHost]);
 }
 
-async function resolveKeyword(correctKeywordObject) {
+async function resolveKeyword(resolvedKeywordArray) {
     let foundWinner = false;
-    let winnerClientName = correctKeywordObject === undefined ? undefined : correctKeywordObject["name"];
-    let winnerClientKeyword = correctKeywordObject === undefined ? undefined : correctKeywordObject["keyword"];
 
-    for(let ele of keywordQueue) {
+    for(let ele of resolvedKeywordArray) {
         let clientName = ele["name"];
-        let clientKeyword = ele["keyword"];
+        let clientCorrect = ele["correct"];
         let wsobj = getHandleFromClientName(clientName);
         clientActiveStateList.set(wsobj, false);
-        if(clientName === winnerClientName && clientKeyword === winnerClientKeyword) {
-            logging(loggingFilename, `Player ${clientName} keyword ${clientKeyword} correct!`);
+        if(clientCorrect) {
+            if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
+            logging(loggingFilename, `Player ${clientName} correct keyword sent`);
             updateClientScore(wsobj, KEYWORD_CORRECT_POINT);
-            status.sendStatusCheckKeyword({"is_correct": 1});
+            status.sendStatusCheckKeyword({"correct": 1});
             status.sendStatusPlayerWin(wsobj);
             foundWinner = true;
         } else {
-            logging(loggingFilename, `Player ${clientName} keyword ${clientKeyword} incorrect`);
-            status.sendStatusCheckKeyword({"is_correct": 0});
+            logging(loggingFilename, `Player ${clientName} incorrect keyword sent`);
+            status.sendStatusCheckKeyword({"correct": 0});
             status.sendStatusPlayerLose(wsobj);
         }
     }
@@ -421,10 +427,11 @@ async function handleStatusKeyword(ws, jsonData) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} already submitted keyword!`)
             return;
         }
-        logging(loggingFilename, `Player ${clientName} sent keyword`);
-        keywordQueue.push({"name": clientName, "keyword": clientKeyword});
+        logging(loggingFilename, `Player ${clientName} sent keyword ${clientKeyword}`);
+        const keywordObject = {"name": clientName, "keyword": clientKeyword};
+        keywordQueue.push(keywordObject);
         keywordAnswerRecord.set(clientName, clientKeyword);
-        await status.sendStatusHostNotifyKeyword(hostHandle);
+        await status.sendStatusHostNotifyKeyword(hostHandle, keywordObject);
     }
 }
 
@@ -528,8 +535,8 @@ app.ws("/", (ws, req) => {
                 broadcastSignalStartQuestion();
                 break;
             }
-            case status.STATUS_GETKEYWORDQUEUE: {
-                status.sendStatusHostKeywordQueue(hostHandle, keywordQueue)
+            case status.STATUS_SHOWKEYWORD: {
+                broadcastShowKeyword(clientMessage)
                 break;
             }
             case status.STATUS_KEYWORDRESOLVE: {
@@ -621,9 +628,9 @@ async function resolveAnswer(resolvedAnswerQueue) {
         let wsobj = getHandleFromClientName(name);
         answerQueue.push({"wsobj": wsobj, "answer": answer, "epoch": epoch, "point": point});
         if(point === 0) {
-            status.sendStatusCheckAnswer(wsobj, {"is_correct": 0, "correct_answer": correctAnswer});
+            status.sendStatusCheckAnswer(wsobj, {"correct": 0, "correct_answer": correctAnswer});
         } else {
-            status.sendStatusCheckAnswer(wsobj, {"is_correct": 1, "correct_answer": correctAnswer});
+            status.sendStatusCheckAnswer(wsobj, {"correct": 1, "correct_answer": correctAnswer});
             updateClientScore(wsobj, 10)
         }
         return Promise.resolve();
@@ -631,7 +638,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
 
     const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
         if(isPlayerAudience(wsObject)) {
-            status.sendStatusCheckAnswer(wsObject, {"is_correct": 1, "correct_answer": correctAnswer});
+            status.sendStatusCheckAnswer(wsObject, {"correct": 1, "correct_answer": correctAnswer});
         }
         resolve();
     })

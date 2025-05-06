@@ -14,6 +14,7 @@ export const STATUS_CHECKANSWER = "ANSCHECK"
 export const STATUS_CHECKKEYWORD = "KEYCHECK"
 export const STATUS_ROUNDSCORE = "ROUNDSCORE"
 export const STATUS_LEADERBOARD = "LEADERBOARD"
+export const STATUS_SHOWKEYWORD = "KEYSHOW"
 
 //Server send these to Host UI 
 //Notify the host with a string message
@@ -22,14 +23,12 @@ export const STATUS_HOSTNOTIFY = "HOSTNOTIFY"
 export const STATUS_HOSTQUESTIONLOAD = "HOSTQLOAD"
 //Send {image: base64string, keyword: string}
 export const STATUS_HOSTKEYIMAGE = "HOSTKEYIMG"
-//for bell ring sth
+//Send {name: string, keyword: string}
 export const STATUS_HOSTNOTIFYKEYWORD = "KEYNOTIFY"
 //time's up
 export const STATUS_HOSTNOTIFYTIMESUP = "TIMESUP"
 //Send {audiences: array of string, players: array of string}
 export const STATUS_HOSTGIVECLIENTS = "CLIENTSLIST"
-//Send keywordAnswerQueue (array of {name: string, keyword: string}). order: first-come-first-serve
-export const STATUS_HOSTKEYWORDQUEUE = "KEYQUEUE"
 //Send array of {name: string, answer: string, epoch: float}
 export const STATUS_HOSTANSWERQUEUE = "ANSQUEUE"
 //Server also send STATUS_CLUE, STATUS_ROUNDSCORE, STATUS_LEADERBOARD
@@ -56,9 +55,8 @@ export const STATUS_HOSTGAMEEND = "HOSTGE"
 export const STATUS_CHOOSEPIECE = "CHOOSEPIECE"
 //Host send to start question
 export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
-//get keyword queue. Array of {name: string, keyword: string}
-export const STATUS_GETKEYWORDQUEUE = "GETKEYQUEUE"
-//If no data send back, no winner. otherwise send single object {name: string, keyword: string} as winner
+//Send STATUS_SHOWKEYWORD {name: string, keyword: string}
+//Send array of {name: string, correct}
 export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
 //GETANSWERQUEUE to get and check the answer manually
 export const STATUS_GETANSWERQUEUE = "GETANSQUEUE"
@@ -137,12 +135,17 @@ export async function sendStatusRunQuestion(wsObject) {
     await sendStatus(wsObject, STATUS_QUESTIONRUN);
 }
 
-//{is_correct: 0 or 1, correct_answer: string}
+//{correct: 0 or 1, correct_answer: string}
 export async function sendStatusCheckAnswer(wsObject, checkObject) {
     await sendStatus(wsObject, STATUS_CHECKANSWER, checkObject);
 }
 
-//{is_correct: 0 or 1}
+//{name: string, keyword: string}
+export async function sendStatusShowKeyword(wsObject, keywordObject) {
+    await sendStatus(wsObject, STATUS_SHOWKEYWORD, keywordObject); 
+}
+
+//{correct: 0 or 1}
 export async function sendStatusCheckKeyword(wsObject, checkObject) {
     await sendStatus(wsObject, STATUS_CHECKKEYWORD, checkObject);
 }
@@ -170,16 +173,12 @@ export async function sendStatusHostKeyImage(wsObject, hostkeyImageObject) {
     await sendStatus(wsObject, STATUS_HOSTKEYIMAGE, hostkeyImageObject);
 }
 
-export async function sendStatusHostNotifyKeyword(wsObject) {
-    await sendStatus(wsObject, STATUS_HOSTNOTIFYKEYWORD);
+export async function sendStatusHostNotifyKeyword(wsObject, keywordObject) {
+    await sendStatus(wsObject, STATUS_HOSTNOTIFYKEYWORD, keywordObject);
 }
 
 export async function sendStatusHostNotifyTimesup(wsObject) {
     await sendStatus(wsObject, STATUS_HOSTNOTIFYTIMESUP);
-}
-
-export async function sendStatusHostKeywordQueue(wsObject, keywordQueueObject) {
-    await sendStatus(wsObject, STATUS_HOSTKEYWORDQUEUE, keywordQueueObject);
 }
 
 export async function sendStatusHostAnswerQueue(wsObject, answerQueueObject) {

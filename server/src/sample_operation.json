@@ -2,7 +2,7 @@
 
 {
     "status": "LOGIN", 
-    "message": {"name": "hieu", "id": "FC58", "score": 50}
+    "message": {"name": "hieu", "id": "9962", "score": 50}
 }
 
 {"status": "ANSWER", "message": {"answer": "aaaaa"}} 
@@ -13,7 +13,7 @@
 
 {
     "status": "HLOGIN", 
-    "message": {"password": "C0d1nCh@llenge25", "id": "4137"}
+    "message": {"password": "C0d1nCh@llenge25", "id": "58B3"}
 }
 
 {
@@ -61,12 +61,18 @@
 }
 
 {
-    "status": "GETKEYQUEUE"
+    "status": "KEYSHOW",
+    "message": {
+        "name": "hieu",
+        "keyword": "aaaaa"
+    }
 }
 
-
 {
-    "status": "KEYRESOLVE"
+    "status": "KEYRESOLVE",
+    "message": [
+        {"name": "hieu","correct": 0}
+    ]
 }
 
 {
