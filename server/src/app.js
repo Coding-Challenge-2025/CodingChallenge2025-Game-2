@@ -372,28 +372,28 @@ async function handleStatusLogin(ws, jsonData) {
     if(flagIngame) {
         logging(loggingFilename, `Connection refused: Game already running!`);
         status.sendStatusGameAlreadyRunning(ws);
-        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Game already running!`)
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Game already running!`)
         return;
     } else if(roomId !== serverRoomId) {
         logging(loggingFilename, `Player ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
-        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
         return;
     } else if(currentPlayerCount >= MAX_PLAYER) {
         logging(loggingFilename, `Player ${clientName} refused. Room is full!`);
         status.sendStatusRoomIsFull(ws);
-        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
         return;
     } else if(getHandleFromClientName(clientName) !== undefined) {
         logging(loggingFilename, `Player ${clientName} refused. Duplicated name`);
         status.sendStatusDuplicateName(ws);
-        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
         return;
     }
 
     allocateClient(ws, clientName, Number.isInteger(initialScore) ? initialScore : 0);
     logging(loggingFilename, `Player ${clientName} authorized`);
-    if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} authorized`)
+    if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
     status.sendStatusAccepted(ws);
 }
 
@@ -454,8 +454,10 @@ async function handleStatusHostLogin(ws, jsonData) {
     if(password === hostPassword) {
         hostHandle = ws;
         logging(loggingFilename, "Host authorized")
+        await status.sendStatusAccepted(ws);
     } else {
         logging(loggingFilename, "Host failed to login");
+        await status.sendStatusInvalidID(ws);
     }
 }
 
@@ -475,7 +477,7 @@ app.ws("/", (ws, req) => {
                 releaseAudience(ws);
                 return;
             }
-            if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${getClientNameFromHandle(ws)} disconnected`)
+            if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${getClientNameFromHandle(ws)} disconnected`)
             logging(loggingFilename, `Player ${getClientNameFromHandle(ws)} disconnected`);
             releaseClient(ws);
             if(flagIngame === false) {
@@ -680,10 +682,10 @@ async function startGame() {
     questionCounter = 0;
     if(flagIngame) {
         logging(loggingFilename, "Host trying to start game, but game is already running!");
-        status.sendStatusHostNotify(hostHandle, "game is already running");
+        status.sendStatusNotify(hostHandle, "game is already running");
     } else if(currentPlayerCount < startGamePlayerCount) {
         logging(loggingFilename, "Host trying to start game, but not enough player!");
-        status.sendStatusHostNotify(hostHandle, "not enough player");
+        status.sendStatusNotify(hostHandle, "not enough player");
     } else {
         clearInterval(waitingRoomHandle);
         logging(loggingFilename, "Starting game...")
@@ -695,7 +697,7 @@ async function startGame() {
         permitKeywordAnswer = true;
         selectedKeywordObject = keywordsList[getRandomIndex(keywordsList)];
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
-        status.sendStatusHostNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
+        status.sendStatusNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
         randomShuffleArray(selectedKeywordObject["clues"]);
         await broadcastKeywordProperties(selectedKeywordObject);
         await status.sendStatusHostKeyImage(hostHandle, await prepareHostKeyImage(selectedKeywordObject));
