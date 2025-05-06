@@ -3,16 +3,18 @@ import { Badge } from "@/components/ui/badge"
 
 export default function PuzzleBoard({ revealed, imageData }) {
   return (
-    <div className="relative mx-auto aspect-[16/9] w-full max-w-4xl overflow-hidden bg-red-400 grid grid-cols-4 grid-rows-3 bg-cover bg-center"
-      style={{ backgroundImage: `url(${imageData})` }}
-    >
-      {revealed.map((value, index) =>
-        <div key={index} className={clsx(
-          "z-10 flex items-center justify-center border border-blue-500 bg-blue-400",
-          value && "opacity-0")}
-        >
-          <span className="text-xl font-bold text-white">{index + 1}</span>
-        </div>)}
+    <div>
+      <div className="relative mx-auto aspect-[16/9] w-full max-w-4xl overflow-hidden bg-red-400 grid grid-cols-4 grid-rows-3 bg-cover bg-center"
+        style={{ backgroundImage: `url(${imageData})` }}
+      >
+        {revealed.map((value, index) =>
+          <div key={index} className={clsx(
+            "z-10 flex items-center justify-center border border-blue-500 bg-blue-400",
+            value && "opacity-0")}
+          >
+            <span className="text-xl font-bold text-white">{index + 1}</span>
+          </div>)}
+      </div>
       {revealed.map((value, index) =>
         value && <Badge>{value}</Badge>)}
     </div>
