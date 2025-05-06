@@ -41,6 +41,7 @@ export default function HostGame() {
               {gameState.question.answer &&
                 <h3 className="text-lg font-bold p-4">Answer: {gameState.question.answer}</h3>}
               <div>
+                <Button onClick={startQuestion}>Start Question</Button>
                 <Button onClick={revealRoundScore}>Reveal Scores</Button>
                 <Button onClick={revealLeaderboards}>Reveal Leaderboards</Button>
                 <Button onClick={revealClue}>Reveal Clue</Button>
@@ -84,7 +85,7 @@ export default function HostGame() {
                   {gameState.revealed.map((_, id) => {
                     return (
                       <div key={id} className="m-1">
-                        {<Button onClick={() => selectQuestion(id)}>Choose question {id}</Button>}
+                        {<Button onClick={() => selectQuestion(id)}>Choose question {id + 1}</Button>}
                       </div>)
                   })}
                 </div>
