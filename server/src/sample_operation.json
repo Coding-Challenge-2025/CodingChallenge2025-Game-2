@@ -43,15 +43,11 @@
     "message": [
         {
             "name": "thinh",
-            "answer": "dfgsdffsdf",
-            "epoch": 29090,
-            "point": 0
+            "correct":0
         },
         {
             "name": "hieu",
-            "answer": "",
-            "epoch": 20001,
-            "point": 0
+            "correct":0
         }
     ]
 }

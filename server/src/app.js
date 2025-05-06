@@ -60,12 +60,13 @@ let permitQuestionAnswer = false;
 let flagIngame = false;
 const keywordQueue = [];
 const ANSWER_TIMEOUT = 20000 
-const KEYWORD_CORRECT_POINT = 80
+// const KEYWORD_CORRECT_POINT = 80
 
 let roundScoreArray = []
 
 let serverRoomId
 let currentPlayerCount = 0
+let questionCounter = 0
 
 let selectedKeywordObject;
 let selectedQuestionObject;
@@ -79,6 +80,10 @@ let hostHandle = undefined;
 
 function isHost(ws) {
     return hostHandle === ws ? true : false;
+}
+
+function isHostActive() {
+    return hostHandle === undefined ? false : true 
 }
 
 function releaseClient(ws) {
@@ -247,6 +252,8 @@ async function broadcastSignalStartQuestion() {
     await Promise.all([timeoutPromise, clientsPromise])
     permitQuestionAnswer = false;
     await status.sendStatusHostNotifyTimesup(hostHandle);
+    let answerQueueSending = prepareAnswerQueue();
+    await status.sendStatusHostAnswerQueue(hostHandle, answerQueueSending);
 }
 
 function prepareAnswerQueue() {
@@ -322,7 +329,7 @@ async function resolveKeyword(resolvedKeywordArray) {
         if(clientCorrect) {
             if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
             logging(loggingFilename, `Player ${clientName} correct keyword sent`);
-            updateClientScore(wsobj, KEYWORD_CORRECT_POINT);
+            updateClientScore(wsobj, (12-questionCounter)*10);
             status.sendStatusCheckKeyword({"correct": 1});
             status.sendStatusPlayerWin(wsobj);
             foundWinner = true;
@@ -365,23 +372,28 @@ async function handleStatusLogin(ws, jsonData) {
     if(flagIngame) {
         logging(loggingFilename, `Connection refused: Game already running!`);
         status.sendStatusGameAlreadyRunning(ws);
+        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Game already running!`)
         return;
     } else if(roomId !== serverRoomId) {
         logging(loggingFilename, `Player ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
+        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
         return;
     } else if(currentPlayerCount >= MAX_PLAYER) {
         logging(loggingFilename, `Player ${clientName} refused. Room is full!`);
         status.sendStatusRoomIsFull(ws);
+        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
         return;
     } else if(getHandleFromClientName(clientName) !== undefined) {
         logging(loggingFilename, `Player ${clientName} refused. Duplicated name`);
         status.sendStatusDuplicateName(ws);
+        if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
         return;
     }
 
     allocateClient(ws, clientName, Number.isInteger(initialScore) ? initialScore : 0);
     logging(loggingFilename, `Player ${clientName} authorized`);
+    if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${clientName} authorized`)
     status.sendStatusAccepted(ws);
 }
 
@@ -463,6 +475,7 @@ app.ws("/", (ws, req) => {
                 releaseAudience(ws);
                 return;
             }
+            if(isHostActive()) status.sendStatusHostNotify(hostHandle, `Player ${getClientNameFromHandle(ws)} disconnected`)
             logging(loggingFilename, `Player ${getClientNameFromHandle(ws)} disconnected`);
             releaseClient(ws);
             if(flagIngame === false) {
@@ -543,13 +556,6 @@ app.ws("/", (ws, req) => {
                 resolveKeyword(clientMessage);
                 break;
             }
-            case status.STATUS_GETANSWERQUEUE: {
-                //prepare another answer queue contain players name
-                //for easier verification 
-                let answerQueueSending = prepareAnswerQueue();
-                status.sendStatusHostAnswerQueue(hostHandle, answerQueueSending);
-                break;
-            }
 
             case status.STATUS_ANSWERRESOLVE: {
                 const tempWrapper = async() => {
@@ -586,7 +592,7 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_GETROUNDSCORE: {
-                broadcastRoundScore()
+                // broadcastRoundScore()    //currently broken
                 break;
             }
             case status.STATUS_GETCLIENTS: {
@@ -624,15 +630,11 @@ async function initGame() {
 async function resolveAnswer(resolvedAnswerQueue) {
     const correctAnswer = selectedQuestionObject["answer"];
     answerQueue.length = 0;     //reload the server answer queue
-    const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, answer, epoch, point}) => {
+    const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, correct}) => {
         let wsobj = getHandleFromClientName(name);
-        answerQueue.push({"wsobj": wsobj, "answer": answer, "epoch": epoch, "point": point});
-        if(point === 0) {
-            status.sendStatusCheckAnswer(wsobj, {"correct": 0, "correct_answer": correctAnswer});
-        } else {
-            status.sendStatusCheckAnswer(wsobj, {"correct": 1, "correct_answer": correctAnswer});
-            updateClientScore(wsobj, 10)
-        }
+        if(wsobj === undefined) return Promise.resolve();
+        if(correct) updateClientScore(wsobj, 10)
+        status.sendStatusCheckAnswer(wsobj, {"correct": correct, "correct_answer": correctAnswer});
         return Promise.resolve();
     })
 
@@ -642,6 +644,8 @@ async function resolveAnswer(resolvedAnswerQueue) {
         }
         resolve();
     })
+
+    questionCounter++;
     
     await Promise.all([sendPromisesPlayers, sendPromisesAudiences]);
 }
@@ -673,6 +677,7 @@ function prepareHostQuestion(originalQuestionObject, questionIndex) {
 async function startGame() {
     // const startGamePlayerCount = MAX_PLAYER
     const startGamePlayerCount = 1;
+    questionCounter = 0;
     if(flagIngame) {
         logging(loggingFilename, "Host trying to start game, but game is already running!");
         status.sendStatusHostNotify(hostHandle, "game is already running");
@@ -690,6 +695,7 @@ async function startGame() {
         permitKeywordAnswer = true;
         selectedKeywordObject = keywordsList[getRandomIndex(keywordsList)];
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
+        status.sendStatusHostNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
         randomShuffleArray(selectedKeywordObject["clues"]);
         await broadcastKeywordProperties(selectedKeywordObject);
         await status.sendStatusHostKeyImage(hostHandle, await prepareHostKeyImage(selectedKeywordObject));

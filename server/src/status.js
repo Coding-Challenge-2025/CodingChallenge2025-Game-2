@@ -59,7 +59,7 @@ export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
 //Send array of {name: string, correct}
 export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
 //GETANSWERQUEUE to get and check the answer manually
-export const STATUS_GETANSWERQUEUE = "GETANSQUEUE"
+// export const STATUS_GETANSWERQUEUE = "GETANSQUEUE"
 //set the checked answer, broadcast to client correct/incorrect
 export const STATUS_ANSWERRESOLVE = "ANSRESOLVE"
 export const STATUS_GETROUNDSCORE = "GETROUNDSCORE"
