@@ -19,6 +19,7 @@ const ServerMessageType = {
   CLUE: "CLUE",
   CHECK_ANSWER: "ANSCHECK",
   CHECK_KEYWORD: "KEYCHECK",
+  GAME_START: "START",
   GAME_END: "END",
   PLAYER_WIN: "WIN",
   PLAYER_LOSE: "LOSE",
