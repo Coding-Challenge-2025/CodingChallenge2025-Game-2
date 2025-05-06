@@ -33,7 +33,7 @@ export default function PlayerJoin() {
             Join a Game
           </CardTitle>
           <CardDescription>
-            {step === 1 ? "Enter the room code to join" : "Choose a username for the game"}
+            Enter the room code to join
           </CardDescription>
         </CardHeader>
 
