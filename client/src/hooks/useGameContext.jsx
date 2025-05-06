@@ -9,6 +9,8 @@ export const GamePhase = {
 };
 
 const ServerMessageType = {
+  NOTIFY: "NOTIFY",
+  HOST_NOTIFY: "HOSTNOTIFY",
   CONNECTION_ACCEPTED: "ACCEPT",
   CONNECTION_DENIED: "DENIED",
   QUESTION_LOAD: "QLOAD",
@@ -70,10 +72,14 @@ const initialGameState = {
   answerQueue: [],
   keywordQueue: [],
   wrongKeywords: [],
+  notifications: [],
 };
 
 const gameReducer = (state, action) => {
   switch (action.status) {
+    case ServerMessageType.HOST_NOTIFY:
+    case ServerMessageType.NOTIFY:
+      return { ...state, notifications: [{ time: new Date(), message: action.message.message }, ...state.notifications] };
     case ServerMessageType.CONNECTION_DENIED:
       return { ...state, error: action.message.reason };
     case ServerMessageType.CONNECTION_ACCEPTED:
@@ -140,9 +146,16 @@ const gameReducer = (state, action) => {
       return { ...state, answerQueue: [] };
     case InternalMessageType.CLEAR_KEYWORD_QUEUE:
       return { ...state, keywordQueue: [] };
-    // case InternalMessageType.MARK_ANSWER:
-    //   let queue = answerQueue.slice(0);
-    //   return {...state, answerQueue}
+    case InternalMessageType.MARK_ANSWER: {
+      let queue = state.answerQueue.slice(0);
+      queue[action.message.id].correct = !queue[action.message.id].correct;
+      return { ...state, answerQueue: queue };
+    }
+    case InternalMessageType.MARK_KEYWORD: {
+      let queue = state.keywordQueue.slice(0);
+      queue[action.message.id].correct = !queue[action.message.id].correct;
+      return { ...state, keywordQueue: queue };
+    }
     default:
       console.warn("Invalid message from server:", action);
       return { ...state };
@@ -311,6 +324,10 @@ export const GameContextProvider = ({ children }) => {
     }
     sendMessage({ status: ClientMessageType.REVEAL_LEADERBOARDS });
   });
+  const markAnswer = useCallback((id) =>
+    sendMessage({ status: InternalMessageType.MARK_ANSWER, message: { id: id } }));
+  const markKeyword = useCallback((id) =>
+    sendMessage({ status: InternalMessageType.MARK_KEYWORD, message: { id: id } }));
 
   const value = {
     gameState,
@@ -331,7 +348,9 @@ export const GameContextProvider = ({ children }) => {
     resolveAnswers,
     resolveKeywords,
     revealRoundScore,
-    revealLeaderboards
+    revealLeaderboards,
+    markAnswer,
+    markKeyword,
   };
 
   return (

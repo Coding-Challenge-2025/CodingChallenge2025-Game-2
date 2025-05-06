@@ -17,6 +17,8 @@ export default function HostGame() {
     revealClue,
     resolveAnswers,
     resolveKeywords,
+    markAnswer,
+    markKeyword,
     revealRoundScore,
     revealLeaderboards } = useGameContext()
 
@@ -25,7 +27,7 @@ export default function HostGame() {
   }, [gameState]);
 
   return (
-    <GameLayout revealed={gameState.revealed} imageData={gameState.image}>
+    <GameLayout revealed={gameState.revealed} imageData={gameState.image} notifications={gameState.notifications}>
       {gameState.phase === GamePhase.CONNECTING &&
         <Panel title="Connecting to server...">
           {gameState.error ?? "Waiting for server response..."}
@@ -38,11 +40,36 @@ export default function HostGame() {
               timeLeft={timeLeft}>
               {gameState.question.answer &&
                 <h3 className="text-lg font-bold p-4">Answer: {gameState.question.answer}</h3>}
-              <Button onClick={startQuestion}>Start Question</Button>
-              <Button onClick={revealRoundScore}>Reveal Scores</Button>
-              <Button onClick={revealLeaderboards}>Reveal Leaderboards</Button>
-              <Button onClick={revealClue}>Reveal Clue</Button>
+              <div>
+                <Button onClick={revealRoundScore}>Reveal Scores</Button>
+                <Button onClick={revealLeaderboards}>Reveal Leaderboards</Button>
+                <Button onClick={revealClue}>Reveal Clue</Button>
+              </div>
+              {gameState.answerQueue.length > 0 &&
+                <div>
+                  <Button>Finish and Reveal Answers</Button>
+                  {gameState.answerQueue.forEach((value, id) =>
+                    <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
+                      onClick={() => markAnswer(id)}>
+                      {value.name}: <strong>{value.answer}</strong>
+                    </Card>)
+                  }
+                </div>
+              }
             </AnswerCard>
+          }
+          {gameState.keywordQueue.length > 0 &&
+            <Panel title="Keyword Received">
+              <div>
+                <Button>Announce Results</Button>
+                {gameState.keywordQueue.forEach((value, id) =>
+                  <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
+                    onClick={() => markKeyword(id)}>
+                    {value.name}: <strong>{value.keyword}</strong>
+                  </Card>)
+                }
+              </div>
+            </Panel>
           }
           <Panel title="Main Controls">
             <div>
@@ -52,13 +79,15 @@ export default function HostGame() {
             {!gameState.gameStarted && <Button onClick={startGame}>Start Game</Button>}
             {gameState.gameStarted &&
               <>
-                <Button onClick={endGame}>End Game</Button>
-                {gameState.revealed.map((_, id) => {
-                  return (
-                    <div key={id} className="mr-2">
-                      {<Button onClick={() => selectQuestion(id)}>Choose question {id}</Button>}
-                    </div>)
-                })}
+                <div><Button onClick={endGame}>End Game</Button></div>
+                <div className="grid grid-cols-4">
+                  {gameState.revealed.map((_, id) => {
+                    return (
+                      <div key={id} className="m-1">
+                        {<Button onClick={() => selectQuestion(id)}>Choose question {id}</Button>}
+                      </div>)
+                  })}
+                </div>
               </>}
           </Panel>
         </>
