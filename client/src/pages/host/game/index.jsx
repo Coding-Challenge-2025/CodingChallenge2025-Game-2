@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
 import { useEffect } from "react"
+import clsx from "clsx"
 
 export default function HostGame() {
   const { gameState, timeLeft,
@@ -48,7 +49,7 @@ export default function HostGame() {
               </div>
               {gameState.answerQueue.length > 0 &&
                 <div>
-                  <Button>Finish and Reveal Answers</Button>
+                  <Button onClick={resolveAnswers}>Finish and Reveal Answers</Button>
                   {gameState.answerQueue.forEach((value, id) =>
                     <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
                       onClick={() => markAnswer(id)}>
@@ -62,7 +63,7 @@ export default function HostGame() {
           {gameState.keywordQueue.length > 0 &&
             <Panel title="Keyword Received">
               <div>
-                <Button>Announce Results</Button>
+                <Button onClick={resolveKeywords}>Announce Results</Button>
                 {gameState.keywordQueue.forEach((value, id) =>
                   <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}
                     onClick={() => markKeyword(id)}>
