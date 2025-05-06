@@ -22,7 +22,7 @@ export default function PlayerGame() {
         <>
           {gameState.question && timeLeft !== undefined &&
             <AnswerCard currentQuestion={gameState.question}
-              submitAnswer={timeLeft > 0 ? submitAnswer : null}
+              submitAnswer={(gameState.isPlayer && timeLeft) > 0 ? submitAnswer : null}
               timeLeft={timeLeft}>
               {gameState.question.correct !== undefined &&
                 <h3 className={clsx("text-lg font-bold p-4 text-red-500",
@@ -38,7 +38,7 @@ export default function PlayerGame() {
       }
       {(gameState.phase === GamePhase.QUESTION_RESULTS || gameState.phase == GamePhase.GAME_COMPLETE)
         && gameState.players &&
-        <Panel title="Leaderboards">
+        <Panel title="Results">
           <RankingBoard players={gameState.players} />
         </Panel>
       }
@@ -46,7 +46,8 @@ export default function PlayerGame() {
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
           questionsAnswered={gameState.questionsAnswered}
-          submitKeyword={submitKeyword} />
+          submitKeyword={gameState.isPlayer ? submitKeyword : undefined}
+          wrongKeywords={gameState.wrongKeywords} />
       }
     </GameLayout>
   )

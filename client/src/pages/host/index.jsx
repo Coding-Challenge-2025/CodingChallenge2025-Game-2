@@ -23,8 +23,6 @@ export default function HostJoin() {
       return
     }
 
-    // In a real app, you would validate the room ID against a database
-    // For this demo, we'll just move to the next step
     setStep(2)
     setError("")
   }
@@ -36,8 +34,6 @@ export default function HostJoin() {
       return
     }
 
-    // In a real app, you would register the player in the room
-    // For this demo, we'll just navigate to the game page
     authenticateHost(roomId, password);
     navigate("/host/game")
   }
@@ -62,10 +58,10 @@ export default function HostJoin() {
                   <Label htmlFor="roomId">Room Code</Label>
                   <Input
                     id="roomId"
-                    placeholder="Enter room code (e.g., ABC123)"
+                    placeholder="Enter room code (e.g., A1B2)"
                     value={roomId}
                     onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-                    maxLength={6}
+                    maxLength={4}
                     className="text-center text-xl font-bold"
                   />
                 </div>

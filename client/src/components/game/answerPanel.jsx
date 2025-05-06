@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import { Send, Ellipsis } from "lucide-react";
 
@@ -16,6 +17,7 @@ export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 	};
 
 	return <>
+		<Label className="ml-2">Input length: <strong>{answer.length}</strong></Label>
 		<div className="flex gap-2">
 			<Input
 				placeholder="Type your answer..."

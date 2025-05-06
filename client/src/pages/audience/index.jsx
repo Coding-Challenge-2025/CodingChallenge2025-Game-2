@@ -1,19 +1,15 @@
+"use client"
+
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Eye } from "lucide-react"
+import { useNavigate } from "react-router"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useGameContext } from "../../hooks/useGameContext"
 
-export default function AudienceJoin() {
+export default function PlayerJoin() {
+  const { authenticateAudience } = useGameContext();
   const [roomId, setRoomId] = useState("")
   const [error, setError] = useState("")
   const navigate = useNavigate()
@@ -25,20 +21,22 @@ export default function AudienceJoin() {
       return
     }
 
-    // Example validation or logic before navigation
-    navigate("/audience/game")
+    authenticateAudience(roomId);
+    navigate("/player/game")
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-indigo-100">
         <CardHeader className="text-center">
-          <div className="mx-auto bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-            <Eye className="h-8 w-8 text-pink-600" />
-          </div>
-          <CardTitle className="text-2xl text-pink-900">Join as Audience</CardTitle>
-          <CardDescription>Enter the room code to watch the game</CardDescription>
+          <CardTitle className="text-2xl text-purple-900">
+            Join a Game
+          </CardTitle>
+          <CardDescription>
+            {step === 1 ? "Enter the room code to join" : "Choose a username for the game"}
+          </CardDescription>
         </CardHeader>
+
         <form onSubmit={handleRoomSubmit}>
           <CardContent>
             <div className="grid w-full items-center gap-4">
@@ -46,10 +44,10 @@ export default function AudienceJoin() {
                 <Label htmlFor="roomId">Room Code</Label>
                 <Input
                   id="roomId"
-                  placeholder="Enter room code (e.g., ABC123)"
+                  placeholder="Enter room code (e.g., A1B2)"
                   value={roomId}
                   onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-                  maxLength={6}
+                  maxLength={4}
                   className="text-center text-xl font-bold"
                 />
               </div>
@@ -57,8 +55,8 @@ export default function AudienceJoin() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700">
-              Join as Audience
+            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+              Join Room
             </Button>
           </CardFooter>
         </form>
@@ -66,3 +64,4 @@ export default function AudienceJoin() {
     </div>
   )
 }
+

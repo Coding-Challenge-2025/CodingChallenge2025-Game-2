@@ -6,12 +6,14 @@ export default function PuzzleBoard({ revealed, imageData }) {
       <img alt="Round image" className="absolute inset-0 h-full w-full object-cover" src={imageData} />
 
       {revealed.map((value, index) =>
-        <div className={clsx(
+        <div key={index} className={clsx(
           "z-10 flex items-center justify-center border border-blue-500 bg-blue-400",
           value && "opacity-0")}
         >
           <span className="text-xl font-bold text-white">{index + 1}</span>
         </div>)}
+      {revealed.map((value, index) =>
+        value && <Badge>{value}</Badge>)}
     </div>
   );
 }

@@ -2,7 +2,7 @@ export default function RankingBoard({ players }) {
   return (
     <div className="w-full">
       <div className="space-y-1">
-        {players.slice(0).sort((a, b) => b.score - a.score).map((player, index) => (
+        {players.slice(0).sort((a, b) => (b.score ?? b.point) - (a.score ?? a.point)).map((player, index) => (
           <div
             key={player.name}
             className={`flex items-center p-2 rounded-lg ${index === 0
@@ -29,7 +29,7 @@ export default function RankingBoard({ players }) {
             <div className="flex-1">
               <span className="font-medium text-sm">{player.name}</span>
             </div>
-            <div className="font-bold text-md">{player.score}</div>
+            <div className="font-bold text-md">{player.score ?? player.point}</div>
           </div>
         ))}
       </div>
