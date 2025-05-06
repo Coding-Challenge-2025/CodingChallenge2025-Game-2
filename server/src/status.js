@@ -1,7 +1,8 @@
-//Server send these to Player & Audience
+//Server send ACCEPT DENIED NOTIFY for all agents
 export const STATUS_ACCEPT = "ACCEPT";
 export const STATUS_DENIED = "DENIED";
 export const STATUS_NOTIFY = "NOTIFY";
+//Server send these to Player & Audience
 export const STATUS_GAMESTART = "START";
 export const STATUS_GAMEEND = "END";
 export const STATUS_PLAYERELOSE = "LOSE";
@@ -105,6 +106,10 @@ export async function sendStatusWaitingForEvent(wsObject) {
     await sendStatus(wsObject, STATUS_NOTIFY, {"message:": "Waiting for event..."});
 }
 
+export async function sendStatusNotify(wsObject, message) {
+    await sendStatus(wsObject, STATUS_NOTIFY, {"message:": message});
+}
+
 export async function sendStatusGameStart(wsObject) {
     await sendStatus(wsObject, STATUS_GAMESTART);
 }
@@ -187,8 +192,4 @@ export async function sendStatusHostAnswerQueue(wsObject, answerQueueObject) {
 
 export async function sendStatusHostClientsList(wsObject, convertedClientsListObject) {
     await sendStatus(wsObject, STATUS_HOSTGIVECLIENTS, convertedClientsListObject);
-}
-
-export async function sendStatusHostNotify(wsObject, notifyString) {
-    await sendStatus(wsObject, STATUS_HOSTNOTIFY, notifyString);
 }
