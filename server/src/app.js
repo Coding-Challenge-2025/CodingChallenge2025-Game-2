@@ -75,6 +75,7 @@ let loggingFilename;
 let waitingRoomHandle;
 
 const hostPassword = "C0d1nCh@llenge25"
+const hostName = "ADMIN"
 //Host ws object
 let hostHandle = undefined;
 
@@ -84,6 +85,20 @@ function isHost(ws) {
 
 function isHostActive() {
     return hostHandle === undefined ? false : true 
+}
+
+function allocateHost(ws) {
+    hostHandle = ws;
+    clientList.set(hostHandle, hostName);
+    clientNameList.set(hostName, hostHandle);
+    clientActiveStateList.set(hostHandle, false);
+}
+
+function releaseHost() {
+    clientList.delete(hostHandle);
+    clientNameList.delete(hostName);
+    clientActiveStateList.delete(hostHandle);
+    hostHandle = undefined;
 }
 
 function releaseClient(ws) {
@@ -200,6 +215,8 @@ async function broadcastQuestion(questionObject) {
 
             if(isPlayerAudience(wsObject)) {
                 logging(loggingFilename, `Question sent to audience ${clientName} for observation purpose`);
+            } else if(isHost(wsObject)) {
+                logging(loggingFilename, `Question sent to host for whatever purpose`);
             } else if(isPlayerActive(wsObject)) {
                 logging(loggingFilename, `Question sent to player ${clientName}`)
             } else {
@@ -224,7 +241,11 @@ async function broadcastSignalStartQuestion() {
 
     permitQuestionAnswer = true;
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(wsObject)) return resolve();
+        if(isPlayerAudience(wsObject) || isHost(wsObject)) {
+            //Only send status, do not add to timer list
+            status.sendStatusRunQuestion(wsObject);
+            return resolve();
+        }
         let serverStartTimepoint = Date.now();
         clientAnswerList.set(wsObject, "");
         clientTimerList.set(wsObject, {"start_time": serverStartTimepoint});
@@ -260,7 +281,7 @@ function prepareAnswerQueue() {
     answerQueue = [];
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        if(isPlayerAudience(wsObject)) return;
+        if(isPlayerAudience(wsObject) || isHost(wsObject)) return;
         const playerAnswer = clientAnswerList.get(wsObject);
         const playerStartTimepoint = clientTimerList.get(wsObject)["start_time"];
         const playerEndTimepoint = clientTimerList.get(wsObject)["end_time"];
@@ -286,10 +307,8 @@ async function broadcastClue(keywordObject, doSendClue) {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         status.sendStatusClue(wsObject, {"clue": clueWord});
     })
-    //do we need to send CLUE status to host?
-    const hostPromises = status.sendStatusClue(hostHandle, {"clue": clueWord});
 
-    await Promise.all([sendPromises, hostPromises]);
+    await Promise.all(sendPromises);
 }
 
 async function broadcastRoundScore() {
@@ -302,9 +321,8 @@ async function broadcastRoundScore() {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusRoundScore(wsObject, getRoundScore())
     });
-    const sendPromiseHost = status.sendStatusRoundScore(hostHandle, getRoundScore());
 
-    await Promise.all([sendPromises, sendPromiseHost]);
+    await Promise.all(sendPromises);
 }
 
 async function broadcastLeaderboard() {
@@ -313,9 +331,8 @@ async function broadcastLeaderboard() {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusLeaderboard(wsObject, getLeaderboard());
     });
-    const sendPromiseHost = status.sendStatusLeaderboard(hostHandle, getLeaderboard());
 
-    await Promise.all([sendPromises, sendPromiseHost]);
+    await Promise.all(sendPromises);
 }
 
 async function resolveKeyword(resolvedKeywordArray) {
@@ -452,11 +469,11 @@ async function handleStatusHostLogin(ws, jsonData) {
     let password = jsonData["password"];
     // if(roomId === serverRoomId && password === hostPassword) {   //frontend didn't like this lol
     if(password === hostPassword) {
-        hostHandle = ws;
+        allocateHost(ws)
         logging(loggingFilename, "Host authorized")
         await status.sendStatusAccepted(ws);
     } else {
-        logging(loggingFilename, "Host failed to login");
+        logging(loggingFilename, "Host failed to login");   
         await status.sendStatusInvalidID(ws);
     }
 }
@@ -466,9 +483,9 @@ app.ws("/", (ws, req) => {
     logging(loggingFilename, `address ${clientRemoveAddress} connected`);
 
     ws.on("close", () => {
-        if(ws === hostHandle) {
+        if(isHost(ws)) {
             logging(loggingFilename, "Host has disconnected!");
-            hostHandle = undefined;
+            releaseHost();
             return;
         }
         if (clientList.has(ws)) {
@@ -603,7 +620,8 @@ app.ws("/", (ws, req) => {
                     convertedClientsListObject["audiences"] = []
                     convertedClientsListObject["players"] = []
                     Array.from(clientList).map(([wsObject, playerName]) => {
-                        if(isPlayerAudience(wsObject)) {
+                        if(isHost(wsObject)) return;
+                        else if(isPlayerAudience(wsObject)) {
                             convertedClientsListObject["audiences"].push(playerName)
                         } else {
                             convertedClientsListObject["players"].push(playerName)
@@ -641,7 +659,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
     })
 
     const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(wsObject)) {
+        if(isPlayerAudience(wsObject) || isHost(wsObject)) {
             status.sendStatusCheckAnswer(wsObject, {"correct": 1, "correct_answer": correctAnswer});
         }
         resolve();

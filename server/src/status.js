@@ -87,27 +87,27 @@ export async function sendStatusAccepted(wsObject) {
 }
 
 export async function sendStatusRoomIsFull(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Room is full"});
+    await sendStatus(wsObject, STATUS_DENIED, {"reason": "Room is full"});
 }
 
 export async function sendStatusInvalidID(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Invalid room ID"});
+    await sendStatus(wsObject, STATUS_DENIED, {"reason": "Invalid room ID"});
 }
 
 export async function sendStatusDuplicateName(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Name already existed"});
+    await sendStatus(wsObject, STATUS_DENIED, {"reason": "Name already existed"});
 }
 
 export async function sendStatusGameAlreadyRunning(wsObject) {
-    await sendStatus(wsObject, STATUS_DENIED, {"reason:": "Game already running!"});
+    await sendStatus(wsObject, STATUS_DENIED, {"reason": "Game already running!"});
 }
 
 export async function sendStatusWaitingForEvent(wsObject) {
-    await sendStatus(wsObject, STATUS_NOTIFY, {"message:": "Waiting for event..."});
+    await sendStatus(wsObject, STATUS_NOTIFY, {"message": "Waiting for event..."});
 }
 
 export async function sendStatusNotify(wsObject, message) {
-    await sendStatus(wsObject, STATUS_NOTIFY, {"message:": message});
+    await sendStatus(wsObject, STATUS_NOTIFY, {"message": message});
 }
 
 export async function sendStatusGameStart(wsObject) {
