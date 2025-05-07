@@ -248,11 +248,11 @@ export const GameContextProvider = ({ children }) => {
     dispatch({ status: InternalMessageType.SET_AUDIENCE });
   });
 
-  const authenticateHost = useCallback((roomID, password) => {
+  const authenticateHost = useCallback((password) => {
     if (authenticated)
       return;
     setAuthenticated(true);
-    sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, message: { "id": roomID, "password": password } });
+    sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, message: { password: password } });
     dispatch({ status: InternalMessageType.SET_AUDIENCE });
   });
 
