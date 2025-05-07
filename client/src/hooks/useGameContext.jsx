@@ -52,6 +52,7 @@ const ClientMessageType = {
   SHOW_KEYWORD: "KEYSHOW",
   REVEAL_ROUND_SCORE: "GETROUNDSCORE",
   REVEAL_LEADERBOARDS: "GETLEADERBOARD",
+  REQUEST_CLIENT_LIST: "GETCLIENTS",
 };
 
 const InternalMessageType = {
@@ -60,6 +61,7 @@ const InternalMessageType = {
   CLEAR_KEYWORD_QUEUE: "CLEAR_KEYWORD_QUEUE",
   MARK_ANSWER: "MARK_ANSWER",
   MARK_KEYWORD: "MARK_KEYWORD",
+  REVEAL_ALL_CLUES: "REVEAL_ALL_CLUES",
 };
 
 const initialGameState = {
@@ -148,15 +150,16 @@ const gameReducer = (state, action) => {
       return { ...state, keywordQueue: [] };
     case InternalMessageType.MARK_ANSWER: {
       let queue = state.answerQueue.slice(0);
-      console.log(action);
-      queue[action.message.id].correct = true;
-      console.log(queue);
+      queue[action.message.id].correct = action.message.value;
       return { ...state, answerQueue: queue };
     }
     case InternalMessageType.MARK_KEYWORD: {
       let queue = state.keywordQueue.slice(0);
-      queue[action.message.id].correct = true; // TODO: react strict mode runs flip twice
+      queue[action.message.id].correct = action.message.value;
       return { ...state, keywordQueue: queue };
+    }
+    case InternalMessageType.REVEAL_ALL_CLUES: {
+      return { ...state, revealed: state.revealed.map((value) => value || " ") };
     }
     default:
       console.warn("Invalid message from server:", action);
@@ -242,7 +245,7 @@ export const GameContextProvider = ({ children }) => {
       return;
     setAuthenticated(true);
     sendMessage({ "status": ClientMessageType.AUTHENTICATE_AUDIENCE, message: { "id": roomID, "name": Date.now().toString() } });
-
+    dispatch({ status: InternalMessageType.SET_AUDIENCE });
   });
 
   const authenticateHost = useCallback((roomID, password) => {
@@ -288,6 +291,13 @@ export const GameContextProvider = ({ children }) => {
     }
     sendMessage({ status: ClientMessageType.OPEN_CLUE });
   });
+  const revealAllClues = useCallback(() => {
+    if (!isConnected) {
+      console.log("revealAllClues called but not connected.");
+      return;
+    }
+    dispatch({ status: InternalMessageType.REVEAL_ALL_CLUES });
+  });
   const resolveAnswers = useCallback(() => {
     if (!isConnected) {
       console.log("resolveAnswers called but not connected.");
@@ -317,7 +327,6 @@ export const GameContextProvider = ({ children }) => {
       console.log("revealRoundScore called but not connected.");
       return;
     }
-    console.log("Revealing round score");
     sendMessage({ status: ClientMessageType.REVEAL_ROUND_SCORE });
   });
   const revealLeaderboards = useCallback(() => {
@@ -325,14 +334,20 @@ export const GameContextProvider = ({ children }) => {
       console.log("revealLeaderboards called but not connected.");
       return;
     }
-    console.log("Revealing leaderboards");
     sendMessage({ status: ClientMessageType.REVEAL_LEADERBOARDS });
   });
-  const markAnswer = useCallback((id) =>
-    dispatch({ status: InternalMessageType.MARK_ANSWER, message: { id: id } }));
-  const markKeyword = useCallback((id) =>
-    dispatch({ status: InternalMessageType.MARK_KEYWORD, message: { id: id } }));
+  const requestClientList = useCallback(() => {
+    if (!isConnected) {
+      console.log("requestClientList called but not connected.");
+      return;
+    }
+    sendMessage({ status: ClientMessageType.REQUEST_CLIENT_LIST });
+  });
 
+  const markAnswer = useCallback((id, value) =>
+    dispatch({ status: InternalMessageType.MARK_ANSWER, message: { id: id, value: value } }));
+  const markKeyword = useCallback((id, value) =>
+    dispatch({ status: InternalMessageType.MARK_KEYWORD, message: { id: id, value: value } }));
   const value = {
     gameState,
     timeLeft,
@@ -355,6 +370,7 @@ export const GameContextProvider = ({ children }) => {
     revealLeaderboards,
     markAnswer,
     markKeyword,
+    requestClientList
   };
 
   return (

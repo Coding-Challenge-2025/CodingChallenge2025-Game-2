@@ -29,7 +29,7 @@ export default function PlayerJoin() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-indigo-100">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-purple-900">
+          <CardTitle className="text-2xl text-pink-900">
             Join a Game
           </CardTitle>
           <CardDescription>
@@ -55,7 +55,7 @@ export default function PlayerJoin() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+            <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700">
               Join Room
             </Button>
           </CardFooter>

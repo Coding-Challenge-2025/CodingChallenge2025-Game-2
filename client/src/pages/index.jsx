@@ -24,7 +24,7 @@ export default function Home() {
             </CardContent>*/}
             <CardFooter>
               <Link to="/host" className="w-full">
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">Enter as Host</Button>
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">Enter as Host</Button>
               </Link>
             </CardFooter>
           </Card>
@@ -42,7 +42,7 @@ export default function Home() {
             </CardContent>*/}
             <CardFooter>
               <Link to="/player" className="w-full">
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">Enter as Player</Button>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">Enter as Player</Button>
               </Link>
             </CardFooter>
           </Card>
