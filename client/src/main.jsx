@@ -17,10 +17,14 @@ function App() {
   )
 }
 
+const wsHost = window.location.hostname;
+const wsPort = '3000';
+const wsUrl = `ws://${wsHost}:${wsPort}`;
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <WebSocketProvider url="ws://localhost:3000">
+      <WebSocketProvider url={wsUrl}>
         <GameContextProvider>
           <App />
         </GameContextProvider>
