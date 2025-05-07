@@ -559,9 +559,13 @@ app.ws("/", (ws, req) => {
                 permitKeywordAnswer = false;
                 flagIngame = false;
                 logging(loggingFilename, "Host requested end game!");
-                for(let client of clientList) {
-                    status.sendStatusGameEnd(client[0], selectedKeywordObject);
+                const wrapper = async() => {
+                    await broadcastLeaderboard();
+                    for(let client of clientList) {
+                        status.sendStatusGameEnd(client[0], selectedKeywordObject);
+                    }
                 }
+                wrapper();
                 break;
             }
             case status.STATUS_CHOOSEPIECE: {
