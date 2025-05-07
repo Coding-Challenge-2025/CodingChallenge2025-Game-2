@@ -44,7 +44,7 @@ export default function PlayerGame() {
         && gameState.players &&
         <Panel title="Results">
           <RankingBoard players={gameState.players} />
-          {gameState.keyword && <h2 className="text-center font-bold text-xl">{gameState.keyword}</h2>}
+          {gameState.keyword && <h2 className="text-center font-bold text-xl m-4">{gameState.keyword}</h2>}
         </Panel>
       }
       {(gameState.phase === GamePhase.PLAY || gameState.phase === GamePhase.QUESTION_RESULTS)
