@@ -23,7 +23,6 @@ export default function HostGame() {
     markKeyword,
     revealRoundScore,
     revealLeaderboards,
-    revealAllClues,
     requestClientList } = useGameContext()
 
   useEffect(() => {
@@ -106,7 +105,6 @@ export default function HostGame() {
               <>
                 <div>
                   <Button onClick={endGame}>End Game</Button>
-                  <Button className="ml-2" onClick={revealAllClues}>Reveal All Clues</Button>
                 </div>
                 <div className="grid grid-cols-4">
                   {gameState.revealed.map((_, id) => {

@@ -29,7 +29,7 @@ export default function RankingBoard({ players }) {
             <div className="flex-1">
               <span className="font-medium text-sm">{player.name}</span>
             </div>
-            <div className="font-bold text-md">{player.score ?? player.point}</div>
+            <div className="font-bold text-md">{player.score ?? '+' + player.point}</div>
           </div>
         ))}
       </div>

@@ -89,7 +89,10 @@ const gameReducer = (state, action) => {
     case ServerMessageType.GAME_START:
       return { ...state, gameStarted: true };
     case ServerMessageType.GAME_END:
-      return { ...state, phase: GamePhase.GAME_COMPLETE, gameStarted: false };
+      return {
+        ...state, phase: GamePhase.GAME_COMPLETE, gameStarted: false,
+        keyword: action.message.keyword, revealed: action.message.clues,
+      };
     case ServerMessageType.HOST_QUESTION_LOAD:
     case ServerMessageType.QUESTION_LOAD:
       return {
@@ -157,9 +160,6 @@ const gameReducer = (state, action) => {
       let queue = state.keywordQueue.slice(0);
       queue[action.message.id].correct = action.message.value;
       return { ...state, keywordQueue: queue };
-    }
-    case InternalMessageType.REVEAL_ALL_CLUES: {
-      return { ...state, revealed: state.revealed.map((value) => value || " ") };
     }
     default:
       console.warn("Invalid message from server:", action);
@@ -290,13 +290,6 @@ export const GameContextProvider = ({ children }) => {
       return;
     }
     sendMessage({ status: ClientMessageType.OPEN_CLUE });
-  });
-  const revealAllClues = useCallback(() => {
-    if (!isConnected) {
-      console.log("revealAllClues called but not connected.");
-      return;
-    }
-    dispatch({ status: InternalMessageType.REVEAL_ALL_CLUES });
   });
   const resolveAnswers = useCallback(() => {
     if (!isConnected) {
