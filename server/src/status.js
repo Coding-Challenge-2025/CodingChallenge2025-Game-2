@@ -102,6 +102,10 @@ export async function sendStatusGameAlreadyRunning(wsObject) {
     await sendStatus(wsObject, STATUS_DENIED, {"reason": "Game already running!"});
 }
 
+export async function sendStatusInvalidPassword(wsObject) {
+    await sendStatus(wsObject, STATUS_DENIED, {"reason": "Invalid password"});
+}
+
 export async function sendStatusWaitingForEvent(wsObject) {
     // await sendStatus(wsObject, STATUS_NOTIFY, {"message": "Waiting for event..."});
 }

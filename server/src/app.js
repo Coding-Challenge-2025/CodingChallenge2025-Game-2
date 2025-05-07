@@ -84,6 +84,7 @@ const hostName = "ADMIN"
 let hostHandle = undefined;
 
 function isHost(ws) {
+    if(!isHostActive()) return false;
     return hostHandle === ws ? true : false;
 }
 
@@ -323,7 +324,7 @@ function prepareRoundScore() {
 }
 
 async function broadcastRoundScore() {
-    logging(loggingFilename, "Log round score:")
+    logging(loggingFilename, `Log round score: ${JSON.stringify(getRoundScore())}`)
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusRoundScore(wsObject, getRoundScore())
     });
@@ -481,7 +482,7 @@ async function handleStatusHostLogin(ws, jsonData) {
         await status.sendStatusNotify(ws, `Connect others with room ID ${serverRoomId}`)
     } else {
         logging(loggingFilename, "Host failed to login");   
-        await status.sendStatusInvalidID(ws);
+        await status.sendStatusInvalidPassword(ws);
     }
 }
 
@@ -623,6 +624,7 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_GETCLIENTS: {
+                if(!isHost(ws)) break;
                 const tempWrapper = async() => {
                     let convertedClientsListObject = {};
                     convertedClientsListObject["audiences"] = []
