@@ -311,7 +311,10 @@ export const GameContextProvider = ({ children }) => {
       console.log("resolveKeywords called but not connected.");
       return;
     }
-    gameState.keywordQueue.forEach(({ keyword }) => revealWrongKeyword(keyword));
+    gameState.keywordQueue.forEach(({ keyword, correct }) => {
+      if (!correct)
+        revealWrongKeyword(keyword);
+    });
     sendMessage({ status: ClientMessageType.RESOLVE_KEYWORDS, message: gameState.keywordQueue });
     dispatch({ status: InternalMessageType.CLEAR_KEYWORD_QUEUE });
   });
