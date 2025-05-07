@@ -114,8 +114,9 @@ export async function sendStatusGameStart(wsObject) {
     await sendStatus(wsObject, STATUS_GAMESTART);
 }
 
-export async function sendStatusGameEnd(wsObject) {
-    await sendStatus(wsObject, STATUS_GAMEEND);
+export async function sendStatusGameEnd(wsObject, finalKeywordObject) {
+    const tmpdata = {"keyword": finalKeywordObject["keyword"], "clues": finalKeywordObject["clues"]}
+    await sendStatus(wsObject, STATUS_GAMEEND, tmpdata);
 }
 
 export async function sendStatusPlayerLose(wsObject) {

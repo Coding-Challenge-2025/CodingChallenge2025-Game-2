@@ -90,3 +90,11 @@
     "status": "SETSCORE",
   "message":{"name":"hieu", "score":1000}
 }
+
+{
+    "status": "END",
+    "message": {
+        "keyword": "word",
+        "clues": {"clue1", "clue2", ...}
+    }
+}

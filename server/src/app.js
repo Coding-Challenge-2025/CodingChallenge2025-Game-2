@@ -38,6 +38,10 @@ const clientActiveStateList = new Map();
 //Format: [wsobj, string]
 const clientAnswerList = new Map();
 
+//Store client answer correct/incorrect status
+//Format: [wsobj, bool]
+const clientAnswerCorrectList = new Map();
+
 //Leaderboard, in map
 //Format: [wsobj, integer]
 const clientScoreList = new Map();
@@ -54,7 +58,6 @@ const clientTimerList = new Map();
 //Format: [wsobj, bool]
 const clientAudienceList = new Map();
 
-let answerQueue = [];   //update each play turn, json array contain wsobj, answer, epoch, point
 let permitKeywordAnswer = false;
 let permitQuestionAnswer = false;
 let flagIngame = false;
@@ -261,7 +264,8 @@ async function broadcastSignalStartQuestion() {
             //audience doesn't in clientTimerList so they won't be caught here 
             const innerClientsPromise = Array.from(clientTimerList).map(([wsObject, timerObject]) => {
                 if(clientAnswerList.get(wsObject) === "") {
-                    logging(loggingFilename, `Player ${getClientNameFromHandle(wsObject)} didn't send answer`);
+                    if(isPlayerActive(wsObject)) logging(loggingFilename, `Player ${getClientNameFromHandle(wsObject)} didn't send answer`);
+                    else logging(loggingFilename, `Player ${getClientNameFromHandle(wsObject)} didn't send answer due to eliminated`);
                     clientTimerList.set(wsObject, {"start_time": timerObject["start_time"], "end_time": timerObject["start_time"]+ANSWER_TIMEOUT+1})
                 }
             });
@@ -278,7 +282,6 @@ async function broadcastSignalStartQuestion() {
 }
 
 function prepareAnswerQueue() {
-    answerQueue = [];
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if(isPlayerAudience(wsObject) || isHost(wsObject)) return;
@@ -286,12 +289,9 @@ function prepareAnswerQueue() {
         const playerStartTimepoint = clientTimerList.get(wsObject)["start_time"];
         const playerEndTimepoint = clientTimerList.get(wsObject)["end_time"];
         const epoch = playerEndTimepoint - playerStartTimepoint;
-        answerQueue.push({"wsobj": wsObject, "answer": playerAnswer, "epoch": epoch, "point": 0});
         answerQueueSending.push({"name": playerName, "answer": playerAnswer, "epoch": epoch, "point": 0});
-        // return Promise.resolve();
     });
     
-    // await Promise.all(sendPromises);
     return answerQueueSending;
 }
 
@@ -311,14 +311,21 @@ async function broadcastClue(keywordObject, doSendClue) {
     await Promise.all(sendPromises);
 }
 
-async function broadcastRoundScore() {
+function prepareRoundScore() {
     roundScoreArray = [];
-    logging(loggingFilename, "Log round score:")
-    answerQueue.map(({wsobj, answer, epoch, point}) => {
-        let epochInSecond = epoch/1000;
-        logging(loggingFilename, `${epochInSecond.toFixed(3)}s ~ ${getClientNameFromHandle(wsobj)}: ${answer} => +${point}`);
-        roundScoreArray.push({"epoch": epochInSecond, "name": getClientNameFromHandle(wsobj), "answer": answer, "point": point});
+    Array.from(clientAnswerList).map(([wsObject, answer]) => {
+        let clientName = getClientNameFromHandle(wsObject)
+        let startTime = clientTimerList.get(wsObject)["start_time"];
+        let endTime = clientTimerList.get(wsObject)["end_time"];
+        let epochInSecond = (endTime - startTime)/1000;
+        let point = clientAnswerCorrectList.get(wsObject) ? 10 : 0
+        logging(loggingFilename, `${epochInSecond.toFixed(3)}s ~ ${clientName}: ${answer} => +${point}`);
+        roundScoreArray.push({"epoch": epochInSecond, "name": clientName, "answer": answer, "point": point});
     })
+}
+
+async function broadcastRoundScore() {
+    logging(loggingFilename, "Log round score:")
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusRoundScore(wsObject, getRoundScore())
     });
@@ -473,6 +480,7 @@ async function handleStatusHostLogin(ws, jsonData) {
         allocateHost(ws)
         logging(loggingFilename, "Host authorized")
         await status.sendStatusAccepted(ws);
+        await status.sendStatusNotify(ws, `Connect others with room ID ${serverRoomId}`)
     } else {
         logging(loggingFilename, "Host failed to login");   
         await status.sendStatusInvalidID(ws);
@@ -553,7 +561,7 @@ app.ws("/", (ws, req) => {
                 flagIngame = false;
                 logging(loggingFilename, "Host requested end game!");
                 for(let client of clientList) {
-                    status.sendStatusGameEnd(client[0]);
+                    status.sendStatusGameEnd(client[0], selectedKeywordObject);
                 }
                 break;
             }
@@ -580,6 +588,7 @@ app.ws("/", (ws, req) => {
             case status.STATUS_ANSWERRESOLVE: {
                 const tempWrapper = async() => {
                     await resolveAnswer(clientMessage);
+                    prepareRoundScore()
                 }
                 tempWrapper();
                 break;
@@ -650,11 +659,15 @@ async function initGame() {
 
 async function resolveAnswer(resolvedAnswerQueue) {
     const correctAnswer = selectedQuestionObject["answer"];
-    answerQueue.length = 0;     //reload the server answer queue
     const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, correct}) => {
         let wsobj = getHandleFromClientName(name);
         if(wsobj === undefined) return Promise.resolve();
-        if(correct) updateClientScore(wsobj, 10)
+        if(correct) {
+            updateClientScore(wsobj, 10)
+            clientAnswerCorrectList.set(wsobj, true)
+        } else {
+            clientAnswerCorrectList.set(wsobj, false)
+        }
         status.sendStatusCheckAnswer(wsobj, {"correct": correct, "correct_answer": correctAnswer});
         return Promise.resolve();
     })
@@ -672,6 +685,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
 }
 
 async function choosePiece(piece_index) {
+    clientAnswerCorrectList.clear();
     let givenIndex = getRandomIndex(questionsList);
     selectedQuestionObject = { ...questionsList[givenIndex] };
     questionsList.splice(givenIndex, 1);
