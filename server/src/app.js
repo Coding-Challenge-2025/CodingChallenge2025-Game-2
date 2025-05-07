@@ -70,6 +70,7 @@ let roundScoreArray = []
 let serverRoomId
 let currentPlayerCount = 0
 let questionCounter = 0
+let currentPieceIndex
 
 let selectedKeywordObject;
 let selectedQuestionObject;
@@ -296,14 +297,11 @@ function prepareAnswerQueue() {
 }
 
 async function broadcastClue(keywordObject, doSendClue) {
-    let selectedIndex = getRandomIndex(keywordObject["clues"]);
     let clueWord = null;
     if(doSendClue) {
-        clueWord = keywordObject["clues"][selectedIndex];
+        clueWord = keywordObject["clues"][currentPieceIndex];
         logging(loggingFilename, `Do open clue: ${clueWord}`);
-    } else logging(loggingFilename, `Do not open clue`);
-    //discard for nothing in case of all incorrect answer
-    keywordObject["clues"].splice(selectedIndex, 1);       
+    } else logging(loggingFilename, `Do not open clue`);   
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         status.sendStatusClue(wsObject, {"clue": clueWord});
     })
@@ -686,6 +684,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
 
 async function choosePiece(piece_index) {
     clientAnswerCorrectList.clear();
+    currentPieceIndex = piece_index;
     let givenIndex = getRandomIndex(questionsList);
     selectedQuestionObject = { ...questionsList[givenIndex] };
     questionsList.splice(givenIndex, 1);
