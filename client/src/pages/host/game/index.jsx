@@ -100,11 +100,14 @@ export default function HostGame() {
               }
               {gameState.keyword && <div>Keyword: <strong>{gameState.keyword}</strong></div>}
             </div>
-            {!gameState.gameStarted && <Button onClick={startGame}>Start Game</Button>}
+            {!gameState.gameStarted && <Button disabled={step === 999} onClick={startGame}>Start Game</Button>}
             {gameState.gameStarted &&
               <>
                 <div>
-                  <Button onClick={endGame}>End Game</Button>
+                  <Button onClick={() => {
+                    endGame();
+                    setStep(999);
+                  }}>End Game</Button>
                 </div>
                 <div className="grid grid-cols-4">
                   {gameState.revealed.map((_, id) => {

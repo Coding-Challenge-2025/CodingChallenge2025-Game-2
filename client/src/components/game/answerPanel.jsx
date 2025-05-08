@@ -17,7 +17,9 @@ export default function AnswerPanel({ submitAnswer, checkValidInput }) {
 	};
 
 	return <>
-		<Label className="ml-2">Input length: <strong>{answer.length}</strong></Label>
+		{submitAnswer &&
+			<Label className="ml-2">Input length: <strong>{answer.length}</strong></Label>
+		}
 		<div className="flex gap-2">
 			<Input
 				placeholder="Type your answer..."

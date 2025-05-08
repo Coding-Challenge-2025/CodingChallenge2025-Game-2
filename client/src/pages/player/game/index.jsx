@@ -12,7 +12,7 @@ export default function PlayerGame() {
   const { gameState, submitAnswer, submitKeyword, timeLeft } = useGameContext()
 
   return (
-    <GameLayout revealed={gameState.revealed} imageData={gameState.image}>
+    <GameLayout revealed={gameState.revealed} imageData={gameState.image} isPlayer={gameState.isPlayer}>
       {gameState.phase === GamePhase.CONNECTING &&
         <Panel title="Connecting to server...">
           {gameState.error ?? "Waiting for server response..."}
