@@ -505,7 +505,7 @@ app.ws("/", (ws, req) => {
             if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${getClientNameFromHandle(ws)} disconnected`)
             logging(loggingFilename, `Player ${getClientNameFromHandle(ws)} disconnected`);
             releaseClient(ws);
-            if(flagIngame === false) {
+            if(flagIngame) {
                 logging(loggingFilename, `Player disconnected while already in-game. Must check!`);
                 //saveGameState()
                 //exit....
