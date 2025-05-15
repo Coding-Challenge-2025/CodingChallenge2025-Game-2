@@ -6,7 +6,6 @@ import AnswerCard from "../../../components/game/answerCard"
 import KeywordCard from "../../../components/game/keywordCard"
 import Panel from "../../../components/game/panel"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
-import clsx from "clsx"
 
 export default function PlayerGame() {
   const { gameState, submitAnswer, submitKeyword, timeLeft } = useGameContext()
@@ -25,12 +24,6 @@ export default function PlayerGame() {
             <AnswerCard currentQuestion={gameState.question}
               submitAnswer={(gameState.isPlayer && timeLeft) > 0 ? submitAnswer : null}
               timeLeft={timeLeft}>
-              {gameState.question.answer &&
-                <h3 className={clsx("text-lg font-bold p-4",
-                  gameState.question.correct && "text-green-500",
-                  !gameState.question.correct && "text-red-500")}>
-                  Answer: {gameState.question.answer}
-                </h3>}
             </AnswerCard>
           }
           {!gameState.question &&

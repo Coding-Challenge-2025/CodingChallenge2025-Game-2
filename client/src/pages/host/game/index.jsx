@@ -57,8 +57,6 @@ export default function HostGame() {
           {gameState.question &&
             <AnswerCard currentQuestion={gameState.question}
               timeLeft={timeLeft}>
-              {gameState.question.answer &&
-                <h3 className="text-lg font-bold p-4">Answer: {gameState.question.answer}</h3>}
               <div className="flex w-full gap-2">
                 <Button className="flex-1" disabled={step !== 1} onClick={() => { startQuestion(); setStep(2) }}>Start Question</Button>
                 <Button className="flex-1" disabled={step !== 3} onClick={() => { revealRoundScore(); setStep(4); }}>Reveal Scores</Button>
