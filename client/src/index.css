@@ -10,6 +10,12 @@ body {
 	background-image: url("/frame.png");
 	background-size: cover;
 }
+mjx-container {
+  display: inline-grid;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
 
 @layer base {
   :root {
