@@ -119,6 +119,7 @@ const gameReducer = (state, action) => {
       revealed[state.question.id] = action.message.clue;
       return { ...state, revealed: revealed };
     case ServerMessageType.END_LEADERBOARD:
+      console.log(action.message);
       return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
       return { ...state, timeStart: Date.now() };
