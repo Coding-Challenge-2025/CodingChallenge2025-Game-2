@@ -73,8 +73,8 @@ export const STATUS_NOCLUE = "NCLUE"
 export const STATUS_SETSCORE = "SETSCORE"
 //Send
 export const STATUS_GETCLIENTS = "GETCLIENTS"
-//Send 
-// export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
+//Send array of {integer, bool}
+export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
 
 async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
     if(wsObject.readyState == WebSocket.OPEN) {
@@ -141,8 +141,9 @@ export async function sendStatusLoadQuestion(wsObject, questionObject) {
     await sendStatus(wsObject, STATUS_QUESTIONLOAD, questionObject);
 }
 
-export async function sendStatusRunQuestion(wsObject) {
-    await sendStatus(wsObject, STATUS_QUESTIONRUN);
+//send integer
+export async function sendStatusRunQuestion(wsObject, timeout) {
+    await sendStatus(wsObject, STATUS_QUESTIONRUN, timeout);
 }
 
 //{correct: 0 or 1, correct_answer: string}
@@ -160,9 +161,9 @@ export async function sendStatusCheckKeyword(wsObject, checkObject) {
     await sendStatus(wsObject, STATUS_CHECKKEYWORD, checkObject);
 }
 
-//{clue: string}
-export async function sendStatusClue(wsObject, clueObject) {
-    await sendStatus(wsObject, STATUS_CLUE, clueObject);
+//{clue: string, piece_index: int}
+export async function sendStatusClue(wsObject, clue, index) {
+    await sendStatus(wsObject, STATUS_CLUE, {"clue": clue, "piece_index": index});
 }
 
 //array of {name: string, score: int}
@@ -197,4 +198,12 @@ export async function sendStatusHostAnswerQueue(wsObject, answerQueueObject) {
 
 export async function sendStatusHostClientsList(wsObject, convertedClientsListObject) {
     await sendStatus(wsObject, STATUS_HOSTGIVECLIENTS, convertedClientsListObject);
+}
+
+export async function sendStatusLoadGameState(wsObject, gameState) {
+    // await sendStatus(wsObject, STATUS_LOADGAMESTATE, gameState);
+    //only send CLUE status for now
+    gameState.map(({index, correct, clue}) => {
+        sendStatusClue(wsObject, clue, index);
+    })
 }

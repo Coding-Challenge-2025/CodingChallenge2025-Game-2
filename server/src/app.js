@@ -19,6 +19,7 @@ import {
     loggingError
 } from "./utilities.js";
 import * as status from "./status.js"
+import * as parser from "./argparse.js"
 
 const MAX_PLAYER = 4;
 const port = 3000;
@@ -31,19 +32,19 @@ const clientNameList = new Map();
 
 //Store boolean value determine if client 
 //is still able to participate in the game
-//Format: [wsobj, boolean]
+//Format: [string, boolean]
 const clientActiveStateList = new Map();
 
 //Store client answer
-//Format: [wsobj, string]
+//Format: [string, string]
 const clientAnswerList = new Map();
 
 //Store client answer correct/incorrect status
-//Format: [wsobj, bool]
+//Format: [string, bool]
 const clientAnswerCorrectList = new Map();
 
 //Leaderboard, in map
-//Format: [wsobj, integer]
+//Format: [string, integer]
 const clientScoreList = new Map();
 
 //Store client name and keyword for recording
@@ -51,18 +52,25 @@ const clientScoreList = new Map();
 const keywordAnswerRecord = new Map();
 
 //Store client answer timer
-//Format: [wsobj, object:{start_time, end_time}]
+//Format: [string, object:{start_time, end_time}]
 const clientTimerList = new Map();
 
 //Store audience players list
-//Format: [wsobj, bool]
+//Format: [string, bool]
 const clientAudienceList = new Map();
+
+//Store unique players that has ever login
+const clientUniqueNameSet = new Set();
+
+//Array of {index: integer, correct: bool, clue: string}
+let gameState = []
 
 let permitKeywordAnswer = false;
 let permitQuestionAnswer = false;
 let flagIngame = false;
 const keywordQueue = [];
 const ANSWER_TIMEOUT = 20000 
+let globalTimer = ANSWER_TIMEOUT
 // const KEYWORD_CORRECT_POINT = 80
 
 let roundScoreArray = []
@@ -75,7 +83,7 @@ let currentPieceIndex
 let selectedKeywordObject;
 let selectedQuestionObject;
 
-let loggingFilename;
+export let loggingFilename;
 let waitingRoomHandle;
 
 const hostPassword = "C0d1nCh@llenge25"
@@ -96,58 +104,68 @@ function allocateHost(ws) {
     hostHandle = ws;
     clientList.set(hostHandle, hostName);
     clientNameList.set(hostName, hostHandle);
-    clientActiveStateList.set(hostHandle, false);
+    clientActiveStateList.set(hostName, false);
+    clientUniqueNameSet.add(hostName);
 }
 
 function releaseHost() {
-    clientList.delete(hostHandle);
-    clientNameList.delete(hostName);
-    clientActiveStateList.delete(hostHandle);
-    hostHandle = undefined;
+    // clientList.delete(hostHandle);
+    // clientNameList.delete(hostName);
+    // clientActiveStateList.delete(hostHandle);
+    // hostHandle = undefined;
 }
 
 function releaseClient(ws) {
     let playerName = getClientNameFromHandle(ws);
     clientList.delete(ws);
-    clientActiveStateList.delete(ws);
-    clientAnswerList.delete(ws);
-    clientScoreList.delete(ws);
+    // clientActiveStateList.delete(ws);
+    // clientAnswerList.delete(ws);
+    // clientScoreList.delete(ws);
     clientNameList.delete(playerName);
-    if(keywordAnswerRecord.has(playerName)) keywordAnswerRecord.delete(playerName);
+    // if(keywordAnswerRecord.has(playerName)) keywordAnswerRecord.delete(playerName);
     currentPlayerCount--;
+}
+
+function restoreClient(ws, clientName) {
+    clientList.set(ws, clientName)
+    clientNameList.set(clientName, ws);
+    currentPlayerCount++;
 }
 
 function allocateClient(ws, clientName, initialScore = 0) {
     clientList.set(ws, clientName)
-    clientActiveStateList.set(ws, true);
-    clientAnswerList.set(ws, undefined);
-    clientScoreList.set(ws, 0);
+    clientActiveStateList.set(clientName, true);
+    clientAnswerList.set(clientName, undefined);
+    clientScoreList.set(clientName, 0);
     clientNameList.set(clientName, ws);
-    clientScoreList.set(ws, initialScore);
+    clientScoreList.set(clientName, initialScore);
+    clientUniqueNameSet.add(clientName);
     currentPlayerCount++;
 }
 
 function releaseAudience(ws) {
-    clientList.delete(ws);
-    clientActiveStateList.delete(ws);
-    clientAudienceList.delete(ws);
+    // clientList.delete(ws);
+    // clientActiveStateList.delete(ws);
+    // clientAudienceList.delete(ws);
 }
 
 function allocateAudience(ws, audienceName) {
     clientList.set(ws, audienceName)
-    clientActiveStateList.set(ws, false);
-    clientAudienceList.set(ws, true);
+    clientNameList.set(audienceName, ws);
+    clientActiveStateList.set(audienceName, false);
+    clientAudienceList.set(audienceName, true);
 }
 
 async function loadGameState(filename) {
-
+    // await nodefs.readFile(filename, )
 }
 
 function updateClientScore(wsObj, scoreAdded) {
-    if(clientScoreList.has(wsObj)) {
-        let currentClientScore = clientScoreList.get(wsObj);
+    const clientName = getClientNameFromHandle(wsObj);
+    if(clientScoreList.has(clientName)) {
+        let currentClientScore = clientScoreList.get(clientName);
         currentClientScore += scoreAdded;
-        clientScoreList.set(wsObj, currentClientScore);
+        clientScoreList.set(clientName, currentClientScore);
     } else {
         console.error(`updateClientScore(): No such object`);
     }
@@ -161,8 +179,8 @@ function getHandleFromClientName(playerName) {
     return clientNameList.get(playerName);
 }
 
-function isPlayerActive(wsObject) {
-    return clientActiveStateList.get(wsObject) === true ? true : false;
+function isPlayerActive(playerName) {
+    return clientActiveStateList.get(playerName) === true ? true : false;
 }
 
 function isPlayerAudience(wsObject) {
@@ -171,8 +189,8 @@ function isPlayerAudience(wsObject) {
 
 function getLeaderboard() {
     let jsonLeaderboard = [];
-    Array.from(clientScoreList).map(([wsObject, score]) => {
-        jsonLeaderboard.push({"name": getClientNameFromHandle(wsObject), "score": score});
+    Array.from(clientScoreList).map(([clientName, score]) => {
+        jsonLeaderboard.push({"name": clientName, "score": score});
     })
     return jsonLeaderboard;
 }
@@ -200,7 +218,7 @@ async function broadcastKeywordProperties(keywordObject) {
 async function broadcastImpl(callback) {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if (wsObject.readyState !== WebSocket.OPEN) {
-            loggingError(loggingFilename, `Websocket for player ${playerName} is not active!`)
+            // loggingError(loggingFilename, `Websocket for player ${playerName} is not active!`)
             return Promise.resolve();
         }
         return new Promise(resolve => {
@@ -222,7 +240,7 @@ async function broadcastQuestion(questionObject) {
                 logging(loggingFilename, `Question sent to audience ${clientName} for observation purpose`);
             } else if(isHost(wsObject)) {
                 logging(loggingFilename, `Question sent to host for whatever purpose`);
-            } else if(isPlayerActive(wsObject)) {
+            } else if(isPlayerActive(clientName)) {
                 logging(loggingFilename, `Question sent to player ${clientName}`)
             } else {
                 logging(loggingFilename, `Question sent to player ${clientName} for observation purpose`);
@@ -248,15 +266,13 @@ async function broadcastSignalStartQuestion() {
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
         if(isPlayerAudience(wsObject) || isHost(wsObject)) {
             //Only send status, do not add to timer list
-            status.sendStatusRunQuestion(wsObject);
+            status.sendStatusRunQuestion(wsObject, ANSWER_TIMEOUT);
             return resolve();
         }
         let serverStartTimepoint = Date.now();
-        clientAnswerList.set(wsObject, "");
-        clientTimerList.set(wsObject, {"start_time": serverStartTimepoint});
-        // if(isPlayerAudience(wsObject) || isPlayerActive(wsObject)) {
-            status.sendStatusRunQuestion(wsObject);
-        // }
+        clientAnswerList.set(playerName, "");
+        clientTimerList.set(playerName, {"start_time": serverStartTimepoint});
+        status.sendStatusRunQuestion(wsObject, ANSWER_TIMEOUT);
         resolve()
     })
 
@@ -264,19 +280,32 @@ async function broadcastSignalStartQuestion() {
         const outerTimeoutHandle = setTimeout(() => {
             clearTimeout(outerTimeoutHandle);
             //audience doesn't in clientTimerList so they won't be caught here 
-            const innerClientsPromise = Array.from(clientTimerList).map(([wsObject, timerObject]) => {
-                if(clientAnswerList.get(wsObject) === "") {
-                    if(isPlayerActive(wsObject)) logging(loggingFilename, `Player ${getClientNameFromHandle(wsObject)} didn't send answer`);
-                    else logging(loggingFilename, `Player ${getClientNameFromHandle(wsObject)} didn't send answer due to eliminated`);
-                    clientTimerList.set(wsObject, {"start_time": timerObject["start_time"], "end_time": timerObject["start_time"]+ANSWER_TIMEOUT+1})
+            const innerClientsPromise = Array.from(clientTimerList).map(([playerName, timerObject]) => {
+                let wsObject = getHandleFromClientName(playerName);
+                if(clientAnswerList.get(playerName) === "") {
+                    if(isPlayerActive(playerName)) logging(loggingFilename, `Player ${playerName} didn't send answer`);
+                    else logging(loggingFilename, `Player ${playerName} didn't send answer due to eliminated`);
+                    clientTimerList.set(playerName, {"start_time": timerObject["start_time"], "end_time": timerObject["start_time"]+ANSWER_TIMEOUT+1})
                 }
             });
             Promise.all(innerClientsPromise);
             promise();
         }, ANSWER_TIMEOUT + 1500);  //1.5s intentional delay in case of slowdown
     })
+
+    const timeoutPromise2 = new Promise((promise) => {
+        const countdownAmount = 250;
+        globalTimer = ANSWER_TIMEOUT
+        const countdown = setInterval(() => {
+            globalTimer -= countdownAmount
+            if(globalTimer <= 0) {
+                clearInterval(countdown)
+                promise();
+            }
+        }, countdownAmount);
+    })
     
-    await Promise.all([timeoutPromise, clientsPromise])
+    await Promise.all([timeoutPromise, timeoutPromise2, clientsPromise])
     permitQuestionAnswer = false;
     await status.sendStatusHostNotifyTimesup(hostHandle);
     let answerQueueSending = prepareAnswerQueue();
@@ -287,9 +316,9 @@ function prepareAnswerQueue() {
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if(isPlayerAudience(wsObject) || isHost(wsObject)) return;
-        const playerAnswer = clientAnswerList.get(wsObject);
-        const playerStartTimepoint = clientTimerList.get(wsObject)["start_time"];
-        const playerEndTimepoint = clientTimerList.get(wsObject)["end_time"];
+        const playerAnswer = clientAnswerList.get(playerName);
+        const playerStartTimepoint = clientTimerList.get(playerName)["start_time"];
+        const playerEndTimepoint = clientTimerList.get(playerName)["end_time"];
         const epoch = playerEndTimepoint - playerStartTimepoint;
         answerQueueSending.push({"name": playerName, "answer": playerAnswer, "epoch": epoch, "point": 0});
     });
@@ -297,14 +326,15 @@ function prepareAnswerQueue() {
     return answerQueueSending;
 }
 
-async function broadcastClue(keywordObject, doSendClue) {
+async function broadcastClue(keywordObject, clueIndex, doSendClue) {
     let clueWord = null;
     if(doSendClue) {
-        clueWord = keywordObject["clues"][currentPieceIndex];
+        clueWord = keywordObject["clues"][clueIndex];
         logging(loggingFilename, `Do open clue: ${clueWord}`);
     } else logging(loggingFilename, `Do not open clue`);   
+    gameState[gameState.length-1]["clue"] = clueWord;
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        status.sendStatusClue(wsObject, {"clue": clueWord});
+        status.sendStatusClue(wsObject, clueWord, clueIndex);
     })
 
     await Promise.all(sendPromises);
@@ -312,12 +342,11 @@ async function broadcastClue(keywordObject, doSendClue) {
 
 function prepareRoundScore() {
     roundScoreArray = [];
-    Array.from(clientAnswerList).map(([wsObject, answer]) => {
-        let clientName = getClientNameFromHandle(wsObject)
-        let startTime = clientTimerList.get(wsObject)["start_time"];
-        let endTime = clientTimerList.get(wsObject)["end_time"];
+    Array.from(clientAnswerList).map(([clientName, answer]) => {
+        let startTime = clientTimerList.get(clientName)["start_time"];
+        let endTime = clientTimerList.get(clientName)["end_time"];
         let epochInSecond = (endTime - startTime)/1000;
-        let point = clientAnswerCorrectList.get(wsObject) ? 10 : 0
+        let point = clientAnswerCorrectList.get(clientName) ? 10 : 0
         logging(loggingFilename, `${epochInSecond.toFixed(3)}s ~ ${clientName}: ${answer} => +${point}`);
         roundScoreArray.push({"epoch": epochInSecond, "name": clientName, "answer": answer, "point": point});
     })
@@ -349,7 +378,7 @@ async function resolveKeyword(resolvedKeywordArray) {
         let clientName = ele["name"];
         let clientCorrect = ele["correct"];
         let wsobj = getHandleFromClientName(clientName);
-        clientActiveStateList.set(wsobj, false);
+        clientActiveStateList.set(clientName, false);
         if(clientCorrect) {
             if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
             logging(loggingFilename, `Player ${clientName} correct keyword sent`);
@@ -393,12 +422,7 @@ async function handleStatusLogin(ws, jsonData) {
 
     logging(loggingFilename, `Client name: ${clientName} Client ID: ${roomId}`);
 
-    if(flagIngame) {
-        logging(loggingFilename, `Connection refused: Game already running!`);
-        status.sendStatusGameAlreadyRunning(ws);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Game already running!`)
-        return;
-    } else if(roomId !== serverRoomId) {
+    if(roomId !== serverRoomId) {
         logging(loggingFilename, `Player ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
@@ -408,17 +432,33 @@ async function handleStatusLogin(ws, jsonData) {
         status.sendStatusRoomIsFull(ws);
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
         return;
-    } else if(getHandleFromClientName(clientName) !== undefined) {
+    } 
+
+    if(!clientUniqueNameSet.has(clientName)) {
+        allocateClient(ws, clientName, Number.isInteger(initialScore) ? initialScore : 0);
+        logging(loggingFilename, `Player ${clientName} authorized`);
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
+        status.sendStatusAccepted(ws);
+    } else if(clientUniqueNameSet.has(clientName) && clientNameList.has(clientName)) {
         logging(loggingFilename, `Player ${clientName} refused. Duplicated name`);
         status.sendStatusDuplicateName(ws);
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
         return;
+    } else {
+        restoreClient(ws, clientName);
+        logging(loggingFilename, `Player ${clientName} authorized`);
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
+        status.sendStatusAccepted(ws);
+        if(flagIngame) {
+            status.sendStatusGameStart(ws);
+            status.sendStatusLoadGameState(ws, gameState);
+            await status.sendStatusKeyImage(ws, await prepareHostKeyImage(selectedKeywordObject))
+            if(permitQuestionAnswer) {
+                status.sendStatusLoadQuestion(ws, await prepareClientQuestion(selectedQuestionObject, currentPieceIndex))
+                status.sendStatusRunQuestion(ws, globalTimer);
+            }
+        }
     }
-
-    allocateClient(ws, clientName, Number.isInteger(initialScore) ? initialScore : 0);
-    logging(loggingFilename, `Player ${clientName} authorized`);
-    if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
-    status.sendStatusAccepted(ws);
 }
 
 async function handleStatusAnswer(ws, jsonData) {
@@ -428,13 +468,13 @@ async function handleStatusAnswer(ws, jsonData) {
         if(jsonData["answer"] === undefined) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} sent status without answer`)
             return;
-        } else if(!isPlayerActive(ws)) {
+        } else if(!isPlayerActive(clientName)) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} was eliminated, do not accept asnwer`)
             return;
         }
         logging(loggingFilename, `Player ${clientName} sent answer`);
-        clientAnswerList.set(ws, jsonData["answer"]);
-        let serverStartTimePoint = clientTimerList.get(ws)["start_time"];
+        clientAnswerList.set(clientName, jsonData["answer"]);
+        let serverStartTimePoint = clientTimerList.get(clientName)["start_time"];
         let clientStartTimePoint = jsonData["start"];
         let clientEndTimePoint = jsonData["end"];
         let timePointObject = {
@@ -445,7 +485,7 @@ async function handleStatusAnswer(ws, jsonData) {
         };
         let flagAlreadyTimeout = fixClientTimepoint(timePointObject, ANSWER_TIMEOUT);
         console.log(timePointObject);
-        clientTimerList.set(ws, {"start_time": timePointObject["client_start"], "end_time": timePointObject["client_end"]});
+        clientTimerList.set(clientName, {"start_time": timePointObject["client_start"], "end_time": timePointObject["client_end"]});
     }
 }
 
@@ -456,7 +496,7 @@ async function handleStatusKeyword(ws, jsonData) {
         if(clientKeyword === undefined) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} sent status without answer`)
             return;
-        } else if(!isPlayerActive(ws)) {
+        } else if(!isPlayerActive(clientName)) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} was eliminated, do not accept keyword`)
             return;
         } else if(keywordAnswerRecord.get(clientName)) {
@@ -480,6 +520,7 @@ async function handleStatusHostLogin(ws, jsonData) {
         logging(loggingFilename, "Host authorized")
         await status.sendStatusAccepted(ws);
         await status.sendStatusNotify(ws, `Connect others with room ID ${serverRoomId}`)
+        await status.sendStatusLoadGameState(ws, gameState);
     } else {
         logging(loggingFilename, "Host failed to login");   
         await status.sendStatusInvalidPassword(ws);
@@ -611,12 +652,14 @@ app.ws("/", (ws, req) => {
             }
             case status.STATUS_OPENCLUE: {
                 if(!isHost(ws)) break;
-                broadcastClue(selectedKeywordObject, true);
+                let piece_index = clientMessage["piece_index"]
+                broadcastClue(selectedKeywordObject, piece_index, true);
                 break;
             }
             case status.STATUS_NOCLUE: {
                 if(!isHost(ws)) break;
-                broadcastClue(selectedKeywordObject, false);
+                let piece_index = clientMessage["piece_index"]
+                broadcastClue(selectedKeywordObject, piece_index, false);
                 break;
             }
             case status.STATUS_GETLEADERBOARD: {
@@ -662,15 +705,17 @@ async function initGame() {
 }
 
 async function resolveAnswer(resolvedAnswerQueue) {
+    let anyCorrect = false;
     const correctAnswer = selectedQuestionObject["answer"];
     const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, correct}) => {
         let wsobj = getHandleFromClientName(name);
         if(wsobj === undefined) return Promise.resolve();
         if(correct) {
             updateClientScore(wsobj, 10)
-            clientAnswerCorrectList.set(wsobj, true)
+            clientAnswerCorrectList.set(name, true)
+            anyCorrect = true;
         } else {
-            clientAnswerCorrectList.set(wsobj, false)
+            clientAnswerCorrectList.set(name, false)
         }
         status.sendStatusCheckAnswer(wsobj, {"correct": correct, "correct_answer": correctAnswer});
         return Promise.resolve();
@@ -684,6 +729,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
     })
 
     questionCounter++;
+    gameState.push({"index": currentPieceIndex, "correct": anyCorrect});
     
     await Promise.all([sendPromisesPlayers, sendPromisesAudiences]);
 }

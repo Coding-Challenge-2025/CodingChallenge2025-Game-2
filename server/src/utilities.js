@@ -1,7 +1,11 @@
 import nodefs from 'node:fs/promises';
 import nodepath from 'node:path';
+import https from 'node:https';
+import http from 'node:http';
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
+import { fileURLToPath } from 'node:url';
+import {loggingFilename} from "./app.js"
 
 export async function waitForAnyKey(msg) {
     const rl = readline.createInterface({ input: stdin, output: stdout });
@@ -162,4 +166,57 @@ export async function loggingError(filename, ...args) {
     } else {
         console.error(formatLogging(LOGGING_CATEGORY.ERROR, "loggingError() error: file not found"));
     }
+}
+
+export async function fetchFile(str) {
+    let type = 0;   //1 if url, 2 is path
+
+    try {
+        new URL(str);
+        type = 1;
+    } catch (error) {
+        if (str.includes('/') || str.includes('\\') || !str.includes('.')) {
+            type = 2;
+        }
+    }
+    if(type == 1) {
+        if(str.startsWith('file://')) {
+            str = fileURLToPath(str);
+            type = 2;
+        } else if(!(str.startsWith('http://') || str.startsWith('https://'))) {
+            type = 2;
+        }
+    }
+
+    if(type == 1) {
+        try {
+            await new Promise((resolve, reject) => {
+                protocol.get(url, (res) => {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        logging(loggingFilename, `fetchFile url: success status ${res.statusCode}`);
+                        resolve(1);
+                    } else {
+                        loggingError(loggingFilename, `fetchFile url: error status ${res.statusCode}`);
+                        reject(-1);
+                    }
+                    res.resume();
+                }).on('error', (err) => {
+                    reject(-1);
+                });
+            });
+            return 1;
+        } catch (error) {
+            loggingError(loggingFilename, `fetchFile url: ${error}`);
+            return -1;
+        }
+    } else if(type == 2) {
+        try {
+            const data = await nodefs.readFile(str, { encoding: 'utf8' });
+            logging(loggingFilename, `fetchFile file: success`);
+            return 2;
+        } catch(err) {
+            loggingError(loggingFilename, `fetchFile file: error ${err}`);
+            return -2;
+        }
+    } else return 0;
 }
