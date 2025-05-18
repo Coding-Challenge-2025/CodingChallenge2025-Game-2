@@ -74,7 +74,7 @@ export const STATUS_SETSCORE = "SETSCORE"
 //Send
 export const STATUS_GETCLIENTS = "GETCLIENTS"
 //Send array of {index: integer, correct: bool, clue: string}
-export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
+// export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
 
 async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
     if(wsObject.readyState == WebSocket.OPEN) {
@@ -201,7 +201,7 @@ export async function sendStatusHostClientsList(wsObject, convertedClientsListOb
 }
 
 export async function sendStatusLoadGameState(wsObject, gameState) {
-    await sendStatus(wsObject, STATUS_LOADGAMESTATE, gameState);
+    // await sendStatus(wsObject, STATUS_LOADGAMESTATE, gameState);
     //send both for testing
     const sendGameStatePromise = gameState.map(({index, correct, clue}) => {
         return new Promise((promise) => {

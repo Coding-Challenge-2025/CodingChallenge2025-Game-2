@@ -199,17 +199,23 @@ function getRoundScore() {
     return roundScoreArray;
 }
 
-async function prepareHostKeyImage(keywordObject) {
-    let base64Image = await imageFileToBase64("assets/"+keywordObject["image_dir"]);
-    const convertedObj = {"keyword": keywordObject["keyword"], "image": base64Image};
-    return convertedObj
+async function prepareKeyImage(selectedObject) {
+    let base64Image = await imageFileToBase64("assets/"+selectedObject["image_dir"]);
+    selectedKeywordObject = {"keyword": selectedObject["keyword"], "image": base64Image};
+}
+
+function prepareClientKeyImage() {
+    let clientSelectedKeywordObject = JSON.parse(JSON.stringify(selectedKeywordObject));
+    clientSelectedKeywordObject["keyword_length"] = clientSelectedKeywordObject["keyword"].length;
+    clientSelectedKeywordObject["keyword"] = undefined;
+    return clientSelectedKeywordObject;
 }
 
 async function broadcastKeywordProperties(keywordObject) {
-    let base64Image = await imageFileToBase64("assets/"+keywordObject["image_dir"]);
+    let prepared = prepareClientKeyImage()
 
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        return status.sendStatusKeyImage(wsObject, {"keyword_length": keywordObject["keyword"].length, "image": base64Image})
+        return status.sendStatusKeyImage(wsObject, prepared)
     });
 
     await Promise.all(sendPromises);
@@ -780,12 +786,12 @@ async function startGame() {
         })
         flagIngame = true;
         permitKeywordAnswer = true;
-        selectedKeywordObject = keywordsList[getRandomIndex(keywordsList)];
+        await prepareKeyImage(keywordsList[getRandomIndex(keywordsList)]);
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
         status.sendStatusNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
-        randomShuffleArray(selectedKeywordObject["clues"]);
+        // randomShuffleArray(selectedKeywordObject["clues"]);
         await broadcastKeywordProperties(selectedKeywordObject);
-        await status.sendStatusHostKeyImage(hostHandle, await prepareHostKeyImage(selectedKeywordObject));
+        await status.sendStatusHostKeyImage(hostHandle, selectedKeywordObject);
     }
 }
 
