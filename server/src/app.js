@@ -652,7 +652,8 @@ app.ws("/", (ws, req) => {
             }
             case status.STATUS_OPENCLUE: {
                 if(!isHost(ws)) break;
-                let piece_index = clientMessage["piece_index"]
+                let piece_index =  currentPieceIndex;
+                if(clientMessage !== undefined && clientMessage["piece_index"] !== undefined) piece_index = clientMessage["piece_index"];
                 broadcastClue(selectedKeywordObject, piece_index, true);
                 break;
             }

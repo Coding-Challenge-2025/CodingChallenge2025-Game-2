@@ -73,7 +73,7 @@ export const STATUS_NOCLUE = "NCLUE"
 export const STATUS_SETSCORE = "SETSCORE"
 //Send
 export const STATUS_GETCLIENTS = "GETCLIENTS"
-//Send array of {integer, bool}
+//Send array of {index: integer, correct: bool, clue: string}
 export const STATUS_LOADGAMESTATE = "LOADGAMESTATE"
 
 async function sendStatus(wsObject, statusCode, statusMessage = undefined) {
@@ -201,9 +201,13 @@ export async function sendStatusHostClientsList(wsObject, convertedClientsListOb
 }
 
 export async function sendStatusLoadGameState(wsObject, gameState) {
-    // await sendStatus(wsObject, STATUS_LOADGAMESTATE, gameState);
-    //only send CLUE status for now
-    gameState.map(({index, correct, clue}) => {
-        sendStatusClue(wsObject, clue, index);
+    await sendStatus(wsObject, STATUS_LOADGAMESTATE, gameState);
+    //send both for testing
+    const sendGameStatePromise = gameState.map(({index, correct, clue}) => {
+        return new Promise((promise) => {
+            sendStatusClue(wsObject, clue, index);
+            promise();
+        })
     })
+    Promise.all(sendGameStatePromise);
 }
