@@ -18,6 +18,7 @@ export const WebSocketProvider = ({ url, children }) => {
       });
     },
     retryOnError: true,
+    reconnectInterval: 1000,
   });
 
   const subscribe = useCallback((listener) => {

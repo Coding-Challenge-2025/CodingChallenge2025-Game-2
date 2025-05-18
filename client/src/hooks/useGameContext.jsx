@@ -83,12 +83,14 @@ const gameReducer = (state, action) => {
     case ServerMessageType.NOTIFY:
       return { ...state, notifications: [{ time: new Date(), message: action.message.message }, ...state.notifications] };
     case ServerMessageType.CONNECTION_DENIED:
+      sessionStorage.clear(); // don't try to reconnect with stale data
       return { ...state, error: action.message.reason };
     case ServerMessageType.CONNECTION_ACCEPTED:
       return { ...state, phase: GamePhase.PLAY };
     case ServerMessageType.GAME_START:
       return { ...state, gameStarted: true };
     case ServerMessageType.GAME_END:
+      sessionStorage.clear(); // don't try to reconnect if we're done
       return {
         ...state, phase: GamePhase.GAME_COMPLETE, gameStarted: false,
         keyword: action.message.keyword, revealed: action.message.clues,
@@ -223,6 +225,8 @@ export const GameContextProvider = ({ children }) => {
     if (authenticated)
       return;
     setAuthenticated(true);
+    sessionStorage.roomID = roomID;
+    sessionStorage.username = username;
     sendMessage({
       "status": ClientMessageType.AUTHENTICATE,
       "message": { "id": roomID, "name": username }
@@ -245,6 +249,7 @@ export const GameContextProvider = ({ children }) => {
     if (authenticated)
       return;
     setAuthenticated(true);
+    sessionStorage.roomID = roomID;
     sendMessage({ "status": ClientMessageType.AUTHENTICATE_AUDIENCE, message: { "id": roomID, "name": Date.now().toString() } });
     dispatch({ status: InternalMessageType.SET_AUDIENCE });
   });
@@ -253,6 +258,7 @@ export const GameContextProvider = ({ children }) => {
     if (authenticated)
       return;
     setAuthenticated(true);
+    sessionStorage.password = password;
     sendMessage({ "status": ClientMessageType.AUTHENTICATE_HOST, message: { password: password } });
     dispatch({ status: InternalMessageType.SET_AUDIENCE });
   });
