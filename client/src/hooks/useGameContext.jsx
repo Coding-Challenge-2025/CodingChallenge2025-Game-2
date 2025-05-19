@@ -124,7 +124,7 @@ const gameReducer = (state, action) => {
       console.log(action.message);
       return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
-      return { ...state, timeStart: Date.now() };
+      return { ...state, timeStart: Date.now(), timeAllotted: action.message.time };
     case ServerMessageType.CHECK_ANSWER:
       return {
         ...state, question: {
@@ -188,7 +188,7 @@ export const GameContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (gameState.timeStart !== undefined) {
-      setTimeLeft(20 - Math.floor((Date.now() - gameState.timeStart) / 1000));
+      setTimeLeft(Math.floor((gameState.timeAllotted - (Date.now() - gameState.timeStart)) / 1000));
 
       const intervalId = setInterval(() => {
         setTimeLeft(prevTimeLeft => {
@@ -205,7 +205,7 @@ export const GameContextProvider = ({ children }) => {
     } else {
       setTimeLeft(undefined);
     }
-  }, [gameState.timeStart]);
+  }, [gameState.timeStart, gameState.timeAllotted]);
 
   useEffect(() => {
     const unsubscribe = subscribe((rawMsg) => {
