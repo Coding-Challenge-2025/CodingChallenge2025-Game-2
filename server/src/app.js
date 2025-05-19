@@ -183,8 +183,8 @@ function isPlayerActive(playerName) {
     return clientActiveStateList.get(playerName) === true ? true : false;
 }
 
-function isPlayerAudience(wsObject) {
-    return clientAudienceList.get(wsObject) === true ? true : false;
+function isPlayerAudience(playerName) {
+    return clientAudienceList.get(playerName) === true ? true : false;
 }
 
 function getLeaderboard() {
@@ -201,7 +201,9 @@ function getRoundScore() {
 
 async function prepareKeyImage(selectedObject) {
     let base64Image = await imageFileToBase64("assets/"+selectedObject["image_dir"]);
-    selectedKeywordObject = {"keyword": selectedObject["keyword"], "image": base64Image};
+    selectedKeywordObject = JSON.parse(JSON.stringify(selectedObject))
+    selectedKeywordObject["image_dir"] = undefined;
+    selectedKeywordObject["image"] = base64Image;
 }
 
 function prepareClientKeyImage() {
@@ -242,7 +244,7 @@ async function broadcastQuestion(questionObject) {
         return new Promise(resolve => {
             status.sendStatusLoadQuestion(wsObject, questionObject)
 
-            if(isPlayerAudience(wsObject)) {
+            if(isPlayerAudience(clientName)) {
                 logging(loggingFilename, `Question sent to audience ${clientName} for observation purpose`);
             } else if(isHost(wsObject)) {
                 logging(loggingFilename, `Question sent to host for whatever purpose`);
@@ -270,7 +272,7 @@ async function broadcastSignalStartQuestion() {
 
     permitQuestionAnswer = true;
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(wsObject) || isHost(wsObject)) {
+        if(isPlayerAudience(playerName) || isHost(wsObject)) {
             //Only send status, do not add to timer list
             status.sendStatusRunQuestion(wsObject, ANSWER_TIMEOUT);
             return resolve();
@@ -321,7 +323,7 @@ async function broadcastSignalStartQuestion() {
 function prepareAnswerQueue() {
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        if(isPlayerAudience(wsObject) || isHost(wsObject)) return;
+        if(isPlayerAudience(playerName) || isHost(wsObject)) return;
         const playerAnswer = clientAnswerList.get(playerName);
         const playerStartTimepoint = clientTimerList.get(playerName)["start_time"];
         const playerEndTimepoint = clientTimerList.get(playerName)["end_time"];
@@ -469,8 +471,8 @@ async function handleStatusLogin(ws, jsonData) {
 
 async function handleStatusAnswer(ws, jsonData) {
     let serverEndTimePoint = Date.now();
-    if(permitQuestionAnswer && !isPlayerAudience(ws)) {
-        let clientName = getClientNameFromHandle(ws);
+    let clientName = getClientNameFromHandle(ws);
+    if(permitQuestionAnswer && !isPlayerAudience(clientName)) {
         if(jsonData["answer"] === undefined) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} sent status without answer`)
             return;
@@ -496,8 +498,8 @@ async function handleStatusAnswer(ws, jsonData) {
 }
 
 async function handleStatusKeyword(ws, jsonData) {
-    if(permitKeywordAnswer && !isPlayerAudience(ws)) {
-        let clientName = getClientNameFromHandle(ws);
+    let clientName = getClientNameFromHandle(ws);
+    if(permitKeywordAnswer && !isPlayerAudience(clientName)) {
         let clientKeyword = jsonData["keyword"];
         if(clientKeyword === undefined) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} sent status without answer`)
@@ -543,14 +545,15 @@ app.ws("/", (ws, req) => {
             releaseHost();
             return;
         }
+        let clientName = getClientNameFromHandle(ws);
         if (clientList.has(ws)) {
-            if(isPlayerAudience(ws)) {
-                logging(loggingFilename, `Audience ${getClientNameFromHandle(ws)} disconnected`);
+            if(isPlayerAudience(clientName)) {
+                logging(loggingFilename, `Audience ${clientName} disconnected`);
                 releaseAudience(ws);
                 return;
             }
-            if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${getClientNameFromHandle(ws)} disconnected`)
-            logging(loggingFilename, `Player ${getClientNameFromHandle(ws)} disconnected`);
+            if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} disconnected`)
+            logging(loggingFilename, `Player ${clientName} disconnected`);
             releaseClient(ws);
             if(flagIngame) {
                 logging(loggingFilename, `Player disconnected while already in-game. Must check!`);
@@ -685,7 +688,7 @@ app.ws("/", (ws, req) => {
                     convertedClientsListObject["players"] = []
                     Array.from(clientList).map(([wsObject, playerName]) => {
                         if(isHost(wsObject)) return;
-                        else if(isPlayerAudience(wsObject)) {
+                        else if(isPlayerAudience(playerName)) {
                             convertedClientsListObject["audiences"].push(playerName)
                         } else {
                             convertedClientsListObject["players"].push(playerName)
@@ -729,7 +732,7 @@ async function resolveAnswer(resolvedAnswerQueue) {
     })
 
     const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(wsObject) || isHost(wsObject)) {
+        if(isPlayerAudience(playerName) || isHost(wsObject)) {
             status.sendStatusCheckAnswer(wsObject, {"correct": 1, "correct_answer": correctAnswer});
         }
         resolve();
@@ -789,7 +792,7 @@ async function startGame() {
         await prepareKeyImage(keywordsList[getRandomIndex(keywordsList)]);
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
         status.sendStatusNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
-        // randomShuffleArray(selectedKeywordObject["clues"]);
+        randomShuffleArray(selectedKeywordObject["clues"]);
         await broadcastKeywordProperties(selectedKeywordObject);
         await status.sendStatusHostKeyImage(hostHandle, selectedKeywordObject);
     }

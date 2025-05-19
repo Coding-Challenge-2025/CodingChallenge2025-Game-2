@@ -118,7 +118,7 @@ const gameReducer = (state, action) => {
       if (!action.message.clue)
         return { ...state };
       let revealed = state.revealed.slice(0);
-      revealed[state.question.id] = action.message.clue;
+      revealed[action.message.piece_index] = action.message.clue;
       return { ...state, revealed: revealed };
     case ServerMessageType.END_LEADERBOARD:
       console.log(action.message);

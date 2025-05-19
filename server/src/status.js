@@ -141,9 +141,9 @@ export async function sendStatusLoadQuestion(wsObject, questionObject) {
     await sendStatus(wsObject, STATUS_QUESTIONLOAD, questionObject);
 }
 
-//send integer
+//send {time: integer}
 export async function sendStatusRunQuestion(wsObject, timeout) {
-    await sendStatus(wsObject, STATUS_QUESTIONRUN, timeout);
+    await sendStatus(wsObject, STATUS_QUESTIONRUN, {"time": timeout});
 }
 
 //{correct: 0 or 1, correct_answer: string}
