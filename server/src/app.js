@@ -19,7 +19,7 @@ import {
     loggingError
 } from "./utilities.js";
 import * as status from "./status.js"
-import * as parser from "./argparse.js"
+// import * as parser from "./argparse.js"
 
 const MAX_PLAYER = 4;
 const port = 3000;
@@ -56,7 +56,7 @@ const keywordAnswerRecord = new Map();
 const clientTimerList = new Map();
 
 //Store audience players list
-//Format: [string, bool]
+//Format: [ws, bool]
 const clientAudienceList = new Map();
 
 //Store unique players that has ever login
@@ -109,10 +109,10 @@ function allocateHost(ws) {
 }
 
 function releaseHost() {
-    // clientList.delete(hostHandle);
-    // clientNameList.delete(hostName);
+    clientList.delete(hostHandle);
+    clientNameList.delete(hostName);
     // clientActiveStateList.delete(hostHandle);
-    // hostHandle = undefined;
+    hostHandle = undefined;
 }
 
 function releaseClient(ws) {
@@ -458,7 +458,7 @@ async function handleStatusLogin(ws, jsonData) {
         if(flagIngame) {
             status.sendStatusGameStart(ws);
             status.sendStatusLoadGameState(ws, gameState);
-            await status.sendStatusKeyImage(ws, await prepareHostKeyImage(selectedKeywordObject))
+            await status.sendStatusKeyImage(ws, await prepareClientKeyImage(selectedKeywordObject))
             if(permitQuestionAnswer) {
                 status.sendStatusLoadQuestion(ws, await prepareClientQuestion(selectedQuestionObject, currentPieceIndex))
                 status.sendStatusRunQuestion(ws, globalTimer);
