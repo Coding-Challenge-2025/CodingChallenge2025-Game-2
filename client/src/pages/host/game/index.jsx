@@ -57,7 +57,7 @@ export default function HostGame() {
           {gameState.question &&
             <AnswerCard currentQuestion={gameState.question}
               timeLeft={timeLeft}>
-              <div className="flex w-full gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-2">
                 <Button className="flex-1" disabled={step !== 1} onClick={() => { startQuestion(); setStep(2) }}>Start Question</Button>
                 <Button className="flex-1" disabled={step !== 3} onClick={() => { revealRoundScore(); setStep(4); }}>Reveal Scores</Button>
                 <Button className="flex-1" disabled={step !== 4} onClick={() => { revealLeaderboards(); setStep(0); }}>Reveal Leaderboards</Button>
@@ -105,13 +105,14 @@ export default function HostGame() {
                   <Button onClick={() => {
                     endGame();
                     setStep(999);
-                  }}>End Game</Button>
+                  }}
+                  >End Game</Button>
                 </div>
-                <div className="grid grid-cols-4">
+                <div className="grid grid-cols-4 gap-1 my-2">
                   {gameState.revealed.map((_, id) => {
                     return (
-                      <div key={id} className="m-1 w-full">
-                        {<Button disabled={selectedQuestions[id] || step !== 0} onClick={() => {
+                      <div key={id} className="flex w-full">
+                        {<Button className="w-full text-wrap truncate" disabled={selectedQuestions[id] || step !== 0} onClick={() => {
                           handleQuestionSelect(id);
                           setStep(1);
                         }}>
