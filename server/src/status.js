@@ -59,8 +59,6 @@ export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
 //Send STATUS_SHOWKEYWORD {name: string, keyword: string}
 //Send array of {name: string, correct}
 export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
-//GETANSWERQUEUE to get and check the answer manually
-// export const STATUS_GETANSWERQUEUE = "GETANSQUEUE"
 //set the checked answer, broadcast to client correct/incorrect
 export const STATUS_ANSWERRESOLVE = "ANSRESOLVE"
 export const STATUS_GETROUNDSCORE = "GETROUNDSCORE"
@@ -146,7 +144,7 @@ export async function sendStatusRunQuestion(wsObject, timeout) {
     await sendStatus(wsObject, STATUS_QUESTIONRUN, {"time": timeout});
 }
 
-//{correct: 0 or 1, correct_answer: string}
+//{name: string, correct: 0 or 1, correct_answer: string}
 export async function sendStatusCheckAnswer(wsObject, checkObject) {
     await sendStatus(wsObject, STATUS_CHECKANSWER, checkObject);
 }

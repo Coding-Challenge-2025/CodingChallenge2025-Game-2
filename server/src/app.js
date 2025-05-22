@@ -20,6 +20,7 @@ import {
 } from "./utilities.js";
 import * as status from "./status.js"
 // import * as parser from "./argparse.js"
+import {GameStateFlag} from "./gamestateflag.js"
 
 const MAX_PLAYER = 4;
 const port = 3000;
@@ -65,9 +66,9 @@ const clientUniqueNameSet = new Set();
 //Array of {index: integer, correct: bool, clue: string}
 let gameState = []
 
+const gameStateFlag = new GameStateFlag();
+
 let permitKeywordAnswer = false;
-let permitQuestionAnswer = false;
-let flagIngame = false;
 const keywordQueue = [];
 const ANSWER_TIMEOUT = 20000 
 let globalTimer = ANSWER_TIMEOUT
@@ -126,10 +127,26 @@ function releaseClient(ws) {
     currentPlayerCount--;
 }
 
-function restoreClient(ws, clientName) {
+async function restoreClient(ws, clientName) {
     clientList.set(ws, clientName)
     clientNameList.set(clientName, ws);
     currentPlayerCount++;
+
+    if(gameStateFlag.startGame) {
+        await status.sendStatusGameStart(ws);
+        await status.sendStatusLoadGameState(ws, gameState);
+        if(isHost(ws)) {
+            await status.sendStatusKeyImage(ws, await selectedKeywordObject)
+        } else {
+            await status.sendStatusKeyImage(ws, await prepareClientKeyImage(selectedKeywordObject))
+        }
+    }
+    if(gameStateFlag.qload) {
+        await status.sendStatusLoadQuestion(ws, await prepareClientQuestion(selectedQuestionObject, currentPieceIndex))
+    }
+    if(gameStateFlag.qrun) {
+        await status.sendStatusRunQuestion(ws, globalTimer);
+    }
 }
 
 function allocateClient(ws, clientName, initialScore = 0) {
@@ -223,6 +240,16 @@ async function broadcastKeywordProperties(keywordObject) {
     await Promise.all(sendPromises);
 }
 
+/**
+ * 
+ * @callback broadcastImplCallback
+ * @param {function(): Promise<void>} resolve
+ * @param {WebSocket} wsObject
+ * @param {string} playername 
+ * @returns {void}
+ * @param {broadcastImplCallback} callback
+ * @returns {Promise<void>}
+ */
 async function broadcastImpl(callback) {
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         if (wsObject.readyState !== WebSocket.OPEN) {
@@ -270,7 +297,7 @@ async function broadcastShowKeyword(keywordObject) {
 //major overhaul
 async function broadcastSignalStartQuestion() {
 
-    permitQuestionAnswer = true;
+    gameStateFlag.qrun = true;
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
         if(isPlayerAudience(playerName) || isHost(wsObject)) {
             //Only send status, do not add to timer list
@@ -314,10 +341,17 @@ async function broadcastSignalStartQuestion() {
     })
     
     await Promise.all([timeoutPromise, timeoutPromise2, clientsPromise])
-    permitQuestionAnswer = false;
+    gameStateFlag.qrun = false;
+    gameStateFlag.qload = false; 
     await status.sendStatusHostNotifyTimesup(hostHandle);
     let answerQueueSending = prepareAnswerQueue();
     await status.sendStatusHostAnswerQueue(hostHandle, answerQueueSending);
+    await broadcastImpl((resolve, wsObject, playername) => {
+        if(isPlayerAudience(playername)) {
+            status.sendStatusHostAnswerQueue(wsObject, answerQueueSending);
+            resolve();
+        }
+    })
 }
 
 function prepareAnswerQueue() {
@@ -453,26 +487,17 @@ async function handleStatusLogin(ws, jsonData) {
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
         return;
     } else {
-        restoreClient(ws, clientName);
         logging(loggingFilename, `Player ${clientName} authorized`);
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
         status.sendStatusAccepted(ws);
-        if(flagIngame) {
-            status.sendStatusGameStart(ws);
-            status.sendStatusLoadGameState(ws, gameState);
-            await status.sendStatusKeyImage(ws, await prepareClientKeyImage(selectedKeywordObject))
-            if(permitQuestionAnswer) {
-                status.sendStatusLoadQuestion(ws, await prepareClientQuestion(selectedQuestionObject, currentPieceIndex))
-                status.sendStatusRunQuestion(ws, globalTimer);
-            }
-        }
+        await restoreClient(ws, clientName);
     }
 }
 
 async function handleStatusAnswer(ws, jsonData) {
     let serverEndTimePoint = Date.now();
     let clientName = getClientNameFromHandle(ws);
-    if(permitQuestionAnswer && !isPlayerAudience(clientName)) {
+    if(gameStateFlag.qrun && !isPlayerAudience(clientName)) {
         if(jsonData["answer"] === undefined) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} sent status without answer`)
             return;
@@ -515,7 +540,10 @@ async function handleStatusKeyword(ws, jsonData) {
         const keywordObject = {"name": clientName, "keyword": clientKeyword};
         keywordQueue.push(keywordObject);
         keywordAnswerRecord.set(clientName, clientKeyword);
-        await status.sendStatusHostNotifyKeyword(hostHandle, keywordObject);
+        broadcastImpl((resolve, wsObject, playerName) => {
+            status.sendStatusHostNotifyKeyword(wsObject, keywordObject);
+            resolve();
+        })
     }
 }
 
@@ -524,11 +552,19 @@ async function handleStatusHostLogin(ws, jsonData) {
     let password = jsonData["password"];
     // if(roomId === serverRoomId && password === hostPassword) {   //frontend didn't like this lol
     if(password === hostPassword) {
-        allocateHost(ws)
-        logging(loggingFilename, "Host authorized")
-        await status.sendStatusAccepted(ws);
-        await status.sendStatusNotify(ws, `Connect others with room ID ${serverRoomId}`)
-        await status.sendStatusLoadGameState(ws, gameState);
+        if(!gameStateFlag.hostEverLogin) {
+            gameStateFlag.hostEverLogin = true;
+            allocateHost(ws)
+            logging(loggingFilename, "Host authorized")
+            await status.sendStatusAccepted(ws);
+            await status.sendStatusNotify(ws, `Connect others with room ID ${serverRoomId}`)
+        } else {
+            logging(loggingFilename, "Host reconnected")
+            hostHandle = ws;
+            await status.sendStatusAccepted(ws);
+            await status.sendStatusLoadGameState(ws, gameState);
+            // await restoreClient(ws);
+        }
     } else {
         logging(loggingFilename, "Host failed to login");   
         await status.sendStatusInvalidPassword(ws);
@@ -555,7 +591,7 @@ app.ws("/", (ws, req) => {
             if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} disconnected`)
             logging(loggingFilename, `Player ${clientName} disconnected`);
             releaseClient(ws);
-            if(flagIngame) {
+            if(gameStateFlag.startGame) {
                 logging(loggingFilename, `Player disconnected while already in-game. Must check!`);
                 //saveGameState()
                 //exit....
@@ -607,7 +643,7 @@ app.ws("/", (ws, req) => {
             case status.STATUS_HOSTGAMEEND: {
                 if(!isHost(ws)) break;
                 permitKeywordAnswer = false;
-                flagIngame = false;
+                gameStateFlag.startGame = false;
                 logging(loggingFilename, "Host requested end game!");
                 const wrapper = async() => {
                     await broadcastLeaderboard();
@@ -709,7 +745,7 @@ async function initGame() {
     //Empty players
     currentPlayerCount = 0;
     clientList.length = 0;
-    flagIngame = false;
+    gameStateFlag.startGame = false;
     // Shuffle question for more randomness
     randomShuffleArray(questionsList);
 }
@@ -717,6 +753,7 @@ async function initGame() {
 async function resolveAnswer(resolvedAnswerQueue) {
     let anyCorrect = false;
     const correctAnswer = selectedQuestionObject["answer"];
+    let savedCheckList = [];
     const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, correct}) => {
         let wsobj = getHandleFromClientName(name);
         if(wsobj === undefined) return Promise.resolve();
@@ -727,13 +764,17 @@ async function resolveAnswer(resolvedAnswerQueue) {
         } else {
             clientAnswerCorrectList.set(name, false)
         }
-        status.sendStatusCheckAnswer(wsobj, {"correct": correct, "correct_answer": correctAnswer});
+        const tmpObj = {"name": name, "correct": correct, "correct_answer": correctAnswer};
+        savedCheckList.push(tmpObj);
+        status.sendStatusCheckAnswer(wsobj, tmpObj);
         return Promise.resolve();
     })
 
     const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
         if(isPlayerAudience(playerName) || isHost(wsObject)) {
-            status.sendStatusCheckAnswer(wsObject, {"correct": 1, "correct_answer": correctAnswer});
+            for(let tmpObj of savedCheckList) {
+                status.sendStatusCheckAnswer(wsObject, tmpObj);
+            }
         }
         resolve();
     })
@@ -755,6 +796,7 @@ async function choosePiece(piece_index) {
     logging(loggingFilename, `Answer hint: ${selectedQuestionObject["answer"]}`);
     await broadcastQuestion(questionObject);
     await status.sendStatusHostQuestionLoad(hostHandle, hostQuestionObject);
+    gameStateFlag.qload = true;
 }
 
 async function prepareClientQuestion(originalQuestionObject, questionIndex) {
@@ -774,7 +816,7 @@ async function startGame() {
     // const startGamePlayerCount = MAX_PLAYER
     const startGamePlayerCount = 1;
     questionCounter = 0;
-    if(flagIngame) {
+    if(gameStateFlag.startGame) {
         logging(loggingFilename, "Host trying to start game, but game is already running!");
         status.sendStatusNotify(hostHandle, "game is already running");
     } else if(currentPlayerCount < startGamePlayerCount) {
@@ -787,7 +829,7 @@ async function startGame() {
             status.sendStatusGameStart(wsObject);
             resolve();
         })
-        flagIngame = true;
+        gameStateFlag.startGame = true;
         permitKeywordAnswer = true;
         await prepareKeyImage(keywordsList[getRandomIndex(keywordsList)]);
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
