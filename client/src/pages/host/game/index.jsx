@@ -59,8 +59,8 @@ export default function HostGame() {
               timeLeft={timeLeft}>
               <div className="grid grid-cols-2 md:grid-cols-4 w-full gap-2">
                 <Button className="flex-1" disabled={step !== 1} onClick={() => { startQuestion(); setStep(2) }}>Start Question</Button>
-                <Button className="flex-1" disabled={step !== 3} onClick={() => { revealRoundScore(); setStep(4); }}>Reveal Scores</Button>
-                <Button className="flex-1" disabled={step !== 4} onClick={() => { revealLeaderboards(); setStep(0); }}>Reveal Leaderboards</Button>
+                <Button className="flex-1" disabled={step !== 3} onClick={() => { revealRoundScore(); setStep(0); }}>Reveal Scores</Button>
+                {/*<Button className="flex-1" disabled={step !== 4} onClick={() => { revealLeaderboards(); setStep(0); }}>Reveal Leaderboards</Button>*/}
                 <Button className="flex-1" disabled={step === 1 || step === 2 || gameState.revealed[gameState.question.id]} onClick={() => { revealClue(); }}>Reveal Clue</Button>
               </div>
               {gameState.answerQueue.length > 0 &&
