@@ -10,6 +10,7 @@ export default function PuzzleBoard({ revealed, imageData }) {
         {revealed.map((value, index) =>
           <div key={index} className={clsx(
             "z-10 flex items-center justify-center border border-blue-500 bg-blue-400",
+            value === "" && "grayscale",
             value && "opacity-0")}
           >
             <span className="text-xl font-bold text-white">{index + 1}</span>

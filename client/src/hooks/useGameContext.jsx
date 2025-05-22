@@ -96,7 +96,10 @@ const gameReducer = (state, action) => {
         keyword: action.message.keyword, revealed: action.message.clues,
       };
     case ServerMessageType.HOST_QUESTION_LOAD:
-    case ServerMessageType.QUESTION_LOAD:
+    case ServerMessageType.QUESTION_LOAD: {
+      let revealed = state.revealed.slice(0);
+      if (state.phase === GamePhase.QUESTION_RESULTS && !revealed[state.question.id])
+        revealed[state.question.id] = "";
       return {
         ...state, phase: GamePhase.PLAY,
         question: {
@@ -104,8 +107,10 @@ const gameReducer = (state, action) => {
           id: action.message.piece_index,
           answer: action.message.answer,
         }, timeStart: undefined,
+        revealed: revealed,
         keywords: undefined, answers: undefined, answerQueue: [],// host
       };
+    }
     case ServerMessageType.HOST_KEYWORD_PROPERTIES:
     case ServerMessageType.KEYWORD_PROPERTIES:
       return {
@@ -115,13 +120,10 @@ const gameReducer = (state, action) => {
         image: action.message.image
       };
     case ServerMessageType.CLUE:
-      if (!action.message.clue)
-        return { ...state };
       let revealed = state.revealed.slice(0);
-      revealed[action.message.piece_index] = action.message.clue;
+      revealed[action.message.piece_index] = action.message.clue ?? "";
       return { ...state, revealed: revealed };
     case ServerMessageType.END_LEADERBOARD:
-      console.log(action.message);
       return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
       return { ...state, timeStart: Date.now(), timeAllotted: action.message.time };
