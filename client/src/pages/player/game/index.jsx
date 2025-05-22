@@ -35,7 +35,7 @@ export default function PlayerGame() {
       }
       {(gameState.phase === GamePhase.QUESTION_RESULTS || gameState.phase == GamePhase.GAME_COMPLETE)
         && gameState.players &&
-        <Panel title="Results">
+        <Panel title={gameState.keyword ? "Leaderboards" : "Round Results"}>
           <RankingBoard players={gameState.players} />
           {gameState.keyword && <h2 className="text-center font-bold text-xl m-4">{gameState.keyword}</h2>}
         </Panel>
@@ -43,7 +43,7 @@ export default function PlayerGame() {
       {(gameState.phase === GamePhase.PLAY || gameState.phase === GamePhase.QUESTION_RESULTS)
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
-          questionsAnswered={gameState.questionsAnswered}
+          questionsAnswered={gameState.revealed.filter((x) => x !== false).length}
           submitKeyword={gameState.isPlayer ? submitKeyword : undefined}
           wrongKeywords={gameState.wrongKeywords} />
       }
