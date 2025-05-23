@@ -7,15 +7,16 @@ export default function AnswerBoard({ answers }) {
         {answers.map((obj, index) => (
           <div
             key={obj.name}
-            className={clsx("flex items-center p-2 rounded-lg bg-white border border-gray-100",
+            className={clsx("flex items-center p-2 rounded-lg",
               obj.correct === false && "bg-red-300",
-              obj.correct && "bg-green-300")}
+              obj.correct && "bg-green-300",
+              obj.correct === undefined && "bg-white")}
           >
-            {/*<div
-              className="w-6 h-6 rounded-full flex items-center justify-center mr-2 bg-gray-200"
+            {<div
+              className="p-1 rounded-full flex text-center mt-1 mr-2 bg-sky-600"
             >
-              <span className="text-white font-bold text-xs">{index + 1}</span>
-            </div>*/}
+              <span className="text-white font-bold text-xs w-12">{(obj.epoch / 1000).toFixed(2)}s</span>
+            </div>}
             <div className="flex-1">
               <span className="font-medium text-sm">{obj.name}</span>
             </div>

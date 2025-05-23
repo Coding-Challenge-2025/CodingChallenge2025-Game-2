@@ -70,7 +70,7 @@ export default function HostGame() {
                     <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}>
                       {!value.correct && <Button onClick={() => markAnswer(id, true)}><Check /></Button>}
                       {value.correct && <Button onClick={() => markAnswer(id, false)}><X /></Button>}
-                      <div className="inline ml-2">{value.name}: <strong>{value.answer}</strong></div>
+                      <div className="inline ml-2">{value.name} ({(value.epoch / 1000).toFixed(2)}s): <strong>{value.answer}</strong></div>
                     </Card>)
                   }
                 </div>
