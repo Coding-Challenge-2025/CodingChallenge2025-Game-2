@@ -43,7 +43,11 @@ function App() {
 
 const wsHost = window.location.hostname;
 const wsPort = '3000';
-const wsUrl = `ws://${wsHost}:${wsPort}`;
+var wsUrl = `ws://${wsHost}:${wsPort}`;
+wsUrl =
+  import.meta.env.VITE_ENV === "production"
+    ? import.meta.env.VITE_PROD_BACKEND_WS
+    : `ws://${wsHost}:${wsPort}`;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -54,5 +58,5 @@ createRoot(document.getElementById('root')).render(
         </GameContextProvider>
       </WebSocketProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )
