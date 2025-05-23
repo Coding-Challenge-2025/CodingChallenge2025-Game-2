@@ -167,13 +167,6 @@ function releaseAudience(ws) {
     // clientAudienceList.delete(ws);
 }
 
-function allocateAudience(ws, audienceName) {
-    clientList.set(ws, audienceName)
-    clientNameList.set(audienceName, ws);
-    clientActiveStateList.set(audienceName, false);
-    clientAudienceList.set(audienceName, true);
-}
-
 async function loadGameState(filename) {
     // await nodefs.readFile(filename, )
 }
@@ -450,16 +443,17 @@ async function handleStatusAudienceLogin(ws, jsonData) {
     if(roomId !== serverRoomId) {
         logging(loggingFilename, `Audience ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} refused: Invalid ID`)
         return;
-    } else if(getHandleFromClientName(clientName) !== undefined) {
-        logging(loggingFilename, `Audience ${clientName} refused. Duplicated name`);
-        status.sendStatusDuplicateName(ws);
-        return;
+    } else {
+        clientActiveStateList.set(clientName, false);
+        clientAudienceList.set(clientName, true);
+        clientUniqueNameSet.add(clientName);
+        logging(loggingFilename, `Audience ${clientName} authorized`);
+        if(isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} authorized`)
+        status.sendStatusAccepted(ws);
+        await restoreClient(ws, clientName);
     }
-
-    allocateAudience(ws,clientName);
-    logging(loggingFilename, `Audience ${clientName} authorized`);
-    status.sendStatusAccepted(ws);
 }
 
 async function handleStatusLogin(ws, jsonData) {
@@ -486,6 +480,7 @@ async function handleStatusLogin(ws, jsonData) {
         logging(loggingFilename, `Player ${clientName} authorized`);
         if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
         status.sendStatusAccepted(ws);
+        await restoreClient(ws, clientName);
     } else if(clientUniqueNameSet.has(clientName) && clientNameList.has(clientName)) {
         logging(loggingFilename, `Player ${clientName} refused. Duplicated name`);
         status.sendStatusDuplicateName(ws);
