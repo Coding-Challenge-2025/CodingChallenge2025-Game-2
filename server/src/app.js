@@ -211,14 +211,10 @@ function getRoundScore() {
 }
 
 async function prepareKeyImage(selectedObject) {
-    let base64Image = await imageUrlToBase64(selectedObject["image_url"]);
-    if(base64Image == null) {
-        loggingError(loggingFilename, "Failed to load keyword image, abort!");
-        process.exit(-1);
-    }
+    let imageUrl = selectedObject["image_url"];
     selectedKeywordObject = JSON.parse(JSON.stringify(selectedObject))
     selectedKeywordObject["image_url"] = undefined;
-    selectedKeywordObject["image"] = base64Image;
+    selectedKeywordObject["image"] = imageUrl;
 }
 
 function prepareClientKeyImage() {
