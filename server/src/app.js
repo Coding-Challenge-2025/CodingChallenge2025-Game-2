@@ -2,10 +2,19 @@
 
 import express from "express";
 import expressWs from "express-ws";
-import nodefs from 'node:fs/promises';
+import https from 'https';
+import nodefs from 'node:fs';
 import nodepath from 'node:path';
+
+//generate key: openssl req -newkey rsa:2048 -nodes -keyout domain.key -x509 -days 365 -out domain.crt
+const certOption = {
+    key: nodefs.readFileSync(process.cwd() + '/key/server.key'),
+    cert: nodefs.readFileSync(process.cwd() + '/key/server.crt')
+};
+
 const app = express();
-expressWs(app);
+const server = https.createServer(certOption, app);
+expressWs(app, server);
 
 import {
     questionsList, keywordsList,
@@ -21,6 +30,7 @@ import {
 import * as status from "./status.js"
 // import * as parser from "./argparse.js"
 import {GameStateFlag} from "./gamestateflag.js"
+
 
 const MAX_PLAYER = 4;
 const port = 3000;
@@ -850,7 +860,7 @@ async function waitingRoom() {
 
 async function main() {
     loggingFilename = await startLogging();
-    app.listen(port, () => {
+    server.listen(port, () => {
         serverRoomId = getRandomRoomId(4);
         logging(loggingFilename, `WebSocket server listening on port ${port}`);
         logging(loggingFilename, `Conenct with room ID ${serverRoomId}`);

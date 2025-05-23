@@ -43,7 +43,7 @@ function App() {
 
 const wsHost = window.location.hostname;
 const wsPort = '3000';
-const wsUrl = `ws://${wsHost}:${wsPort}`;
+const wsUrl = `wss://${wsHost}:${wsPort}`;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
