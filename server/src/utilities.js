@@ -1,7 +1,7 @@
 import nodefs from 'node:fs/promises';
 import nodepath from 'node:path';
-import https from 'node:https';
-import http from 'node:http';
+import { get as httpGet } from 'https';
+import { Buffer } from 'buffer';
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -75,6 +75,41 @@ export async function imageFileToBase64(filePath) {
         return `data:${mimeType};base64,${base64String}`;
     } catch(error) {
         console.error('Error converting image file to base64:', error);
+        return null;
+    }
+}
+
+export async function imageUrlToBase64(url) {
+    try {
+        let parsedUrl = new URL(url);
+
+        const imageBuffer = await new Promise((resolve) => {
+            const req = httpGet(url, (res) => {
+                if (res.statusCode !== 200) {
+                    loggingError(`Request failed with status ${res.statusCode}`);
+                    return resolve(null);
+                }
+
+                const chunks = [];
+                res.on('data', (chunk) => chunks.push(chunk));
+                res.on('end', () => resolve(Buffer.concat(chunks)));
+            });
+
+            req.on('error', (err) => {
+                loggingError(loggingFilename, `imageUrlToBase64 error: Request failed ${err.message}`);
+                resolve(null);
+            });
+
+            req.on('timeout', () => {
+                loggingError(loggingFilename, 'imageUrlToBase64 error: Request timed out');
+                req.destroy();
+                resolve(null);
+            });
+        });
+
+        return "data:image/png;base64," + imageBuffer?.toString('base64') ?? null;
+    } catch (err) {
+        loggingError(loggingFilename, `imageUrlToBase64 error: ${err.message}`);
         return null;
     }
 }

@@ -16,7 +16,7 @@ import {
     getRandomRoomId, getRandomIndex,
     randomShuffleArray, fixClientTimepoint, imageFileToBase64,
     waitForAnyKey, getLocalTimeISO8601, logging, startLogging,
-    loggingError
+    loggingError, imageUrlToBase64
 } from "./utilities.js";
 import * as status from "./status.js"
 // import * as parser from "./argparse.js"
@@ -82,6 +82,7 @@ let questionCounter = 0
 let currentPieceIndex
 
 let selectedKeywordObject;
+let clueIndex = -1;
 let selectedQuestionObject;
 
 export let loggingFilename;
@@ -217,9 +218,13 @@ function getRoundScore() {
 }
 
 async function prepareKeyImage(selectedObject) {
-    let base64Image = await imageFileToBase64("assets/"+selectedObject["image_dir"]);
+    let base64Image = await imageUrlToBase64(selectedObject["image_url"]);
+    if(base64Image == null) {
+        loggingError(loggingFilename, "Failed to load keyword image, abort!");
+        process.exit(-1);
+    }
     selectedKeywordObject = JSON.parse(JSON.stringify(selectedObject))
-    selectedKeywordObject["image_dir"] = undefined;
+    selectedKeywordObject["image_url"] = undefined;
     selectedKeywordObject["image"] = base64Image;
 }
 
@@ -368,7 +373,7 @@ function prepareAnswerQueue() {
     return answerQueueSending;
 }
 
-async function broadcastClue(keywordObject, clueIndex, doSendClue) {
+async function broadcastClue(keywordObject, doSendClue) {
     let clueWord = null;
     if(doSendClue) {
         clueWord = keywordObject["clues"][clueIndex];
@@ -376,7 +381,7 @@ async function broadcastClue(keywordObject, clueIndex, doSendClue) {
     } else logging(loggingFilename, `Do not open clue`);   
     gameState[gameState.length-1]["clue"] = clueWord;
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        status.sendStatusClue(wsObject, clueWord, clueIndex);
+        status.sendStatusClue(wsObject, clueWord, currentPieceIndex);
     })
 
     await Promise.all(sendPromises);
@@ -697,15 +702,17 @@ app.ws("/", (ws, req) => {
             }
             case status.STATUS_OPENCLUE: {
                 if(!isHost(ws)) break;
-                let piece_index =  currentPieceIndex;
-                if(clientMessage !== undefined && clientMessage["piece_index"] !== undefined) piece_index = clientMessage["piece_index"];
-                broadcastClue(selectedKeywordObject, piece_index, true);
+                // let piece_index =  currentPieceIndex;
+                // if(clientMessage !== undefined && clientMessage["piece_index"] !== undefined) piece_index = clientMessage["piece_index"];
+                // broadcastClue(selectedKeywordObject, piece_index, true);
+                broadcastClue(selectedKeywordObject, true);
                 break;
             }
             case status.STATUS_NOCLUE: {
-                if(!isHost(ws)) break;
-                let piece_index = clientMessage["piece_index"]
-                broadcastClue(selectedKeywordObject, piece_index, false);
+                // if(!isHost(ws)) break;
+                // let piece_index = clientMessage["piece_index"]
+                // broadcastClue(selectedKeywordObject, piece_index, false);
+                broadcastClue(selectedKeywordObject, false);
                 break;
             }
             case status.STATUS_GETLEADERBOARD: {
@@ -746,8 +753,9 @@ async function initGame() {
     currentPlayerCount = 0;
     clientList.length = 0;
     gameStateFlag.startGame = false;
+    clueIndex = -1;
     // Shuffle question for more randomness
-    randomShuffleArray(questionsList);
+    // randomShuffleArray(questionsList);
 }
 
 async function resolveAnswer(resolvedAnswerQueue) {
@@ -788,15 +796,16 @@ async function resolveAnswer(resolvedAnswerQueue) {
 async function choosePiece(piece_index) {
     clientAnswerCorrectList.clear();
     currentPieceIndex = piece_index;
-    let givenIndex = getRandomIndex(questionsList);
-    selectedQuestionObject = { ...questionsList[givenIndex] };
-    questionsList.splice(givenIndex, 1);
+    // let givenIndex = getRandomIndex(questionsList);
+    selectedQuestionObject = { ...questionsList[piece_index] };
+    // questionsList.splice(givenIndex, 1);
     let questionObject = await prepareClientQuestion(selectedQuestionObject, piece_index);
     let hostQuestionObject = prepareHostQuestion(selectedQuestionObject, piece_index);
     logging(loggingFilename, `Answer hint: ${selectedQuestionObject["answer"]}`);
     await broadcastQuestion(questionObject);
     await status.sendStatusHostQuestionLoad(hostHandle, hostQuestionObject);
     gameStateFlag.qload = true;
+    clueIndex++;
 }
 
 async function prepareClientQuestion(originalQuestionObject, questionIndex) {
@@ -831,10 +840,10 @@ async function startGame() {
         })
         gameStateFlag.startGame = true;
         permitKeywordAnswer = true;
-        await prepareKeyImage(keywordsList[getRandomIndex(keywordsList)]);
+        await prepareKeyImage(keywordsList[getRandomIndex(keywordsList)]);      //expect only 1 keyword object in production
         logging(loggingFilename, `Selected keyword: ${selectedKeywordObject["keyword"]}`)
         status.sendStatusNotify(hostHandle, `Selected keyword: ${selectedKeywordObject["keyword"]}`);
-        randomShuffleArray(selectedKeywordObject["clues"]);
+        // randomShuffleArray(selectedKeywordObject["clues"]);
         await broadcastKeywordProperties(selectedKeywordObject);
         await status.sendStatusHostKeyImage(hostHandle, selectedKeywordObject);
     }

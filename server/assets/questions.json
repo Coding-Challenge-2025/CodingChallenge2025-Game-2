@@ -9,8 +9,8 @@
             "answer": "$3$"
         },
         {
-            "question": "Let $x$ be the chemical symbol for o'er. Find $x$.",
-            "answer": "$H_2O$"
+            "question": "what is it? ![git blame yourself](https://upload.wikimedia.org/wikipedia/commons/c/cc/Merge-sort-example-300px.gif) lmao so ez",
+            "answer": "merge sort"
         },
         {
             "question": "What year did World War $x$ where $x = 2$ end?",
@@ -21,8 +21,8 @@
             "answer": "$13$"
         },
         {
-            "question": "Who is in France? Round your answer to $5$ characters.",
-            "answer": "Par$i$s :skull:"
+            "question": "Yukihiro Matsumoto created what?",
+            "answer": "Ruby"
         },
         {
             "question": "Calculate the area of a rectangle with length $5$ and width $3$.",
