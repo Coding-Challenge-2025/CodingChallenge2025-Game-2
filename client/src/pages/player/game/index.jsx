@@ -6,6 +6,7 @@ import AnswerCard from "../../../components/game/answerCard"
 import KeywordCard from "../../../components/game/keywordCard"
 import Panel from "../../../components/game/panel"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
+import AnswerBoard from "../../../components/answerBoard"
 
 export default function PlayerGame() {
   const { gameState, submitAnswer, submitKeyword, timeLeft } = useGameContext()
@@ -29,6 +30,11 @@ export default function PlayerGame() {
           {!gameState.question &&
             <Panel title="Waiting for host">
               Game will start soon, be ready!
+            </Panel>
+          }
+          {gameState.answerQueue.length > 0 &&
+            <Panel title="Player Answers">
+              <AnswerBoard answers={gameState.answerQueue} />
             </Panel>
           }
         </>

@@ -127,13 +127,22 @@ const gameReducer = (state, action) => {
       return { ...state, phase: GamePhase.QUESTION_RESULTS, players: action.message };
     case ServerMessageType.QUESTION_START:
       return { ...state, timeStart: Date.now(), timeAllotted: action.message.time };
-    case ServerMessageType.CHECK_ANSWER:
+    case ServerMessageType.CHECK_ANSWER: {
+      let answerQueue = state.answerQueue;
+      if (answerQueue.length > 0) {
+        answerQueue = answerQueue.map((item) => {
+          let correct = item.name === action.message.name ? !!action.message.correct : item.correct;
+          return { ...item, correct: correct };
+        });
+      }
       return {
         ...state, question: {
           ...state.question, correct: action.message.correct,
           answer: action.message.correct_answer
         },
+        answerQueue: answerQueue,
       };
+    }
     case ServerMessageType.QUESTION_RESULTS:
       return {
         ...state, phase: GamePhase.QUESTION_RESULTS,
