@@ -1,6 +1,11 @@
 import clsx from "clsx";
+import { useEffect } from "react";
 
 export default function KeywordBoard({ keywords }) {
+  useEffect(() => {
+    new Audio("/buzzer.mp3").play();
+  }, []);
+
   return (
     <div className="w-full">
       <div className="space-y-1">
