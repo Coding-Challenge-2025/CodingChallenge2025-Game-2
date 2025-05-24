@@ -1,4 +1,5 @@
-//Server send ACCEPT DENIED NOTIFY for all agents
+//Send {name: string, id: string, score: integer}
+export const STATUS_LOGIN = "LOGIN"
 export const STATUS_ACCEPT = "ACCEPT";
 export const STATUS_DENIED = "DENIED";
 export const STATUS_NOTIFY = "NOTIFY";
@@ -12,10 +13,16 @@ export const STATUS_QUESTIONLOAD = "QLOAD";
 export const STATUS_QUESTIONRUN = "QRUN";
 export const STATUS_CLUE = "CLUE"; 
 export const STATUS_CHECKANSWER = "ANSCHECK"
-export const STATUS_CHECKKEYWORD = "KEYCHECK"
+// export const STATUS_CHECKKEYWORD = "KEYCHECK"
 export const STATUS_ROUNDSCORE = "ROUNDSCORE"
 export const STATUS_LEADERBOARD = "LEADERBOARD"
+
+//Send {name: string, keyword: string}
+export const STATUS_NOTIFYKEYWORD = "KEYNOTIFY"
+//Send {name: string, keyword: string}
 export const STATUS_SHOWKEYWORD = "KEYSHOW"
+//Send {name: string, keyword: string, correct: bool}
+export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
 
 //Server send these to Host UI 
 //Notify the host with a string message
@@ -25,7 +32,6 @@ export const STATUS_HOSTQUESTIONLOAD = "HOSTQLOAD"
 //Send {image: base64string, keyword: string}
 export const STATUS_HOSTKEYIMAGE = "HOSTKEYIMG"
 //Send {name: string, keyword: string}
-export const STATUS_HOSTNOTIFYKEYWORD = "KEYNOTIFY"
 //time's up
 export const STATUS_HOSTNOTIFYTIMESUP = "TIMESUP"
 //Send {audiences: array of string, players: array of string}
@@ -35,8 +41,7 @@ export const STATUS_HOSTANSWERQUEUE = "ANSQUEUE"
 //Server also send STATUS_CLUE, STATUS_ROUNDSCORE, STATUS_LEADERBOARD
 
 //Player send these
-//Send {name: string, id: string, score: integer}
-export const STATUS_LOGIN = "LOGIN"
+
 //Send {answer: string}
 export const STATUS_ANSWER = "ANSWER"
 //Send {keyword: string}
@@ -57,8 +62,6 @@ export const STATUS_CHOOSEPIECE = "CHOOSEPIECE"
 //Host send to start question
 export const STATUS_HOSTQUESTIONRUN = "HOSTQRUN"
 //Send STATUS_SHOWKEYWORD {name: string, keyword: string}
-//Send array of {name: string, correct}
-export const STATUS_KEYWORDRESOLVE = "KEYRESOLVE"
 //set the checked answer, broadcast to client correct/incorrect
 export const STATUS_ANSWERRESOLVE = "ANSRESOLVE"
 export const STATUS_GETROUNDSCORE = "GETROUNDSCORE"
@@ -154,9 +157,8 @@ export async function sendStatusShowKeyword(wsObject, keywordObject) {
     await sendStatus(wsObject, STATUS_SHOWKEYWORD, keywordObject); 
 }
 
-//{correct: 0 or 1}
 export async function sendStatusCheckKeyword(wsObject, checkObject) {
-    await sendStatus(wsObject, STATUS_CHECKKEYWORD, checkObject);
+    await sendStatus(wsObject, STATUS_KEYWORDRESOLVE, checkObject);
 }
 
 //{clue: string, piece_index: int}
@@ -182,8 +184,8 @@ export async function sendStatusHostKeyImage(wsObject, hostkeyImageObject) {
     await sendStatus(wsObject, STATUS_HOSTKEYIMAGE, hostkeyImageObject);
 }
 
-export async function sendStatusHostNotifyKeyword(wsObject, keywordObject) {
-    await sendStatus(wsObject, STATUS_HOSTNOTIFYKEYWORD, keywordObject);
+export async function sendStatusNotifyKeyword(wsObject, keywordObject) {
+    await sendStatus(wsObject, STATUS_NOTIFYKEYWORD, keywordObject);
 }
 
 export async function sendStatusHostNotifyTimesup(wsObject) {

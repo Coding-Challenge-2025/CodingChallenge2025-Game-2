@@ -283,7 +283,9 @@ async function broadcastQuestion(questionObject) {
 
 async function broadcastShowKeyword(keywordObject) {
     broadcastImpl((resolve, wsObject, playerName) => {
-        status.sendStatusShowKeyword(wsObject, keywordObject);
+        if(isPlayerAudience(playerName)) {
+            status.sendStatusShowKeyword(wsObject, keywordObject);
+        }
         resolve()
     });
 }
@@ -407,28 +409,27 @@ async function broadcastLeaderboard() {
     await Promise.all(sendPromises);
 }
 
-async function resolveKeyword(resolvedKeywordArray) {
+async function resolveKeyword(resolvedKeywordObject) {
     let foundWinner = false;
-
-    for(let ele of resolvedKeywordArray) {
-        let clientName = ele["name"];
-        let clientCorrect = ele["correct"];
-        let wsobj = getHandleFromClientName(clientName);
-        clientActiveStateList.set(clientName, false);
-        if(clientCorrect) {
-            if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
-            logging(loggingFilename, `Player ${clientName} correct keyword sent`);
-            updateClientScore(wsobj, (12-questionCounter)*10);
-            status.sendStatusCheckKeyword({"correct": 1});
-            status.sendStatusPlayerWin(wsobj);
-            foundWinner = true;
-        } else {
-            logging(loggingFilename, `Player ${clientName} incorrect keyword sent`);
-            status.sendStatusCheckKeyword({"correct": 0});
-            status.sendStatusPlayerLose(wsobj);
-        }
+    let clientName = resolvedKeywordObject["name"];
+    let clientCorrect = resolvedKeywordObject["correct"];
+    let wsobj = getHandleFromClientName(clientName);
+    clientActiveStateList.set(clientName, false);
+    broadcastImpl((resolve, wsObject, playerName) => {
+        status.sendStatusCheckKeyword(wsObject, resolvedKeywordObject);
+        resolve();
+    })
+    if(clientCorrect) {
+        if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
+        logging(loggingFilename, `Player ${clientName} correct keyword sent`);
+        updateClientScore(wsobj, (12-questionCounter)*10);
+        status.sendStatusPlayerWin(wsobj);
+        foundWinner = true;
+    } else {
+        logging(loggingFilename, `Player ${clientName} incorrect keyword sent`);
+        status.sendStatusPlayerLose(wsobj);
     }
-    keywordQueue.splice(0);
+
     return foundWinner;
 }
 
@@ -537,7 +538,7 @@ async function handleStatusKeyword(ws, jsonData) {
         keywordQueue.push(keywordObject);
         keywordAnswerRecord.set(clientName, clientKeyword);
         broadcastImpl((resolve, wsObject, playerName) => {
-            status.sendStatusHostNotifyKeyword(wsObject, keywordObject);
+            status.sendStatusNotifyKeyword(wsObject, keywordObject);
             resolve();
         })
     }
