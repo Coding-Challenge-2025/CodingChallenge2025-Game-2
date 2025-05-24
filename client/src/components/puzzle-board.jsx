@@ -20,7 +20,7 @@ export default function PuzzleBoard({ revealed, imageData }) {
             <span className="text-xl font-bold text-white">{index + 1}</span>
           </div>)}
       </div>
-      <div className="flex">
+      <div class="mt-1">
         {revealed.map((value, index) =>
           value && <Badge><Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>
             {value}

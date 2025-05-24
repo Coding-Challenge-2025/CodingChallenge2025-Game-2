@@ -12,6 +12,7 @@ body {
 }
 mjx-container {
   display: inline-grid;
+  align-items: center;
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
