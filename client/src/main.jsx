@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom'
 import routes from '~react-pages'
 import './index.css'
+import './prism.css'
 import { WebSocketProvider } from '@/hooks/useWebSocketContext';
 import { GameContextProvider } from '@/hooks/useGameContext'
 import { useGameContext } from './hooks/useGameContext'

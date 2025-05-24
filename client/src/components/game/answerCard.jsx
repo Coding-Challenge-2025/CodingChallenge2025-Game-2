@@ -5,12 +5,13 @@ import Markdown from "react-markdown"
 import remarkMath from "remark-math"
 import rehypeMathjax from "rehype-mathjax"
 import clsx from "clsx"
+import rehypePrismAll from "rehype-prism-plus/all";
 
 export default function AnswerCard({ children, currentQuestion, submitAnswer, timeLeft }) {
 	return (
 		<Panel title={`Question ${currentQuestion.id + 1}`} customStatus={<Timer timeLeft={timeLeft} />}>
 			<h3 className="text-lg p-4">
-				<Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>
+				<Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypePrismAll, rehypeMathjax]}>
 					{currentQuestion.text}
 				</Markdown>
 			</h3>

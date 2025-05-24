@@ -56,7 +56,7 @@ export default function PlayerGame() {
       {(gameState.phase === GamePhase.PLAY || gameState.phase === GamePhase.QUESTION_RESULTS)
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
-          questionsAnswered={10 + gameState.revealed.filter((x) => x !== false).length}
+          questionsAnswered={gameState.revealed.filter((x) => x !== false).length}
           submitKeyword={gameState.isPlayer ? submitKeyword : undefined}
           wrongKeywords={gameState.wrongKeywords} />
       }
