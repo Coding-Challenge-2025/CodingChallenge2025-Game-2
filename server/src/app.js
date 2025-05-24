@@ -20,16 +20,16 @@ import {
 } from "./utilities.js";
 import * as status from "./status.js"
 // import * as parser from "./argparse.js"
-import {GameStateFlag} from "./gamestateflag.js"
+import { GameStateFlag } from "./gamestateflag.js"
 
-const MAX_PLAYER = 4;
+const MAX_PLAYER = 420;
 const port = 3000;
 
 //Format: [wsobj, string]
-const clientList = new Map();               
+const clientList = new Map();
 
 //Format: [string, wsobj]
-const clientNameList = new Map();         
+const clientNameList = new Map();
 
 //Store boolean value determine if client 
 //is still able to participate in the game
@@ -70,7 +70,7 @@ const gameStateFlag = new GameStateFlag();
 
 let permitKeywordAnswer = false;
 const keywordQueue = [];
-const ANSWER_TIMEOUT = 20000 
+const ANSWER_TIMEOUT = 20000
 let globalTimer = ANSWER_TIMEOUT
 // const KEYWORD_CORRECT_POINT = 80
 
@@ -94,12 +94,12 @@ const hostName = "ADMIN"
 let hostHandle = undefined;
 
 function isHost(ws) {
-    if(!isHostActive()) return false;
+    if (!isHostActive()) return false;
     return hostHandle === ws ? true : false;
 }
 
 function isHostActive() {
-    return hostHandle === undefined ? false : true 
+    return hostHandle === undefined ? false : true
 }
 
 function allocateHost(ws) {
@@ -133,19 +133,19 @@ async function restoreClient(ws, clientName) {
     clientNameList.set(clientName, ws);
     currentPlayerCount++;
 
-    if(gameStateFlag.startGame) {
+    if (gameStateFlag.startGame) {
         await status.sendStatusGameStart(ws);
         await status.sendStatusLoadGameState(ws, gameState);
-        if(isHost(ws)) {
+        if (isHost(ws)) {
             await status.sendStatusKeyImage(ws, await selectedKeywordObject)
         } else {
             await status.sendStatusKeyImage(ws, await prepareClientKeyImage(selectedKeywordObject))
         }
     }
-    if(gameStateFlag.qload) {
+    if (gameStateFlag.qload) {
         await status.sendStatusLoadQuestion(ws, await prepareClientQuestion(selectedQuestionObject, currentPieceIndex))
     }
-    if(gameStateFlag.qrun) {
+    if (gameStateFlag.qrun) {
         await status.sendStatusRunQuestion(ws, globalTimer);
     }
 }
@@ -173,7 +173,7 @@ async function loadGameState(filename) {
 
 function updateClientScore(wsObj, scoreAdded) {
     const clientName = getClientNameFromHandle(wsObj);
-    if(clientScoreList.has(clientName)) {
+    if (clientScoreList.has(clientName)) {
         let currentClientScore = clientScoreList.get(clientName);
         currentClientScore += scoreAdded;
         clientScoreList.set(clientName, currentClientScore);
@@ -201,7 +201,7 @@ function isPlayerAudience(playerName) {
 function getLeaderboard() {
     let jsonLeaderboard = [];
     Array.from(clientScoreList).map(([clientName, score]) => {
-        jsonLeaderboard.push({"name": clientName, "score": score});
+        jsonLeaderboard.push({ "name": clientName, "score": score });
     })
     return jsonLeaderboard;
 }
@@ -265,11 +265,11 @@ async function broadcastQuestion(questionObject) {
         return new Promise(resolve => {
             status.sendStatusLoadQuestion(wsObject, questionObject)
 
-            if(isPlayerAudience(clientName)) {
+            if (isPlayerAudience(clientName)) {
                 logging(loggingFilename, `Question sent to audience ${clientName} for observation purpose`);
-            } else if(isHost(wsObject)) {
+            } else if (isHost(wsObject)) {
                 logging(loggingFilename, `Question sent to host for whatever purpose`);
-            } else if(isPlayerActive(clientName)) {
+            } else if (isPlayerActive(clientName)) {
                 logging(loggingFilename, `Question sent to player ${clientName}`)
             } else {
                 logging(loggingFilename, `Question sent to player ${clientName} for observation purpose`);
@@ -283,9 +283,7 @@ async function broadcastQuestion(questionObject) {
 
 async function broadcastShowKeyword(keywordObject) {
     broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(playerName)) {
-            status.sendStatusShowKeyword(wsObject, keywordObject);
-        }
+        status.sendStatusShowKeyword(wsObject, keywordObject);
         resolve()
     });
 }
@@ -295,14 +293,14 @@ async function broadcastSignalStartQuestion() {
 
     gameStateFlag.qrun = true;
     const clientsPromise = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(playerName) || isHost(wsObject)) {
+        if (isPlayerAudience(playerName) || isHost(wsObject)) {
             //Only send status, do not add to timer list
             status.sendStatusRunQuestion(wsObject, ANSWER_TIMEOUT);
             return resolve();
         }
         let serverStartTimepoint = Date.now();
         clientAnswerList.set(playerName, "");
-        clientTimerList.set(playerName, {"start_time": serverStartTimepoint});
+        clientTimerList.set(playerName, { "start_time": serverStartTimepoint });
         status.sendStatusRunQuestion(wsObject, ANSWER_TIMEOUT);
         resolve()
     })
@@ -313,10 +311,10 @@ async function broadcastSignalStartQuestion() {
             //audience doesn't in clientTimerList so they won't be caught here 
             const innerClientsPromise = Array.from(clientTimerList).map(([playerName, timerObject]) => {
                 let wsObject = getHandleFromClientName(playerName);
-                if(clientAnswerList.get(playerName) === "") {
-                    if(isPlayerActive(playerName)) logging(loggingFilename, `Player ${playerName} didn't send answer`);
+                if (clientAnswerList.get(playerName) === "") {
+                    if (isPlayerActive(playerName)) logging(loggingFilename, `Player ${playerName} didn't send answer`);
                     else logging(loggingFilename, `Player ${playerName} didn't send answer due to eliminated`);
-                    clientTimerList.set(playerName, {"start_time": timerObject["start_time"], "end_time": timerObject["start_time"]+ANSWER_TIMEOUT+1})
+                    clientTimerList.set(playerName, { "start_time": timerObject["start_time"], "end_time": timerObject["start_time"] + ANSWER_TIMEOUT + 1 })
                 }
             });
             Promise.all(innerClientsPromise);
@@ -329,21 +327,21 @@ async function broadcastSignalStartQuestion() {
         globalTimer = ANSWER_TIMEOUT
         const countdown = setInterval(() => {
             globalTimer -= countdownAmount
-            if(globalTimer <= 0) {
+            if (globalTimer <= 0) {
                 clearInterval(countdown)
                 promise();
             }
         }, countdownAmount);
     })
-    
+
     await Promise.all([timeoutPromise, timeoutPromise2, clientsPromise])
     gameStateFlag.qrun = false;
-    gameStateFlag.qload = false; 
+    gameStateFlag.qload = false;
     await status.sendStatusHostNotifyTimesup(hostHandle);
     let answerQueueSending = prepareAnswerQueue();
     await status.sendStatusHostAnswerQueue(hostHandle, answerQueueSending);
     await broadcastImpl((resolve, wsObject, playername) => {
-        if(isPlayerAudience(playername)) {
+        if (isPlayerAudience(playername)) {
             status.sendStatusHostAnswerQueue(wsObject, answerQueueSending);
             resolve();
         }
@@ -353,24 +351,24 @@ async function broadcastSignalStartQuestion() {
 function prepareAnswerQueue() {
     let answerQueueSending = [];
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
-        if(isPlayerAudience(playerName) || isHost(wsObject)) return;
+        if (isPlayerAudience(playerName) || isHost(wsObject)) return;
         const playerAnswer = clientAnswerList.get(playerName);
         const playerStartTimepoint = clientTimerList.get(playerName)["start_time"];
         const playerEndTimepoint = clientTimerList.get(playerName)["end_time"];
         const epoch = playerEndTimepoint - playerStartTimepoint;
-        answerQueueSending.push({"name": playerName, "answer": playerAnswer, "epoch": epoch, "point": 0});
+        answerQueueSending.push({ "name": playerName, "answer": playerAnswer, "epoch": epoch, "point": 0 });
     });
-    
+
     return answerQueueSending;
 }
 
 async function broadcastClue(keywordObject, doSendClue) {
     let clueWord = null;
-    if(doSendClue) {
+    if (doSendClue) {
         clueWord = keywordObject["clues"][clueIndex];
         logging(loggingFilename, `Do open clue: ${clueWord}`);
-    } else logging(loggingFilename, `Do not open clue`);   
-    gameState[gameState.length-1]["clue"] = clueWord;
+    } else logging(loggingFilename, `Do not open clue`);
+    gameState[gameState.length - 1]["clue"] = clueWord;
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         status.sendStatusClue(wsObject, clueWord, currentPieceIndex);
     })
@@ -383,10 +381,10 @@ function prepareRoundScore() {
     Array.from(clientAnswerList).map(([clientName, answer]) => {
         let startTime = clientTimerList.get(clientName)["start_time"];
         let endTime = clientTimerList.get(clientName)["end_time"];
-        let epochInSecond = (endTime - startTime)/1000;
+        let epochInSecond = (endTime - startTime) / 1000;
         let point = clientAnswerCorrectList.get(clientName) ? 10 : 0
         logging(loggingFilename, `${epochInSecond.toFixed(3)}s ~ ${clientName}: ${answer} => +${point}`);
-        roundScoreArray.push({"epoch": epochInSecond, "name": clientName, "answer": answer, "point": point});
+        roundScoreArray.push({ "epoch": epochInSecond, "name": clientName, "answer": answer, "point": point });
     })
 }
 
@@ -400,7 +398,7 @@ async function broadcastRoundScore() {
 }
 
 async function broadcastLeaderboard() {
-    let leaderboardJSONString = JSON.stringify(getLeaderboard()); 
+    let leaderboardJSONString = JSON.stringify(getLeaderboard());
     logging(loggingFilename, `Log leaderboard: ${leaderboardJSONString}`);
     const sendPromises = Array.from(clientList).map(([wsObject, playerName]) => {
         return status.sendStatusLeaderboard(wsObject, getLeaderboard());
@@ -419,10 +417,10 @@ async function resolveKeyword(resolvedKeywordObject) {
         status.sendStatusCheckKeyword(wsObject, resolvedKeywordObject);
         resolve();
     })
-    if(clientCorrect) {
-        if(foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
+    if (clientCorrect) {
+        if (foundWinner) loggingError(loggingFilename, "A player was decleared winner, now found another one?");
         logging(loggingFilename, `Player ${clientName} correct keyword sent`);
-        updateClientScore(wsobj, (12-questionCounter)*10);
+        updateClientScore(wsobj, (12 - questionCounter) * 10);
         status.sendStatusPlayerWin(wsobj);
         foundWinner = true;
     } else {
@@ -437,17 +435,17 @@ async function handleStatusAudienceLogin(ws, jsonData) {
     let clientName = jsonData["name"]
     let roomId = jsonData["id"]
     logging(loggingFilename, `Audience name: ${clientName} Audience ID: ${roomId}`);
-    if(roomId !== serverRoomId) {
+    if (roomId !== serverRoomId) {
         logging(loggingFilename, `Audience ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} refused: Invalid ID`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} refused: Invalid ID`)
         return;
     } else {
         clientActiveStateList.set(clientName, false);
         clientAudienceList.set(clientName, true);
         clientUniqueNameSet.add(clientName);
         logging(loggingFilename, `Audience ${clientName} authorized`);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} authorized`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Audience ${clientName} authorized`)
         status.sendStatusAccepted(ws);
         await restoreClient(ws, clientName);
     }
@@ -460,32 +458,32 @@ async function handleStatusLogin(ws, jsonData) {
 
     logging(loggingFilename, `Client name: ${clientName} Client ID: ${roomId}`);
 
-    if(roomId !== serverRoomId) {
+    if (roomId !== serverRoomId) {
         logging(loggingFilename, `Player ${clientName} unauthorized`);
         status.sendStatusInvalidID(ws);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Invalid ID`)
         return;
-    } else if(currentPlayerCount >= MAX_PLAYER) {
+    } else if (currentPlayerCount >= MAX_PLAYER) {
         logging(loggingFilename, `Player ${clientName} refused. Room is full!`);
         status.sendStatusRoomIsFull(ws);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Room is full!`)
         return;
-    } 
+    }
 
-    if(!clientUniqueNameSet.has(clientName)) {
+    if (!clientUniqueNameSet.has(clientName)) {
         allocateClient(ws, clientName, Number.isInteger(initialScore) ? initialScore : 0);
         logging(loggingFilename, `Player ${clientName} authorized`);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
         status.sendStatusAccepted(ws);
         await restoreClient(ws, clientName);
-    } else if(clientUniqueNameSet.has(clientName) && clientNameList.has(clientName)) {
+    } else if (clientUniqueNameSet.has(clientName) && clientNameList.has(clientName)) {
         logging(loggingFilename, `Player ${clientName} refused. Duplicated name`);
         status.sendStatusDuplicateName(ws);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} refused: Duplicated name`)
         return;
     } else {
         logging(loggingFilename, `Player ${clientName} authorized`);
-        if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
+        if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} authorized`)
         status.sendStatusAccepted(ws);
         await restoreClient(ws, clientName);
     }
@@ -494,11 +492,11 @@ async function handleStatusLogin(ws, jsonData) {
 async function handleStatusAnswer(ws, jsonData) {
     let serverEndTimePoint = Date.now();
     let clientName = getClientNameFromHandle(ws);
-    if(gameStateFlag.qrun && !isPlayerAudience(clientName)) {
-        if(jsonData["answer"] === undefined) {
+    if (gameStateFlag.qrun && !isPlayerAudience(clientName)) {
+        if (jsonData["answer"] === undefined) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} sent status without answer`)
             return;
-        } else if(!isPlayerActive(clientName)) {
+        } else if (!isPlayerActive(clientName)) {
             logging(loggingFilename, `status ANSWER: Player ${clientName} was eliminated, do not accept asnwer`)
             return;
         }
@@ -508,33 +506,33 @@ async function handleStatusAnswer(ws, jsonData) {
         let clientStartTimePoint = jsonData["start"];
         let clientEndTimePoint = jsonData["end"];
         let timePointObject = {
-            "server_start" : serverStartTimePoint,
-            "server_end"   : serverEndTimePoint,
-            "client_start" : clientStartTimePoint,
-            "client_end"   : clientEndTimePoint,
+            "server_start": serverStartTimePoint,
+            "server_end": serverEndTimePoint,
+            "client_start": clientStartTimePoint,
+            "client_end": clientEndTimePoint,
         };
         let flagAlreadyTimeout = fixClientTimepoint(timePointObject, ANSWER_TIMEOUT);
         console.log(timePointObject);
-        clientTimerList.set(clientName, {"start_time": timePointObject["client_start"], "end_time": timePointObject["client_end"]});
+        clientTimerList.set(clientName, { "start_time": timePointObject["client_start"], "end_time": timePointObject["client_end"] });
     }
 }
 
 async function handleStatusKeyword(ws, jsonData) {
     let clientName = getClientNameFromHandle(ws);
-    if(permitKeywordAnswer && !isPlayerAudience(clientName)) {
+    if (permitKeywordAnswer && !isPlayerAudience(clientName)) {
         let clientKeyword = jsonData["keyword"];
-        if(clientKeyword === undefined) {
+        if (clientKeyword === undefined) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} sent status without answer`)
             return;
-        } else if(!isPlayerActive(clientName)) {
+        } else if (!isPlayerActive(clientName)) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} was eliminated, do not accept keyword`)
             return;
-        } else if(keywordAnswerRecord.get(clientName)) {
+        } else if (keywordAnswerRecord.get(clientName)) {
             logging(loggingFilename, `status KEYWORD: Player ${clientName} already submitted keyword!`)
             return;
         }
         logging(loggingFilename, `Player ${clientName} sent keyword ${clientKeyword}`);
-        const keywordObject = {"name": clientName, "keyword": clientKeyword};
+        const keywordObject = { "name": clientName, "keyword": clientKeyword };
         keywordQueue.push(keywordObject);
         keywordAnswerRecord.set(clientName, clientKeyword);
         broadcastImpl((resolve, wsObject, playerName) => {
@@ -548,8 +546,8 @@ async function handleStatusHostLogin(ws, jsonData) {
     let roomId = jsonData["id"]
     let password = jsonData["password"];
     // if(roomId === serverRoomId && password === hostPassword) {   //frontend didn't like this lol
-    if(password === hostPassword) {
-        if(!gameStateFlag.hostEverLogin) {
+    if (password === hostPassword) {
+        if (!gameStateFlag.hostEverLogin) {
             gameStateFlag.hostEverLogin = true;
             allocateHost(ws)
             logging(loggingFilename, "Host authorized")
@@ -563,7 +561,7 @@ async function handleStatusHostLogin(ws, jsonData) {
             // await restoreClient(ws);
         }
     } else {
-        logging(loggingFilename, "Host failed to login");   
+        logging(loggingFilename, "Host failed to login");
         await status.sendStatusInvalidPassword(ws);
     }
 }
@@ -573,22 +571,22 @@ app.ws("/", (ws, req) => {
     logging(loggingFilename, `address ${clientRemoveAddress} connected`);
 
     ws.on("close", () => {
-        if(isHost(ws)) {
+        if (isHost(ws)) {
             logging(loggingFilename, "Host has disconnected!");
             releaseHost();
             return;
         }
         let clientName = getClientNameFromHandle(ws);
         if (clientList.has(ws)) {
-            if(isPlayerAudience(clientName)) {
+            if (isPlayerAudience(clientName)) {
                 logging(loggingFilename, `Audience ${clientName} disconnected`);
                 releaseAudience(ws);
                 return;
             }
-            if(isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} disconnected`)
+            if (isHostActive()) status.sendStatusNotify(hostHandle, `Player ${clientName} disconnected`)
             logging(loggingFilename, `Player ${clientName} disconnected`);
             releaseClient(ws);
-            if(gameStateFlag.startGame) {
+            if (gameStateFlag.startGame) {
                 logging(loggingFilename, `Player disconnected while already in-game. Must check!`);
                 //saveGameState()
                 //exit....
@@ -612,7 +610,7 @@ app.ws("/", (ws, req) => {
         let clientStatus = jsonData["status"];
         let clientMessage = jsonData["message"];
         //For now, all status from client have message data, so let it here
-        switch(clientStatus) {
+        switch (clientStatus) {
             case status.STATUS_LOGIN: {
                 handleStatusLogin(ws, clientMessage);
                 break;
@@ -634,17 +632,17 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_HOSTGAMESTART: {
-                if(isHost(ws)) startGame();
+                if (isHost(ws)) startGame();
                 break;
             }
             case status.STATUS_HOSTGAMEEND: {
-                if(!isHost(ws)) break;
+                if (!isHost(ws)) break;
                 permitKeywordAnswer = false;
                 gameStateFlag.startGame = false;
                 logging(loggingFilename, "Host requested end game!");
-                const wrapper = async() => {
+                const wrapper = async () => {
                     await broadcastLeaderboard();
-                    for(let client of clientList) {
+                    for (let client of clientList) {
                         status.sendStatusGameEnd(client[0], selectedKeywordObject);
                     }
                 }
@@ -652,13 +650,13 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_CHOOSEPIECE: {
-                if(!isHost(ws)) break;
+                if (!isHost(ws)) break;
                 let piece_index = clientMessage["piece_index"]
                 choosePiece(piece_index);
                 break;
             }
             case status.STATUS_HOSTQUESTIONRUN: {
-                if(!isHost(ws)) break;
+                if (!isHost(ws)) break;
                 broadcastSignalStartQuestion();
                 break;
             }
@@ -672,7 +670,7 @@ app.ws("/", (ws, req) => {
             }
 
             case status.STATUS_ANSWERRESOLVE: {
-                const tempWrapper = async() => {
+                const tempWrapper = async () => {
                     await resolveAnswer(clientMessage);
                     prepareRoundScore()
                 }
@@ -680,12 +678,12 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_SETSCORE: {
-                if(!isHost(ws)) break;
+                if (!isHost(ws)) break;
                 let clientName = clientMessage["name"]
                 let scoreToSet = clientMessage["score"];
-                if(Number.isInteger(scoreToSet)) {
+                if (Number.isInteger(scoreToSet)) {
                     let wsObject = getHandleFromClientName(clientName);
-                    if(wsObject !== undefined) {
+                    if (wsObject !== undefined) {
                         clientScoreList.set(wsObject, scoreToSet);
                         logging(loggingFilename, `Client ${clientName} score has been set to ${scoreToSet}`)
                     }
@@ -693,7 +691,7 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_OPENCLUE: {
-                if(!isHost(ws)) break;
+                if (!isHost(ws)) break;
                 // let piece_index =  currentPieceIndex;
                 // if(clientMessage !== undefined && clientMessage["piece_index"] !== undefined) piece_index = clientMessage["piece_index"];
                 // broadcastClue(selectedKeywordObject, piece_index, true);
@@ -716,14 +714,14 @@ app.ws("/", (ws, req) => {
                 break;
             }
             case status.STATUS_GETCLIENTS: {
-                if(!isHost(ws)) break;
-                const tempWrapper = async() => {
+                if (!isHost(ws)) break;
+                const tempWrapper = async () => {
                     let convertedClientsListObject = {};
                     convertedClientsListObject["audiences"] = []
                     convertedClientsListObject["players"] = []
                     Array.from(clientList).map(([wsObject, playerName]) => {
-                        if(isHost(wsObject)) return;
-                        else if(isPlayerAudience(playerName)) {
+                        if (isHost(wsObject)) return;
+                        else if (isPlayerAudience(playerName)) {
                             convertedClientsListObject["audiences"].push(playerName)
                         } else {
                             convertedClientsListObject["players"].push(playerName)
@@ -754,25 +752,25 @@ async function resolveAnswer(resolvedAnswerQueue) {
     let anyCorrect = false;
     const correctAnswer = selectedQuestionObject["answer"];
     let savedCheckList = [];
-    const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({name, correct}) => {
+    const sendPromisesPlayers = Array.from(resolvedAnswerQueue).map(({ name, correct }) => {
         let wsobj = getHandleFromClientName(name);
-        if(wsobj === undefined) return Promise.resolve();
-        if(correct) {
+        if (wsobj === undefined) return Promise.resolve();
+        if (correct) {
             updateClientScore(wsobj, 10)
             clientAnswerCorrectList.set(name, true)
             anyCorrect = true;
         } else {
             clientAnswerCorrectList.set(name, false)
         }
-        const tmpObj = {"name": name, "correct": correct, "correct_answer": correctAnswer};
+        const tmpObj = { "name": name, "correct": correct, "correct_answer": correctAnswer };
         savedCheckList.push(tmpObj);
         status.sendStatusCheckAnswer(wsobj, tmpObj);
         return Promise.resolve();
     })
 
     const sendPromisesAudiences = broadcastImpl((resolve, wsObject, playerName) => {
-        if(isPlayerAudience(playerName) || isHost(wsObject)) {
-            for(let tmpObj of savedCheckList) {
+        if (isPlayerAudience(playerName) || isHost(wsObject)) {
+            for (let tmpObj of savedCheckList) {
                 status.sendStatusCheckAnswer(wsObject, tmpObj);
             }
         }
@@ -780,8 +778,8 @@ async function resolveAnswer(resolvedAnswerQueue) {
     })
 
     questionCounter++;
-    gameState.push({"index": currentPieceIndex, "correct": anyCorrect});
-    
+    gameState.push({ "index": currentPieceIndex, "correct": anyCorrect });
+
     await Promise.all([sendPromisesPlayers, sendPromisesAudiences]);
 }
 
@@ -817,10 +815,10 @@ async function startGame() {
     // const startGamePlayerCount = MAX_PLAYER
     const startGamePlayerCount = 1;
     questionCounter = 0;
-    if(gameStateFlag.startGame) {
+    if (gameStateFlag.startGame) {
         logging(loggingFilename, "Host trying to start game, but game is already running!");
         status.sendStatusNotify(hostHandle, "game is already running");
-    } else if(currentPlayerCount < startGamePlayerCount) {
+    } else if (currentPlayerCount < startGamePlayerCount) {
         logging(loggingFilename, "Host trying to start game, but not enough player!");
         status.sendStatusNotify(hostHandle, "not enough player");
     } else {

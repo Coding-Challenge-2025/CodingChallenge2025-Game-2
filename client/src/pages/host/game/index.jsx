@@ -8,22 +8,27 @@ import { Button } from "@/components/ui/button"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
 import { useEffect, useState } from "react"
 import clsx from "clsx"
-import { Check, X } from "lucide-react"
+import { Check, Eye, X } from "lucide-react"
 
 export default function HostGame() {
-  const { gameState, timeLeft,
+  const {
+    gameState,
+    timeLeft,
+
     startGame,
     endGame,
     selectQuestion,
     startQuestion,
     revealClue,
     resolveAnswers,
-    resolveKeywords,
-    markAnswer,
-    markKeyword,
     revealRoundScore,
     revealLeaderboards,
-    requestClientList } = useGameContext()
+    markAnswer,
+    markKeyword,
+    requestClientList,
+
+    resolveKeyword,
+    revealPlayerKeyword, } = useGameContext()
 
   useEffect(() => {
     console.log(gameState)
@@ -80,11 +85,16 @@ export default function HostGame() {
           {gameState.keywordQueue.length > 0 &&
             <Panel title="Keyword Received">
               <div>
-                <Button onClick={resolveKeywords}>Announce Results</Button>
+                {/*<Button onClick={resolveKeywords}>Announce Results</Button>*/}
                 {gameState.keywordQueue.map((value, id) =>
-                  <Card key={value.name} className={clsx("p-2", value.correct && "bg-lime-400")}>
-                    {!value.correct && <Button onClick={() => markKeyword(id, true)}><Check /></Button>}
-                    {value.correct && <Button onClick={() => markKeyword(id, false)}><X /></Button>}
+                  <Card key={value.name} className="p-2">
+                    {value.correct === undefined &&
+                      <>
+                        <Button onClick={() => resolveKeyword(value.name, true)}><Check /></Button>
+                        <Button onClick={() => resolveKeyword(value.name, false)}><X /></Button>
+                      </>
+                    }
+                    {!value.visible && <Button onClick={() => revealPlayerKeyword(value.name)}><Eye /></Button>}
                     <div className="inline ml-2">{value.name}: <strong>{value.keyword}</strong></div>
                   </Card>)
                 }

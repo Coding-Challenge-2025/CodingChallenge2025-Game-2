@@ -20,7 +20,7 @@ const ServerMessageType = {
   QUESTION_RESULTS: "ROUNDSCORE",
   CLUE: "CLUE",
   CHECK_ANSWER: "ANSCHECK",
-  CHECK_KEYWORD: "KEYCHECK",
+  CHECK_KEYWORD: "KEYRESOLVE",
   GAME_START: "START",
   GAME_END: "END",
   PLAYER_WIN: "WIN",
@@ -28,7 +28,7 @@ const ServerMessageType = {
   SHOW_KEYWORD: "KEYSHOW",
 
   HOST_KEYWORD_PROPERTIES: "HOSTKEYIMG",
-  HOST_KEYWORD_NOTIFY: "KEYNOTIFY",
+  KEYWORD_NOTIFY: "KEYNOTIFY",
   HOST_ANSWER_QUEUE: "ANSQUEUE",
   HOST_CLIENT_LIST: "CLIENTSLIST",
   HOST_QUESTION_LOAD: "HOSTQLOAD",
@@ -47,7 +47,7 @@ const ClientMessageType = {
   SELECT_QUESTION: "CHOOSEPIECE",
   START_QUESTION: "HOSTQRUN",
   OPEN_CLUE: "OCLUE",
-  RESOLVE_KEYWORDS: "KEYRESOLVE",
+  RESOLVE_KEYWORD: "KEYRESOLVE",
   RESOLVE_ANSWERS: "ANSRESOLVE",
   SHOW_KEYWORD: "KEYSHOW",
   REVEAL_ROUND_SCORE: "GETROUNDSCORE",
@@ -58,7 +58,7 @@ const ClientMessageType = {
 const InternalMessageType = {
   SET_AUDIENCE: "SET_AUDIENCE",
   CLEAR_ANSWER_QUEUE: "CLEAR_ANSWER_QUEUE",
-  CLEAR_KEYWORD_QUEUE: "CLEAR_KEYWORD_QUEUE",
+  UPDATE_KEYWORD_QUEUE: "UPDATE_KEYWORD_QUEUE",
   MARK_ANSWER: "MARK_ANSWER",
   MARK_KEYWORD: "MARK_KEYWORD",
   REVEAL_ALL_CLUES: "REVEAL_ALL_CLUES",
@@ -109,6 +109,9 @@ const gameReducer = (state, action) => {
         }, timeStart: undefined,
         revealed: revealed,
         keywords: undefined, answers: undefined, answerQueue: [],// host
+        wrongKeywords: [...state.wrongKeywords,
+        ...state.keywordQueue.filter(x => !x.correct).map(x => x.keyword)],
+        keywordQueue: [],
       };
     }
     case ServerMessageType.HOST_KEYWORD_PROPERTIES:
@@ -148,14 +151,27 @@ const gameReducer = (state, action) => {
         ...state, phase: GamePhase.QUESTION_RESULTS,
         questionsAnswered: state.questionsAnswered + 1, players: action.message
       };
-    case ServerMessageType.HOST_KEYWORD_NOTIFY:
+    case ServerMessageType.KEYWORD_NOTIFY:
       return { ...state, keywordQueue: [...state.keywordQueue, action.message] };
     case ServerMessageType.HOST_ANSWER_QUEUE:
       return { ...state, answerQueue: action.message };
     case ServerMessageType.HOST_CLIENT_LIST:
       return { ...state, connectedPlayers: action.message.players };
+    case ServerMessageType.CHECK_KEYWORD:
+      return {
+        ...state, keywordQueue: state.keywordQueue.map((item) => {
+          let correct = item.name === action.message.name ? !!action.message.correct : item.correct;
+          return { ...item, correct: correct };
+        })
+      };
     case ServerMessageType.SHOW_KEYWORD:
-      return { ...state, wrongKeywords: [...state.wrongKeywords, action.message.keyword] };
+      return {
+        ...state, keywordQueue: state.keywordQueue.map((item) => {
+          if (item.name === action.message.name)
+            return { ...item, visible: true };
+          return { ...item };
+        })
+      };
     case InternalMessageType.SET_AUDIENCE:
     case ServerMessageType.PLAYER_WIN:
     case ServerMessageType.PLAYER_LOSE:
@@ -163,8 +179,8 @@ const gameReducer = (state, action) => {
 
     case InternalMessageType.CLEAR_ANSWER_QUEUE:
       return { ...state, answerQueue: [] };
-    case InternalMessageType.CLEAR_KEYWORD_QUEUE:
-      return { ...state, keywordQueue: [] };
+    // case InternalMessageType.UPDATE_KEYWORD_QUEUE:
+    //   return { ...state, keywordQueue: [] };
     case InternalMessageType.MARK_ANSWER: {
       let queue = state.answerQueue.slice(0);
       queue[action.message.id].correct = action.message.value;
@@ -317,24 +333,20 @@ export const GameContextProvider = ({ children }) => {
     sendMessage({ status: ClientMessageType.RESOLVE_ANSWERS, message: gameState.answerQueue });
     dispatch({ status: InternalMessageType.CLEAR_ANSWER_QUEUE });
   });
-  const revealWrongKeyword = useCallback((keyword) => {
+  const revealPlayerKeyword = useCallback((name) => {
     if (!isConnected) {
-      console.log("revealWrongKeyword called but not connected.");
+      console.log("revealPlayerKeyword called but not connected.");
       return;
     }
-    sendMessage({ status: ClientMessageType.SHOW_KEYWORD, message: { keyword: keyword } });
+    sendMessage({ status: ClientMessageType.SHOW_KEYWORD, message: { name: name } });
   });
-  const resolveKeywords = useCallback(() => {
+  const resolveKeyword = useCallback((name, correct) => {
     if (!isConnected) {
-      console.log("resolveKeywords called but not connected.");
+      console.log("resolveKeyword called but not connected.");
       return;
     }
-    gameState.keywordQueue.forEach(({ keyword, correct }) => {
-      if (!correct)
-        revealWrongKeyword(keyword);
-    });
-    sendMessage({ status: ClientMessageType.RESOLVE_KEYWORDS, message: gameState.keywordQueue });
-    dispatch({ status: InternalMessageType.CLEAR_KEYWORD_QUEUE });
+    sendMessage({ status: ClientMessageType.RESOLVE_KEYWORD, message: { name: name, correct: correct } });
+    // dispatch({ status: InternalMessageType.UPDATE_KEYWORD_QUEUE, message: {name: name, correct: correct} });
   });
   const revealRoundScore = useCallback(() => {
     if (!isConnected) {
@@ -379,12 +391,14 @@ export const GameContextProvider = ({ children }) => {
     startQuestion,
     revealClue,
     resolveAnswers,
-    resolveKeywords,
     revealRoundScore,
     revealLeaderboards,
     markAnswer,
     markKeyword,
-    requestClientList
+    requestClientList,
+
+    resolveKeyword,
+    revealPlayerKeyword,
   };
 
   return (

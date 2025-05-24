@@ -7,6 +7,7 @@ import KeywordCard from "../../../components/game/keywordCard"
 import Panel from "../../../components/game/panel"
 import { useGameContext, GamePhase } from "../../../hooks/useGameContext"
 import AnswerBoard from "../../../components/answerBoard"
+import KeywordBoard from "../../../components/keywordBoard"
 
 export default function PlayerGame() {
   const { gameState, submitAnswer, submitKeyword, timeLeft } = useGameContext()
@@ -46,10 +47,16 @@ export default function PlayerGame() {
           {gameState.keyword && <h2 className="text-center font-bold text-xl m-4">{gameState.keyword}</h2>}
         </Panel>
       }
+      {gameState.phase !== GamePhase.GAME_COMPLETE && !gameState.isPlayer
+        && gameState.keywordQueue.length > 0 &&
+        <Panel title="Keyword Received">
+          <KeywordBoard keywords={gameState.keywordQueue} />
+        </Panel>
+      }
       {(gameState.phase === GamePhase.PLAY || gameState.phase === GamePhase.QUESTION_RESULTS)
         && gameState.keywordLength &&
         <KeywordCard keywordLength={gameState.keywordLength}
-          questionsAnswered={gameState.revealed.filter((x) => x !== false).length}
+          questionsAnswered={10 + gameState.revealed.filter((x) => x !== false).length}
           submitKeyword={gameState.isPlayer ? submitKeyword : undefined}
           wrongKeywords={gameState.wrongKeywords} />
       }
