@@ -1,10 +1,10 @@
 {
-    "keywords":
-    [
-      {
-        "image_url": "https://upload.wikimedia.org/wikipedia/en/thumb/2/22/Heckert_GNU_white.svg/535px-Heckert_GNU_white.svg.png",
-        "keyword": "GNU",
-        "clues": ["FOSS", "copyleft", "$Linux$", "Free Software Foundation", "Hurd", "coreutils", "GPL", "popular compiler", "Richard Stallman", "glibc", "wildebeest", "is not unix"]
-      }
-    ]
+  "keywords":
+  [
+    {
+      "image_url": "https://www.ritchievink.com/img/post-5-fft/fig_2.png",
+      "keyword": "FFT",
+      "clues": ["Joseph", "Bignum", "$O(N \\cdot \\log{N})$", "Discrete", "DnC", "$998244353$ vs. $10^9 + 7$", "Algorithm", "Convolution", "Seperate pure waves", "Vandermonde matrix", "Detect nuclear weapons", "Root of unity"]
+    }
+  ]
 }
