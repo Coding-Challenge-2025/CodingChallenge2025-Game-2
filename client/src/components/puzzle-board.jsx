@@ -1,6 +1,10 @@
 import clsx from 'clsx';
 import { Badge } from "@/components/ui/badge"
 
+import Markdown from "react-markdown"
+import remarkMath from "remark-math"
+import rehypeMathjax from "rehype-mathjax"
+
 export default function PuzzleBoard({ revealed, imageData }) {
   return (
     <div>
@@ -16,8 +20,12 @@ export default function PuzzleBoard({ revealed, imageData }) {
             <span className="text-xl font-bold text-white">{index + 1}</span>
           </div>)}
       </div>
-      {revealed.map((value, index) =>
-        value && <Badge>{value}</Badge>)}
+      <div className="flex">
+        {revealed.map((value, index) =>
+          value && <Badge><Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>
+            {value}
+          </Markdown></Badge>)}
+      </div>
     </div>
   );
 }
