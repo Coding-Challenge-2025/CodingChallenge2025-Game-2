@@ -8,7 +8,7 @@ export default function GameLayout({ children, revealed, imageData, notification
       <div className={clsx(
         "min-h-screen max-w-full mx-auto p-2 gap-2",
         !isPlayer && "items-center")}>
-        <img src="/header2.png" className="mx-auto mb-4 w-2/3" />
+        <img src="/header3.png" className="mx-auto mb-4 w-2/3" />
         <div className={clsx("grid grid-cols-1 md:grid-cols-2",
           !isPlayer && "items-center")}>
           {/* Left column - Puzzle */}
